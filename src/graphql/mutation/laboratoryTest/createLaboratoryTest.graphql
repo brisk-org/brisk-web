@@ -1,0 +1,15 @@
+mutation CreateLaboratoryTest(
+  $cardId: ID!
+  $result: [LaboratoryTestInput!]!
+  $price: Float!
+) {
+  createLaboratoryTest(
+    input: { cardId: $cardId, result: $result, price: $price }
+  ) {
+    id
+    card {
+      name
+    }
+    price
+  }
+}

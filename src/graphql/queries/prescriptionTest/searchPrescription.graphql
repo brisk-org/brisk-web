@@ -1,0 +1,18 @@
+query SearchPrescriptionTests($term: String!, $skip: Float!, $take: Float!) {
+  searchPrescriptionTests(term: $term, skip: $skip, take: $take) {
+    id
+    card {
+      id
+      name
+      age
+      gender
+    }
+    result
+    paid
+    price
+    completed
+    new
+    rx
+    created_at
+  }
+}

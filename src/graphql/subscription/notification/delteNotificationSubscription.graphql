@@ -1,0 +1,5 @@
+subscription DeleteNotificationSubscription {
+  deleteNotificationSubscription {
+    id
+  }
+}

@@ -1,0 +1,3 @@
+mutation DeleteNotification($id: ID!) {
+  deleteNotification(id: $id)
+}

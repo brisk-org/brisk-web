@@ -1,0 +1,22 @@
+mutation ChangeUserDetail(
+  $username: String!
+  $password: String!
+  $newName: String
+) {
+  changeUserDetail(
+    username: $username
+    password: $password
+    newName: $newName
+  ) {
+    errors {
+      field
+      message
+    }
+    user {
+      id
+      username
+      occupation
+    }
+    token
+  }
+}

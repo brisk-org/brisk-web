@@ -1,0 +1,7 @@
+mutation MarkCardAsSeen($id: ID!) {
+  markCardAsSeen(id: $id) {
+    id
+    new
+    name
+  }
+}

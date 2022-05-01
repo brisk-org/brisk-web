@@ -1,0 +1,21 @@
+mutation ChangeSetting(
+  $card_price: Float!
+  $card_expiration_date: Float!
+  $laboratory_tests_data: [LaboratoryTestSettingInput!]!
+  $prescription_tests_data: [PrescriptionInput!]!
+) {
+  changeSetting(
+    setting: {
+      card_price: $card_price
+      card_expiration_date: $card_expiration_date
+      laboratory_tests_data: $laboratory_tests_data
+      prescription_tests_data: $prescription_tests_data
+    }
+  ) {
+    id
+    card_price
+    card_expiration_date
+    laboratory_tests_data
+    prescription_tests_data
+  }
+}

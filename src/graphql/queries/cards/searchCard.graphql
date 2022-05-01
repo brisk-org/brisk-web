@@ -1,0 +1,21 @@
+query SearchCards($name: String, $phone: String, $skip: Float!, $take: Float!) {
+  searchCards(name: $name, phone: $phone, skip: $skip, take: $take) {
+    id
+    name
+    new
+    phone
+    age
+    gender
+    valid
+    address
+    k_ketema
+    kebele
+    house_no
+    history {
+      id
+      created_at
+    }
+    created_at
+    updated_at
+  }
+}

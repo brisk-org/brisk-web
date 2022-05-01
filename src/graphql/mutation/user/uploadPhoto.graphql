@@ -1,0 +1,10 @@
+# mutation UploadPhoto($id: ID!, $files: Upload!) {
+#   uploadPhoto(id: $id, files: $files) {
+#     id
+#     username
+#     occupation
+#     work_hours
+#     image_url
+#     created_at
+#   }
+# }

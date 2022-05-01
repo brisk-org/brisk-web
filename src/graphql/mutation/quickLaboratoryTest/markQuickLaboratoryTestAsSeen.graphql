@@ -1,0 +1,6 @@
+mutation MarkQuickLaboratoryTestAsSeen($id: ID!) {
+  markQuickLaboratoryTestAsSeen(id: $id) {
+    id
+    new
+  }
+}

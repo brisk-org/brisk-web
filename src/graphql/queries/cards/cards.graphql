@@ -1,0 +1,21 @@
+query Cards($skip: Float!, $take: Float!, $from: String, $to: String) {
+  cards(skip: $skip, take: $take, from: $from, to: $to) {
+    id
+    name
+    new
+    phone
+    age
+    gender
+    valid
+    address
+    k_ketema
+    kebele
+    house_no
+    history {
+      id
+      created_at
+    }
+    created_at
+    updated_at
+  }
+}

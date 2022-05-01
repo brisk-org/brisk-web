@@ -1,0 +1,13 @@
+subscription NewNotificationSubscription {
+  newNotificationSubscription {
+    id
+    desc
+    card_id
+    laboratory_test_id
+    prescription_test_id
+    quick_laboratory_test_id
+    quick_prescription_test_id
+    action
+    created_at
+  }
+}

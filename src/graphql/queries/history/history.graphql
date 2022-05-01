@@ -1,0 +1,7 @@
+query History($id: ID!) {
+  history(id: $id) {
+    id
+    result
+    created_at
+  }
+}

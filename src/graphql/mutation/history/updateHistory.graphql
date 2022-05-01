@@ -1,0 +1,7 @@
+mutation UpdateHistory($id: ID!, $result: String!) {
+  updateHistory(id: $id, result: $result) {
+    id
+    result
+    created_at
+  }
+}

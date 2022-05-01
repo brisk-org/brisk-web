@@ -1,0 +1,8 @@
+mutation MarkLaboratoryTestAsSeen($id: ID!) {
+  markLaboratoryTestAsSeen(id: $id) {
+    id
+    card {
+      name
+    }
+  }
+}

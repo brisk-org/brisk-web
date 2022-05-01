@@ -1,0 +1,17 @@
+mutation CreateQuickPrescriptionTest(
+  $name: String!
+  $result: QuickPrescriptionTestResults!
+  $price: Float
+  $other: String
+) {
+  createQuickPrescriptionTest(
+    input: { name: $name, price: $price, result: $result, other: $other }
+  ) {
+    id
+    name
+    price
+    result
+    other
+    created_at
+  }
+}

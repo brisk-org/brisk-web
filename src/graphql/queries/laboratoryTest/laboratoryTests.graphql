@@ -1,0 +1,15 @@
+query LaboratoryTests($skip: Float!, $take: Float!) {
+  laboratoryTests(skip: $skip, take: $take) {
+    id
+    paid
+    price
+    new
+    completed
+    card {
+      id
+      name
+    }
+    created_at
+    updated_at
+  }
+}

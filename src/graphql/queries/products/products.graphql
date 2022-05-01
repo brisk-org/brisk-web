@@ -1,0 +1,10 @@
+query Products($skip: Float!, $take: Float!) {
+  products(skip: $skip, take: $take) {
+    id
+    name
+    desc
+    price
+    created_at
+    updated_at
+  }
+}

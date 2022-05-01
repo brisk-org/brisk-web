@@ -1,0 +1,13 @@
+subscription NewCreatedQuickPrescriptionTest {
+  newCreatedQuickPrescriptionTest {
+    id
+    name
+    price
+    paid
+    completed
+    new
+    result
+    created_at
+    updated_at
+  }
+}

@@ -1,0 +1,14 @@
+query QuickLaboratoryTests($skip: Float!, $take: Float!) {
+  quickLaboratoryTests(skip: $skip, take: $take) {
+    id
+    name
+    price
+    paid
+    completed
+    new
+    result
+    other
+    created_at
+    updated_at
+  }
+}

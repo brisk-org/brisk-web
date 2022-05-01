@@ -1,0 +1,18 @@
+query LaboratoryTest($id: ID!) {
+  laboratoryTest(id: $id) {
+    id
+    paid
+    completed
+    new
+    price
+    result
+    cardId
+    card {
+      name
+      phone
+      age
+      gender
+    }
+    created_at
+  }
+}

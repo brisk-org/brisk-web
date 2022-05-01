@@ -1,0 +1,7 @@
+mutation InvalidateCard($id: ID!) {
+  invalidateCard(id: $id) {
+    id
+    name
+    valid
+  }
+}

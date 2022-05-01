@@ -1,0 +1,8 @@
+query AllUsers {
+  allUsers {
+    id
+    username
+    occupation
+    created_at
+  }
+}

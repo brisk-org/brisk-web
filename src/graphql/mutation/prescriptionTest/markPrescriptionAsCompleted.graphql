@@ -1,0 +1,6 @@
+mutation MarkPrescriptionTestAsCompleted($id: ID!) {
+  markPrescriptionTestAsCompleted(id: $id) {
+    id
+    new
+  }
+}

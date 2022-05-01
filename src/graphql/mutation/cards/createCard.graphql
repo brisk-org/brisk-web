@@ -1,0 +1,37 @@
+mutation CreateCard(
+  $name: String!
+  $phone: String!
+  $age: String!
+  $gender: String!
+  $address: String
+  $house_no: String
+  $k_ketema: String
+  $kebele: String
+) {
+  createCard(
+    profile: {
+      name: $name
+      phone: $phone
+      gender: $gender
+      age: $age
+      kebele: $kebele
+      k_ketema: $k_ketema
+      house_no: $house_no
+      address: $address
+    }
+  ) {
+    id
+    name
+    new
+    phone
+    age
+    gender
+    valid
+    address
+    k_ketema
+    kebele
+    house_no
+    created_at
+    updated_at
+  }
+}

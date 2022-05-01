@@ -1,0 +1,17 @@
+{
+  "env": {
+    "commonjs": false,
+    "es6": true,
+    "node": true
+  },
+  "extends": "react-app",
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+  "plugins": ["react"],
+  "rules": {
+    "no-console": "off",
+    "no-eval": "error",
+    "import/first": "error"
+  }
+}

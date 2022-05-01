@@ -1,0 +1,18 @@
+query PrescriptionTest($id: ID!) {
+  prescriptionTest(id: $id) {
+    id
+    card {
+      id
+      name
+      age
+      gender
+    }
+    result
+    paid
+    price
+    completed
+    new
+    rx
+    created_at
+  }
+}

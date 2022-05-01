@@ -1,0 +1,20 @@
+mutation CompleteQuickLaboratoryTest(
+  $id: String!
+  $price: Float
+  $other: String
+) {
+  completeQuickLaboratoryTest(
+    id: $id
+    input: { price: $price, other: $other }
+  ) {
+    id
+    name
+    price
+    paid
+    completed
+    new
+    result
+    created_at
+    updated_at
+  }
+}

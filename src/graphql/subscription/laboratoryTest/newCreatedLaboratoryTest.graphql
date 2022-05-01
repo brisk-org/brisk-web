@@ -1,0 +1,16 @@
+subscription NewCreatedLaboratoryTest {
+  newCreatedLaboratoryTest {
+    id
+    paid
+    price
+    new
+    result
+    completed
+    card {
+      id
+      name
+    }
+    created_at
+    updated_at
+  }
+}

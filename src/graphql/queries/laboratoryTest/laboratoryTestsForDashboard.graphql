@@ -1,0 +1,10 @@
+query LaboratoryTestsForDashboard($skip: Float!, $take: Float!) {
+  laboratoryTests(skip: $skip, take: $take) {
+    id
+    result
+    price
+    paid
+    updated_at
+    created_at
+  }
+}

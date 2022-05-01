@@ -1,0 +1,50 @@
+query Card($id: ID!) {
+  card(id: $id) {
+    id
+    name
+    new
+    phone
+    age
+    gender
+    address
+    k_ketema
+    kebele
+    house_no
+    payment {
+      price
+      created_at
+    }
+    prescription_tests {
+      id
+      cardId
+      result
+      paid
+      price
+      completed
+      new
+      rx
+      created_at
+      updated_at
+    }
+    laboratory_tests {
+      id
+      cardId
+      result
+      paid
+      new
+      completed
+      price
+      created_at
+      updated_at
+    }
+    history {
+      id
+      result
+      cardId
+      created_at
+      updated_at
+    }
+    created_at
+    updated_at
+  }
+}

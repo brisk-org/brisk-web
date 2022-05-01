@@ -1,0 +1,9 @@
+query Setting {
+  setting {
+    id
+    card_price
+    card_expiration_date
+    laboratory_tests_data
+    prescription_tests_data
+  }
+}

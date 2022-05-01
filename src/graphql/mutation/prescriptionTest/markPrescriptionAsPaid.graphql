@@ -1,0 +1,6 @@
+mutation MarkPrescriptionTestAsPaid($id: ID!) {
+  markPrescriptionTestAsPaid(id: $id) {
+    id
+    paid
+  }
+}

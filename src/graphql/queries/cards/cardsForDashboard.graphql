@@ -1,0 +1,18 @@
+query CardsForDashboard(
+  $skip: Float!
+  $take: Float!
+  $from: String
+  $to: String
+) {
+  cards(skip: $skip, take: $take, from: $from, to: $to) {
+    id
+    age
+    gender
+    payment {
+      id
+      created_at
+      price
+    }
+    created_at
+  }
+}

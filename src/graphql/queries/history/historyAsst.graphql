@@ -1,0 +1,11 @@
+query HistoryAsst($startingDate: String!, $endingDate: String!) {
+  weeklyHistory(startingDate: $startingDate, endingDate: $endingDate) {
+    result
+    card {
+      id
+      name
+      age
+    }
+    created_at
+  }
+}

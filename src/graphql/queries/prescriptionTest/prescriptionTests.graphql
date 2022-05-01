@@ -1,0 +1,18 @@
+query PrescriptionTests($skip: Float!, $take: Float!) {
+  prescriptionTests(skip: $skip, take: $take) {
+    id
+    card {
+      id
+      name
+      age
+      gender
+    }
+    paid
+    price
+    completed
+    new
+    rx
+    created_at
+    updated_at
+  }
+}

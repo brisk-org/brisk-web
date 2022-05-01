@@ -1,0 +1,16 @@
+subscription NewCreatedPrescriptionTest {
+  newCreatedPrescriptionTest {
+    id
+    card {
+      id
+      name
+    }
+    paid
+    price
+    completed
+    new
+    rx
+    created_at
+    updated_at
+  }
+}
