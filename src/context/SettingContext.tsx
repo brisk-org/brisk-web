@@ -74,8 +74,6 @@ const SettingsProvider: React.FC = ({ children }) => {
     setPrescriptionTestSettingData(prescriptionRateData);
   }, [data, loading]);
 
-  const handleChange = () => {};
-
   return (
     <SettingsContext.Provider
       value={{

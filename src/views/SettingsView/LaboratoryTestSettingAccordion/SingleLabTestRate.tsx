@@ -11,7 +11,13 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Close, Edit } from '@mui/icons-material';
-import { LaboratorySettingDataType } from '../../context/SettingContext';
+import { LaboratorySettingDataType } from '../../../context/SettingContext';
+import {
+  LaboratoryTestCatagories,
+  LaboratoryTestDetails,
+  SubCategoryLaboratoryTestDetails
+} from '../../../data/testsSeed';
+import { Action } from './LaboratoryCategoriesAccordion';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -26,64 +32,61 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface SingleRateProps {
-  name: string;
-  price: number;
-  normalValue: string | undefined;
-  setTests: React.Dispatch<React.SetStateAction<LaboratorySettingDataType[]>>;
+  testDetails: LaboratoryTestDetails | SubCategoryLaboratoryTestDetails;
+  categoryName: string;
+  subCategoryName?: string;
+  dispatch: React.Dispatch<Action>;
 }
 const SingleRate: React.FC<SingleRateProps> = ({
-  name,
-  price,
-  normalValue,
-  setTests
+  testDetails,
+  categoryName,
+  subCategoryName,
+  dispatch
 }) => {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
 
-  const handlePriceChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-    setTests(prevTests => {
-      const value = event.target.value;
-      const changedPrice = prevTests
-        ?.filter(test => test.name === name)
-        .map(test => {
-          event.target.name === 'price' && (test.price = Number(value));
-          event.target.name === 'normalValue' && (test.normalValue = value);
-          return test;
-        });
-      console.log(prevTests, changedPrice);
-      return [...new Set([...prevTests, ...changedPrice])];
-    });
-  };
-
   return (
-    <ListItem className={clsx({ [classes.root]: normalValue })}>
-      <ListItemText primary={name} secondary={normalValue} />
+    <ListItem className={clsx({ [classes.root]: testDetails.hasNormalValue })}>
+      <ListItemText primary={testDetails.name} secondary={testDetails.name} />
       {open && (
         <Box
           display="flex"
-          className={clsx({ [classes.fieldContainer]: !normalValue })}
+          className={clsx({
+            [classes.fieldContainer]: !testDetails.hasNormalValue
+          })}
         >
           <TextField
             name="price"
-            value={price}
+            // value={testDetails.individualPrice}
             type="number"
             label="New Price"
-            onChange={handlePriceChange}
+            onChange={e => {
+              console.log('lkjsdf');
+              dispatch({
+                type: 'changeTestPrice',
+                payload: {
+                  testName: testDetails.name,
+                  price: parseInt(e.target.value) || 0
+                }
+              });
+            }}
+            // onChange={handlePriceChange}
           />
-          {normalValue && (
+          {testDetails.hasNormalValue && (
             <TextField
               name="normalValue"
-              value={normalValue}
+              value={testDetails.normalValue}
               label="New Normal value"
-              onChange={handlePriceChange}
+              onChange={() => {}}
             />
           )}
         </Box>
       )}
       <ListItemSecondaryAction>
         <IconButton
-          name={name}
+          name={testDetails.name}
           onClick={() => {
             setOpen(prevOpen => !prevOpen);
           }}

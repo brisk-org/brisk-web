@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
 
 const SettingsView = () => {
   const classes = useStyles();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const { occupation } = useContext(AuthContext);
 
   return (

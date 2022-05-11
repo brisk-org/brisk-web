@@ -9,7 +9,7 @@ import {
   Button
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import LabRates from './LabRates';
+import LabRates from './LaboratoryTestSettingAccordion/LabRates';
 import {
   useChangeSettingMutation,
   SettingDocument
