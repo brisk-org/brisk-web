@@ -33,8 +33,8 @@ const uri =
 
 const wsUri =
   process.env.NODE_ENV === 'production'
-    ? `wss://${host}:4000/subscription`
-    : `ws://${host}:4000/subscription`;
+    ? `wss://${host}:4000/subscriptions`
+    : `ws://${host}:4000/subscriptions`;
 
 const httpLink = new HttpLink({
   uri,
