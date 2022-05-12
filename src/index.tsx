@@ -18,22 +18,31 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 
 declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface DefaultTheme extends Theme {}
 }
 
-// eslint-disable-next-line no-restricted-globals
-const host = location.hostname;
+const host =
+  process.env.NODE_ENV === 'production'
+    ? process.env.SERVER_URL
+    : window.location.hostname;
+
+const uri =
+  process.env.NODE_ENV === 'production'
+    ? `https://${host}:4000/graphql`
+    : `http://${host}:4000/graphql`;
+
+const wsUri =
+  process.env.NODE_ENV === 'production'
+    ? `wss://${host}:4000/subscription`
+    : `ws://${host}:4000/subscription`;
+
 const httpLink = new HttpLink({
-  uri: `http://${host}:4000/graphql`,
+  uri,
   credentials: 'same-origin'
 });
-export const wsClient = new SubscriptionClient(
-  `ws://${host}:4000/subscriptions`,
-  {
-    reconnect: true
-  }
-);
+export const wsClient = new SubscriptionClient(wsUri, {
+  reconnect: true
+});
 
 const wsLink = new WebSocketLink(wsClient);
 const splitLink = split(
