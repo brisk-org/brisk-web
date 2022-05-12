@@ -29,12 +29,7 @@ const CommonValuesCollapse: React.FC<Props> = ({
   const onSubmitImproved = () => {};
   return (
     <>
-      <ListItemButton
-        onClick={() => setOpen(prevOpen => !prevOpen)}
-        sx={{
-          pl: 6
-        }}
-      >
+      <ListItemButton onClick={() => setOpen(prevOpen => !prevOpen)}>
         <ListItemText primary="Common Values" />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
@@ -47,7 +42,7 @@ const CommonValuesCollapse: React.FC<Props> = ({
           pl: 5
         }}
       >
-        <List dense sx={{ pl: 4 }}>
+        <List dense sx={{ px: 4 }}>
           {children}
           <FormControl required variant="standard">
             <InputLabel>new common value</InputLabel>

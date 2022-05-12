@@ -34,9 +34,10 @@ const LabRates: React.FC<LabRatesProps> = ({
       </AccordionSummary>
       <AccordionDetails>
         <Grid container spacing={1}>
-          {laboratoryTestCategories.map(category => (
+          {laboratoryTestCategories.map((category, index) => (
             <LaboratoryCategoriesAccordion
               category={category}
+              index={index}
               setCategory={setLaboratoryTestCategories}
             />
           ))}

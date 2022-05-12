@@ -18,13 +18,16 @@ import {
   FormControl,
   FormHelperText,
   Input,
-  InputLabel
+  InputLabel,
+  IconButton
 } from '@mui/material';
 import { LaboratoryTestCatagories } from '../../../data/testsSeed';
 import { Action } from './LaboratoryCategoriesAccordion';
 import DialogExaminationCollapseListItem from './DialogExaminationCollapseListItem';
 import AddNewFieldsFormDialog from './AddNewFieldsFormDialog';
 import CommonValuesCollapse from './CommonValuesCollapse';
+import AlertDialog from '../../../components/AlertDialog';
+import { Delete as DeleteIcon } from '@mui/icons-material';
 
 interface Props {
   open: boolean;
@@ -46,6 +49,7 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
   const [newSubCategoryDetails, setNewSubCategoryDetails] = useState({
     name: ''
   });
+
   const [newAddedField, setNewAddedField] = useState<{
     name: string;
     price?: number;
@@ -123,8 +127,14 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                   prevExpanded === test.name ? '' : test.name
                 )
               }
+              handleDelete={() => {
+                dispatch({
+                  type: 'deleteTest',
+                  payload: { name: test.name }
+                });
+              }}
             >
-              <ListItem sx={{ pl: 4 }}>
+              <ListItem>
                 <ListItemIcon>
                   <Checkbox
                     checked={test.isInfluencedByCategory}
@@ -144,7 +154,7 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                   secondary="this item can't be requested individually"
                 />
               </ListItem>
-              <ListItem sx={{ pl: 4 }}>
+              <ListItem>
                 <ListItemIcon>
                   <Checkbox
                     color="secondary"
@@ -201,7 +211,7 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
               </ListItem>
               <Divider />
 
-              <ListItem sx={{ pl: 4 }}>
+              <ListItem>
                 <ListItemIcon>
                   <Checkbox
                     color="success"
@@ -270,9 +280,30 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                 }}
               >
                 {test.commonValues &&
-                  test.commonValues.map(commonValue => (
+                  test.commonValues.map((commonValue, index) => (
                     <>
-                      <ListItemText primary={commonValue} />
+                      <ListItem
+                        secondaryAction={
+                          <IconButton
+                            onClick={() => {
+                              dispatch({
+                                type: 'deleteCommonValueForTest',
+                                payload: {
+                                  testName: test.name,
+                                  commonValueIndex: index
+                                }
+                              });
+                            }}
+                            color="secondary"
+                            size="small"
+                            edge="end"
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemText primary={commonValue} />
+                      </ListItem>
                       <Divider />
                     </>
                   ))}
@@ -314,6 +345,12 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                     prevExpanded === subCategory.name ? '' : subCategory.name
                   )
                 }
+                handleDelete={() => {
+                  dispatch({
+                    type: 'deleteSubCategory',
+                    payload: { name: subCategory.name }
+                  });
+                }}
               >
                 <Box sx={{ my: '15px', display: 'flex' }}>
                   <TextField
@@ -359,8 +396,17 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                         prevExpanded === test.name ? '' : test.name
                       )
                     }
+                    handleDelete={() => {
+                      dispatch({
+                        type: 'deleteSubCategoryTest',
+                        payload: {
+                          subCategoryName: subCategory.name,
+                          name: test.name
+                        }
+                      });
+                    }}
                   >
-                    <ListItem sx={{ pl: 4 }}>
+                    <ListItem>
                       <ListItemIcon>
                         <Checkbox
                           color="success"
@@ -432,9 +478,32 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                       }}
                     >
                       {test.commonValues &&
-                        test.commonValues.map(commonValue => (
+                        test.commonValues.map((commonValue, index) => (
                           <>
-                            <ListItemText primary={commonValue} />
+                            <ListItem
+                              secondaryAction={
+                                <IconButton
+                                  onClick={() => {
+                                    dispatch({
+                                      type:
+                                        'deleteCommonValueForSubCategoryTest',
+                                      payload: {
+                                        subCategoryName: subCategory.name,
+                                        testName: test.name,
+                                        commonValueIndex: index
+                                      }
+                                    });
+                                  }}
+                                  color="secondary"
+                                  size="small"
+                                  edge="end"
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              }
+                            >
+                              <ListItemText primary={commonValue} />
+                            </ListItem>
                             <Divider />
                           </>
                         ))}

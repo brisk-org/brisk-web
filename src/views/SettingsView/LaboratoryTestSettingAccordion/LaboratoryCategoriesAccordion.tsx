@@ -70,6 +70,12 @@ export type Action =
       };
     }
   | {
+      type: 'deleteTest';
+      payload: {
+        name: string;
+      };
+    }
+  | {
       type: 'addNewSubCategory';
       payload: {
         name: string;
@@ -77,10 +83,23 @@ export type Action =
       };
     }
   | {
+      type: 'deleteSubCategory';
+      payload: {
+        name: string;
+      };
+    }
+  | {
       type: 'addNewSubCategoryTest';
       payload: {
         subCategoryName: string;
         testName: string;
+      };
+    }
+  | {
+      type: 'deleteSubCategoryTest';
+      payload: {
+        subCategoryName: string;
+        name: string;
       };
     }
   | {
@@ -113,11 +132,26 @@ export type Action =
       };
     }
   | {
+      type: 'deleteCommonValueForTest';
+      payload: {
+        testName: string;
+        commonValueIndex: number;
+      };
+    }
+  | {
       type: 'addNewCommonValueForSubCategoryTest';
       payload: {
         testName: string;
         subCategoryName: string;
         newCommonValue: string;
+      };
+    }
+  | {
+      type: 'deleteCommonValueForSubCategoryTest';
+      payload: {
+        testName: string;
+        subCategoryName: string;
+        commonValueIndex: number;
       };
     }
   | {
@@ -164,10 +198,10 @@ export type Action =
       };
     };
 
-type CategoryEditReducer = (
-  state: LaboratoryTestCatagories,
-  action: Action
-) => LaboratoryTestCatagories;
+interface State extends LaboratoryTestCatagories {
+  index: number;
+}
+type CategoryEditReducer = (state: State, action: Action) => State;
 
 const categoryEditReducer: CategoryEditReducer = (state, action) => {
   switch (action.type) {
@@ -230,6 +264,11 @@ const categoryEditReducer: CategoryEditReducer = (state, action) => {
           }
         ]
       };
+    case 'deleteTest':
+      return {
+        ...state,
+        tests: state.tests.filter(test => test.name !== action.payload.name)
+      };
     case 'addNewSubCategory':
       if (!state.subCategories) {
         return {
@@ -254,6 +293,13 @@ const categoryEditReducer: CategoryEditReducer = (state, action) => {
           }
         ]
       };
+    case 'deleteSubCategory':
+      return {
+        ...state,
+        subCategories: state.subCategories?.filter(
+          subCategory => subCategory.name !== action.payload.name
+        )
+      };
     case 'addNewSubCategoryTest':
       if (!state.subCategories) {
         console.log('error check this log, isnt supposed to happen');
@@ -277,6 +323,27 @@ const categoryEditReducer: CategoryEditReducer = (state, action) => {
                 hasNormalValue: false
               }
             ]
+          };
+        })
+      };
+    case 'deleteSubCategoryTest':
+      if (!state.subCategories) {
+        console.log('error check this log, isnt supposed to happen');
+        return { ...state };
+      }
+      return {
+        ...state,
+        subCategories: state.subCategories.map(subCategory => {
+          if (subCategory.name !== action.payload.subCategoryName) {
+            return {
+              ...subCategory
+            };
+          }
+          return {
+            ...subCategory,
+            tests: subCategory.tests.filter(
+              test => test.name !== action.payload.name
+            )
           };
         })
       };
@@ -326,51 +393,93 @@ const categoryEditReducer: CategoryEditReducer = (state, action) => {
       console.log(state);
       return {
         ...state,
-        tests: state.tests.map(test => ({
-          ...test,
-          commonValues:
-            test.name === action.payload.testName
-              ? !test.commonValues
-                ? [action.payload.newCommonValue]
-                : [...test.commonValues, action.payload.newCommonValue]
-              : test.commonValues
-        }))
+        tests: state.tests.map(test => {
+          if (test.name !== action.payload.testName) {
+            return { ...test };
+          }
+          return {
+            ...test,
+            commonValues: !test.commonValues
+              ? [action.payload.newCommonValue]
+              : [...test.commonValues, action.payload.newCommonValue]
+          };
+        })
       };
-    case 'addNewCommonValueForSubCategoryTest':
+    case 'deleteCommonValueForTest':
       return {
         ...state,
-        subCategories:
-          state.subCategories &&
-          state.subCategories.map(subCategory => ({
+        tests: state.tests.map(test => {
+          if (test.name !== action.payload.testName) {
+            return { ...test };
+          }
+
+          return {
+            ...test,
+            commonValues: test.commonValues?.filter(
+              (_, index) => index !== action.payload.commonValueIndex
+            )
+          };
+        })
+      };
+    case 'addNewCommonValueForSubCategoryTest':
+      if (!state.subCategories) {
+        console.log('NOt supposed to happen');
+        return { ...state };
+      }
+
+      return {
+        ...state,
+        subCategories: state.subCategories.map(subCategory => {
+          if (subCategory.name !== action.payload.subCategoryName) {
+            return { ...subCategory };
+          }
+          return {
             ...subCategory,
-            tests:
-              subCategory.name === action.payload.subCategoryName
-                ? subCategory.tests.map(test => ({
-                    ...test,
-                    commonValues:
-                      test.name === action.payload.testName
-                        ? !test.commonValues
-                          ? [action.payload.newCommonValue]
-                          : [
-                              ...test.commonValues,
-                              action.payload.newCommonValue
-                            ]
-                        : test.commonValues
-                  }))
-                : subCategory.tests
-          }))
+            tests: subCategory.tests.map(test => {
+              if (test.name !== action.payload.testName) {
+                return { ...test };
+              }
+              return {
+                ...test,
+                commonValues: !test.commonValues
+                  ? [action.payload.newCommonValue]
+                  : [...test.commonValues, action.payload.newCommonValue]
+              };
+            })
+          };
+        })
       };
 
-    // case 'addNewSubCategoryTest':
-    //   return {
-    //     ...state,
-    //     subCategories: state.subCategories!.map(subCategory => ({
-    //       ...subCategory,
-    //       tests:
-    //         subCategory.name === action.payload.subCategoryName
-    //           && [...subCategory.tests, {name: action.payload.newSubCategory }]
-    //     }))
-    //   };
+    case 'deleteCommonValueForSubCategoryTest':
+      if (!state.subCategories) {
+        console.log('NOt supposed to happen');
+        return { ...state };
+      }
+
+      return {
+        ...state,
+        subCategories: state.subCategories.map(subCategory => {
+          if (subCategory.name !== action.payload.subCategoryName) {
+            return { ...subCategory };
+          }
+          return {
+            ...subCategory,
+            tests: subCategory.tests.map(test => {
+              if (test.name !== action.payload.testName) {
+                return { ...test };
+              }
+              return {
+                ...test,
+
+                commonValues: test.commonValues?.filter(
+                  (_, index) => index !== action.payload.commonValueIndex
+                )
+              };
+            })
+          };
+        })
+      };
+
     case 'changeCommonValue':
       return {
         ...state
@@ -449,15 +558,20 @@ const categoryEditReducer: CategoryEditReducer = (state, action) => {
 };
 
 interface Props {
+  index: number;
   category: LaboratoryTestCatagories;
   setCategory: React.Dispatch<React.SetStateAction<LaboratoryTestCatagories[]>>;
 }
 const LaboratoryCategoriesAccordion: React.FC<Props> = ({
+  index,
   category,
   setCategory
 }) => {
   const classes = useStyles();
-  const [categoryEdit, dispatch] = useReducer(categoryEditReducer, category);
+  const [categoryEdit, dispatch] = useReducer(categoryEditReducer, {
+    ...category,
+    index
+  });
   const [parentAccordionDialogOpen, setParentAccordionDialogOpen] = useState(
     false
   );
@@ -465,7 +579,19 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({
     setParentAccordionDialogOpen(false);
   };
 
-  const handleCategoryTestEditSuccess = () => {};
+  const handleCategoryTestEditSuccess = () => {
+    setCategory(prevCategories => {
+      return [
+        ...prevCategories.map((prevCategory, prevCategoryIndex) => {
+          if (prevCategoryIndex !== index) {
+            return { ...prevCategory };
+          }
+          return { ...categoryEdit };
+        })
+      ];
+    });
+    setParentAccordionDialogOpen(false);
+  };
 
   return (
     <Grid item md={4} sm={6} xs={12}>

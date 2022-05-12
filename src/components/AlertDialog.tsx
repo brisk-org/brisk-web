@@ -36,7 +36,7 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Delete Selected Card?</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Are you sure</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {dialogText}
