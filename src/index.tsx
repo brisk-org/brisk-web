@@ -56,6 +56,7 @@ const splitLink = split(
   wsLink,
   httpLink
 );
+console.log(process.env, process.env.NODE_ENV, process.env.SERVER_URL);
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
