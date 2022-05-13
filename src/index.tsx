@@ -23,7 +23,7 @@ declare module '@mui/styles/defaultTheme' {
 
 const host =
   process.env.NODE_ENV === 'production'
-    ? 'briskserver.heroku.app'
+    ? 'briskserver.herokuapp.com'
     : `${window.location.hostname}:4000`;
 
 const uri =
