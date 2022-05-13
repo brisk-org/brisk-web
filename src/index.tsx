@@ -24,17 +24,17 @@ declare module '@mui/styles/defaultTheme' {
 const host =
   process.env.NODE_ENV === 'production'
     ? process.env.SERVER_URL
-    : window.location.hostname;
+    : `${window.location.hostname}:4000`;
 
 const uri =
   process.env.NODE_ENV === 'production'
-    ? `https://${host}:4000/graphql`
-    : `http://${host}:4000/graphql`;
+    ? `https://${host}/graphql`
+    : `http://${host}/graphql`;
 
 const wsUri =
   process.env.NODE_ENV === 'production'
-    ? `wss://${host}:4000/subscriptions`
-    : `ws://${host}:4000/subscriptions`;
+    ? `wss://${host}/subscriptions`
+    : `ws://${host}/subscriptions`;
 
 const httpLink = new HttpLink({
   uri,
