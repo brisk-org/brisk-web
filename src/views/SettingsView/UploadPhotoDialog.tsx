@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogActions,
   Button
-} from '@material-ui/core';
+} from '@mui/material';
 // import { RegisteredUsersProps } from './RegisteredUsers';
 // import { useUploadPhotoMutation } from '../../generated/graphql';
 

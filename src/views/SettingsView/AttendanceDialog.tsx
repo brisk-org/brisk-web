@@ -7,7 +7,7 @@ import {
   TextField,
   DialogActions,
   Button
-} from '@material-ui/core';
+} from '@mui/material';
 import * as faceapi from 'face-api.js';
 import loadLabeledImages from '../../utils/loadLabeledImages';
 
