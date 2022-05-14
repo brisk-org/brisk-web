@@ -31,6 +31,7 @@ const AddNewFieldsFormDialog: React.FC<Props> = ({
   description = `insert the name and settings can be edited later`
 }) => {
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState('');
   const onClose = () => {
     setOpen(false);
   };
@@ -40,6 +41,17 @@ const AddNewFieldsFormDialog: React.FC<Props> = ({
     const name = e.target.name;
     const value = name === 'price' ? parseInt(e.target.value) : e.target.value;
     setField(prevField => ({ ...prevField, [name]: value }));
+  };
+
+  const handleSuccess = () => {
+    if (!field.name) {
+      setError("name can't be empty");
+      return;
+    }
+    onSubmit();
+    setField({ name: '', price: undefined });
+    onClose();
+    setError('');
   };
 
   return (
@@ -57,6 +69,8 @@ const AddNewFieldsFormDialog: React.FC<Props> = ({
         <DialogContent>
           <DialogContentText>{description}</DialogContentText>
           <TextField
+            error={!!error}
+            helperText={error}
             required
             name="name"
             value={field.name}
@@ -87,11 +101,7 @@ const AddNewFieldsFormDialog: React.FC<Props> = ({
             type="submit"
             variant="contained"
             sx={{ mr: 2 }}
-            onClick={() => {
-              onSubmit();
-              setField({ name: '', price: undefined });
-              onClose();
-            }}
+            onClick={handleSuccess}
           >
             Done
           </Button>

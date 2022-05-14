@@ -7,10 +7,7 @@ import {
   Grid
 } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
-import {
-  defaultLaboratoryTestSeed,
-  LaboratoryTestCatagories
-} from '../../../data/testsSeed';
+import { defaultLaboratoryTestSeed } from '../../../data/testsSeed';
 import { LaboratorySettingDataType } from '../../../context/SettingContext';
 import LaboratoryCategoriesAccordion from './LaboratoryCategoriesAccordion';
 

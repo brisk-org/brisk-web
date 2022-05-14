@@ -17,7 +17,7 @@ import {
   LaboratoryTestDetails,
   SubCategoryLaboratoryTestDetails
 } from '../../../data/testsSeed';
-import { Action } from './LaboratoryCategoriesAccordion';
+import { LaboratoryTestSettingReducerAction } from '../../../reducer/laboratoryTestSettingReducer';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -35,7 +35,7 @@ interface SingleRateProps {
   testDetails: LaboratoryTestDetails | SubCategoryLaboratoryTestDetails;
   categoryName: string;
   subCategoryName?: string;
-  dispatch: React.Dispatch<Action>;
+  dispatch: React.Dispatch<LaboratoryTestSettingReducerAction>;
 }
 const SingleRate: React.FC<SingleRateProps> = ({
   testDetails,

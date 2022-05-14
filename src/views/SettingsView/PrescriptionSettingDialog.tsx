@@ -21,7 +21,7 @@ interface Props {
   setPrescription: React.Dispatch<
     React.SetStateAction<PrescriptionSettingDataType>
   >;
-  handleSubmit: () => void;
+  handleSubmit: React.FormEventHandler<HTMLFormElement>;
 }
 
 const PrescriptionSettingDialog: React.FC<Props> = ({
@@ -53,9 +53,9 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
   };
   return (
     <Dialog maxWidth="lg" open={open} onClose={onClose}>
-      <DialogTitle>{title}</DialogTitle>
-      <DialogContent sx={{ width: '400px' }}>
-        <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>{title}</DialogTitle>
+        <DialogContent sx={{ width: '400px' }}>
           <FormControl fullWidth>
             <TextField
               required
@@ -114,9 +114,9 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
               variant="standard"
             />
           </FormControl>
-        </form>
-      </DialogContent>
-      <DialogActions>{children}</DialogActions>
+        </DialogContent>
+        <DialogActions>{children}</DialogActions>
+      </form>
     </Dialog>
   );
 };

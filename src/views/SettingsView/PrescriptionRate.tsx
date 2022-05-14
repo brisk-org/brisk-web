@@ -6,8 +6,7 @@ import {
   Typography,
   AccordionDetails,
   List,
-  Button,
-  SelectChangeEvent
+  Button
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -17,7 +16,15 @@ import SinglePrescriptionRate from './SinglePrescriptionRate';
 import { PrescriptionSettingDataType } from '../../context/SettingContext';
 import PrescriptionSettingDialog from './PrescriptionSettingDialog';
 
-interface LabRatesProps {
+const initialState: PrescriptionSettingDataType = {
+  name: '',
+  forDays: 1,
+  perDay: 'stat',
+  price: 0,
+  quantity: '',
+  other: ''
+};
+interface Props {
   prescriptionState: {
     prescription: PrescriptionSettingDataType[] | undefined;
     setPrescription: React.Dispatch<
@@ -25,26 +32,19 @@ interface LabRatesProps {
     >;
   };
 }
-const PrescriptionRate: React.FC<LabRatesProps> = ({
+const PrescriptionRate: React.FC<Props> = ({
   prescriptionState: { prescription, setPrescription }
 }) => {
   const [open, setOpen] = useState(false);
-  const [newPrescription, setNewPrescription] = useState<
-    PrescriptionSettingDataType
-  >({
-    name: '',
-    forDays: 1,
-    perDay: 'stat',
-    price: 0,
-    quantity: '',
-    other: ''
-  });
+  const [newPrescription, setNewPrescription] = useState(initialState);
   const onClose = () => {
     setOpen(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+    event.preventDefault();
     setPrescription(prevPrescription => [...prevPrescription, newPrescription]);
+    setNewPrescription(initialState);
     onClose();
   };
 
@@ -67,10 +67,7 @@ const PrescriptionRate: React.FC<LabRatesProps> = ({
           </List>
         </AccordionDetails>
         <AccordionSummary>
-          <Box
-            border="ButtonFace"
-            sx={{ width: '100%', display: 'flex', justifyContent: 'end' }}
-          >
+          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
             <Button
               variant="contained"
               size="small"

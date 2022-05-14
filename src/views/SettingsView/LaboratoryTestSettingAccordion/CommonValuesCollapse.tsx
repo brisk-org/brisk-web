@@ -26,7 +26,6 @@ const CommonValuesCollapse: React.FC<Props> = ({
 }) => {
   const [open, setOpen] = useState(false);
 
-  const onSubmitImproved = () => {};
   return (
     <>
       <ListItemButton onClick={() => setOpen(prevOpen => !prevOpen)}>
@@ -44,9 +43,10 @@ const CommonValuesCollapse: React.FC<Props> = ({
       >
         <List dense sx={{ px: 4 }}>
           {children}
-          <FormControl required variant="standard">
+          <FormControl variant="standard">
             <InputLabel>new common value</InputLabel>
             <Input
+              autoFocus
               value={commonValue}
               sx={{ display: 'block' }}
               onChange={e => {
@@ -59,7 +59,6 @@ const CommonValuesCollapse: React.FC<Props> = ({
                 onSubmit();
                 setCommonValue('');
               }}
-              type="submit"
               disabled={!commonValue}
               size="small"
               sx={{ textTransform: 'capitalize' }}

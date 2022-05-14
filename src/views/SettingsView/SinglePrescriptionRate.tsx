@@ -66,7 +66,8 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({
     }
   }, [confirmDelete]);
 
-  const handleSubmit = () => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+    event.preventDefault();
     setPrescription(prevTests => {
       return prevTests.map(test => {
         if (test.name === prescription.name) {
