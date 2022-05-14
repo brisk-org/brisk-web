@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, Divider, Grid, Button, Box } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Grid,
+  Button,
+  Box,
+  SelectChangeEvent
+} from '@mui/material';
 
 import makeStyles from '@mui/styles/makeStyles';
 
@@ -57,9 +66,11 @@ const ProfileForm: React.FC<ProfileFormProps> = () => {
     onError: err => console.log(err)
   });
 
-  const handleChange:
-    | React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>
-    | undefined = event => {
+  const handleChange = (
+    event:
+      | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+      | SelectChangeEvent<string>
+  ) => {
     setCard(card => ({
       ...card,
       [event.target.name]: event.target.value

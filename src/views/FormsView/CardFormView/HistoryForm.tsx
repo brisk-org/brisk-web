@@ -10,6 +10,7 @@ import {
   Button,
   ButtonGroup,
   TextField,
+  SelectChangeEvent
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import TextArea from './TextArea';
@@ -118,9 +119,11 @@ const HistoryForm: React.FC<HistoryFormProps> = () => {
     setClickedButton(event.currentTarget.name);
   };
 
-  const handleChange:
-    | React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>
-    | undefined = event => {
+  const handleChange = (
+    event:
+      | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+      | SelectChangeEvent<string>
+  ) => {
     setHistory(history => ({
       ...history,
       [event.target.name]: event.target.value

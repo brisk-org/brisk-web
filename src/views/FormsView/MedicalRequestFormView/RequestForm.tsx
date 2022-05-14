@@ -12,6 +12,7 @@ import {
   TextField,
   TextareaAutosize,
   Typography,
+  SelectChangeEvent
 } from '@mui/material';
 
 import makeStyles from '@mui/styles/makeStyles';
@@ -65,10 +66,11 @@ const RequestForm: React.FC<ProfileDetailsI> = ({
 
   const componentRef = useRef(null);
   // const [addReport, { error, data, loading }] = useMutation(ADD_REPORT);
-
-  const handleChange:
-    | React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>
-    | undefined = event => {
+  const handleChange = (
+    event:
+      | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+      | SelectChangeEvent<string>
+  ) => {
     setUser({
       ...user,
       [event.target.name]: event.target.value

@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { ListItem, ListItemText, Box, Divider, IconButton, Grid, Typography } from '@mui/material';
+import {
+  ListItemText,
+  Divider,
+  Typography,
+  ListItemButton,
+  IconButton,
+  ListItem,
+  Button
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { Close, Edit } from '@mui/icons-material';
 import { PrescriptionSettingDataType } from '../../context/SettingContext';
-import SelectTextField from '../../components/helpers/SelectTextField';
-import NumberTextField from '../../components/helpers/NumberTextField';
-import StringTextField from '../../components/helpers/StringTextField';
+import {
+  Delete as DeleteIcon,
+  Settings as SettingsIcon
+} from '@mui/icons-material';
+import PrescriptionSettingDialog from './PrescriptionSettingDialog';
+import AlertDialog from '../../components/AlertDialog';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -31,105 +41,109 @@ interface SingleRateProps {
   >;
 }
 const SinglePrescriptionRate: React.FC<SingleRateProps> = ({
-  prescription: { name, price, quantity, forDays, perDay, other },
+  prescription,
   setPrescription
 }) => {
   const classes = useStyles();
 
-  const [open, setOpen] = useState(false);
+  const [openSettingDialog, setOpenSettingDialog] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const handlePriceChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+  const [prescriptionEdit, setPrescriptionEdit] = useState(prescription);
+  const onClose = () => {
+    setOpenSettingDialog(false);
+  };
+
+  useEffect(() => {
+    if (confirmDelete) {
+      onClose();
+      setPrescription(prevPrescriptions =>
+        prevPrescriptions.filter(
+          prevPrescription => prevPrescription.name !== prescription.name
+        )
+      );
+    }
+  }, [confirmDelete]);
+
+  const handleSubmit = () => {
     setPrescription(prevTests => {
-      const sValue = event.target.value;
-      const nValue = Number(sValue);
-      const changedPrice = prevTests
-        ?.filter(test => test.name === name)
-        .map(test => {
-          event.target.name === 'price' && (test.price = nValue);
-          event.target.name === 'quantity' && (test.quantity = sValue);
-          event.target.name === 'forDays' && (test.forDays = nValue);
-          event.target.name === 'other' && (test.other = sValue);
-          event.target.name === 'perDay' &&
-            (test.perDay = sValue as 'stat' | 'bid');
-          return test;
-        });
-
-      return [...new Set([...prevTests, ...changedPrice])];
+      return prevTests.map(test => {
+        if (test.name === prescription.name) {
+          return { ...prescriptionEdit };
+        }
+        return { ...test };
+      }) as PrescriptionSettingDataType[];
     });
+    onClose();
   };
 
   return (
-    <ListItem className={clsx(classes.root)}>
-      <ListItemText
-        primary={
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="body1">{name}</Typography>
-            <IconButton
-              name={name}
-              onClick={() => {
-                setOpen(prevOpen => !prevOpen);
-              }}
-              size="large">
-              {open ? <Close fontSize="small" /> : <Edit fontSize="small" />}
-            </IconButton>
-          </Box>
+    <>
+      <ListItem
+        className={clsx(classes.root)}
+        onClick={() => {
+          setOpenSettingDialog(true);
+        }}
+        secondaryAction={
+          <IconButton size="small" edge="end" aria-label="comments">
+            <SettingsIcon fontSize="small" />
+          </IconButton>
         }
-        secondary={<>{open && <Divider />}</>}
+        disablePadding
+      >
+        <ListItemButton>
+          <ListItemText
+            primary={prescription.name}
+            secondary={
+              <>
+                <Typography variant="caption">9 in stock</Typography>
+              </>
+            }
+          />
+          <Divider />
+        </ListItemButton>
+      </ListItem>
+      <></>
+      <PrescriptionSettingDialog
+        title={`Change Settings For ${prescription.name}`}
+        open={openSettingDialog}
+        prescription={prescriptionEdit}
+        setPrescription={setPrescriptionEdit}
+        onClose={onClose}
+        handleSubmit={handleSubmit}
+      >
+        <Button
+          variant="contained"
+          endIcon={<DeleteIcon fontSize="small" />}
+          color="error"
+          onClick={() => {
+            setDeleteDialogOpen(true);
+          }}
+        >
+          Delete
+        </Button>
+        <Button
+          onClick={() => {
+            onClose();
+            setPrescriptionEdit(prescription);
+          }}
+        >
+          Cancel
+        </Button>
+        <Button type="submit" variant="contained" sx={{ mr: 2 }}>
+          Done
+        </Button>
+      </PrescriptionSettingDialog>
+      <AlertDialog
+        dialogText={`Delete ${prescription.name}? Can't be reversed`}
+        state={{
+          dialogToggle: deleteDialogOpen,
+          setDialogToggle: setDeleteDialogOpen,
+          setProceedToAction: setConfirmDelete
+        }}
       />
-      {open && (
-        <Grid container spacing={3}>
-          <Grid item md={6} sm={12}>
-            <NumberTextField
-              name="price"
-              value={price}
-              label="New Price"
-              handleChange={handlePriceChange}
-            />
-          </Grid>
-          {typeof quantity === 'string' && (
-            <Grid item md={6} sm={12}>
-              <StringTextField
-                name="quantity"
-                value={quantity}
-                label="New Normal value"
-                handleChange={handlePriceChange}
-              />
-            </Grid>
-          )}
-          <Grid item md={6} sm={12}>
-            <SelectTextField
-              name="perDay"
-              value={perDay}
-              label="Per Day"
-              handleChange={handlePriceChange}
-              options={perDayOption}
-            />
-          </Grid>
-          <Grid item md={6} sm={12}>
-            <NumberTextField
-              name="forDays"
-              value={forDays}
-              label="For: "
-              handleChange={handlePriceChange}
-            />
-          </Grid>
-          <Grid item sm={12}>
-            <StringTextField
-              name="other"
-              handleChange={handlePriceChange}
-              label="Others: "
-              value={other || ''}
-              required={false}
-            />
-          </Grid>
-        </Grid>
-      )}
-      <Divider />
-    </ListItem>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Checkbox, FormControlLabel } from '@mui/material';
+import { Checkbox, FormControlLabel, SelectChangeEvent } from '@mui/material';
 import React from 'react';
 import { CurrentPrescription } from '.';
 import NumberTextField from '../../../components/helpers/NumberTextField';
@@ -8,9 +8,12 @@ import { perDayOption } from '../../SettingsView/SinglePrescriptionRate';
 
 interface SinglePrescProps {
   presc: CurrentPrescription;
-  handleChange:
-    | React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
-    | undefined;
+
+  handleChange: (
+    event:
+      | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+      | SelectChangeEvent<string>
+  ) => void;
 }
 const SinglePresc: React.FC<SinglePrescProps> = ({
   presc: {

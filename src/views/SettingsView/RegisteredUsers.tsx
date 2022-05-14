@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 
 import {
   Grid,
@@ -6,69 +6,47 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  Avatar,
   Button,
-  Typography,
-  colors
+  Divider
 } from '@mui/material';
-import { User } from '../../generated/graphql';
+import { useAllUsersQuery } from '../../generated/graphql';
+import { AuthContext } from '../../context/AuthContext';
+import RegisteredUsersCard from './RegisteredUserCard';
+import CreateUserDialog from './CreateUserDialog';
 
-export interface RegisteredUsersProps {
-  user: {
-    __typename?: 'User' | undefined;
-  } & Pick<User, 'id' | 'username' | 'occupation' | 'created_at'>;
-}
-
-const RegisteredUsers: React.FC<RegisteredUsersProps> = ({ user }) => {
+const RegisteredUsers = () => {
+  const [open, setOpen] = useState(false);
+  const { data, loading } = useAllUsersQuery();
+  const { username } = useContext(AuthContext);
   return (
-    <Grid item md={4} sm={6} style={{}}>
+    <>
       <Card>
-        <CardHeader
-          avatar={
-            <Avatar
-              style={{ backgroundColor: colors.red[500] }}
-              aria-label="recipe"
-            >
-              R
-            </Avatar>
-          }
-          title={user.username}
-          subheader={user.occupation}
-        />
+        <CardHeader title="All registered user" />
         <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {user.username}
-          </Typography>
+          <Grid container spacing={2}>
+            {data &&
+              data.allUsers.map(
+                user =>
+                  user.username !== username && (
+                    <RegisteredUsersCard user={user} />
+                  )
+              )}
+            {loading && <div>loading</div>}
+          </Grid>
         </CardContent>
-        <CardActions>
+        <Divider />
+        <CardActions sx={{ display: 'flex', justifyContent: 'end' }}>
           <Button
-            // onClick={() => setOpenAddPictureDialog(true)}
-            variant="outlined"
             color="primary"
-            size="small"
-          >
-            Add Pictures
-          </Button>{' '}
-          <Button
-            // onClick={() => setOpenWorkHourDialog(true)}
-            variant="outlined"
-            color="primary"
-            size="small"
-          >
-            Change User Setting
-          </Button>
-          <Button
-            color="secondary"
             variant="contained"
-            value={user.id}
-            size="small"
-            // onClick={handleDeleteUser}
+            onClick={() => setOpen(true)}
           >
-            Delete
+            Add a new User
           </Button>
         </CardActions>
       </Card>
-    </Grid>
+      <CreateUserDialog open={open} handleClose={() => setOpen(false)} />
+    </>
   );
 };
 export default RegisteredUsers;

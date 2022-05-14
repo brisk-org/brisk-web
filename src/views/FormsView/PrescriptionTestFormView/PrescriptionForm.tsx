@@ -10,6 +10,7 @@ import {
   TextareaAutosize,
   Typography,
   TextField,
+  SelectChangeEvent
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Prescription, CurrentPrescription } from '.';
@@ -69,9 +70,11 @@ const PrescriptionTestForm: React.FC<PrescriptionFormProps> = ({
       [name]: event.target.value
     }));
   };
-  const handleDetailedPrescChange:
-    | React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>
-    | undefined = event => {
+  const handleDetailedPrescChange = (
+    event:
+      | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+      | SelectChangeEvent<string>
+  ) => {
     const [name, field] = JSON.parse(event.target.name);
     const value = event.target.value;
 
@@ -149,100 +152,102 @@ const PrescriptionTestForm: React.FC<PrescriptionFormProps> = ({
     });
   };
 
-  return <>
-    <Card className={clsx(classes.root, {})} ref={componentRef}>
-      <PrintHeader />
-      <Divider />
-      <CardContent>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Typography variant="body1">
-              Card ID:{' '}
-              {prescription.cardId
-                ? '#' + prescription.cardId
-                : 'Please Go to the Target card and prescribe from there'}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1">
-              Pt'Name: {prescription.name}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1">Age: {prescription.age}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="body1">
-              Sex: {prescription.gender}
-            </Typography>
-          </Grid>
-          {!printReady &&
-            prescription.detailedPrescription.map((presc, index) => (
-              <Grid id="checkBox" key={index} item md={3}>
-                <SinglePresc
-                  presc={{ ...presc }}
-                  handleChange={handleDetailedPrescChange}
+  return (
+    <>
+      <Card className={clsx(classes.root, {})} ref={componentRef}>
+        <PrintHeader />
+        <Divider />
+        <CardContent>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Typography variant="body1">
+                Card ID:{' '}
+                {prescription.cardId
+                  ? '#' + prescription.cardId
+                  : 'Please Go to the Target card and prescribe from there'}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">
+                Pt'Name: {prescription.name}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">Age: {prescription.age}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                Sex: {prescription.gender}
+              </Typography>
+            </Grid>
+            {!printReady &&
+              prescription.detailedPrescription.map((presc, index) => (
+                <Grid id="checkBox" key={index} item md={3}>
+                  <SinglePresc
+                    presc={{ ...presc }}
+                    handleChange={handleDetailedPrescChange}
+                  />
+                </Grid>
+              ))}
+            {!printReady && (
+              <Grid item md={6}>
+                <TextField
+                  fullWidth
+                  label="Prescriber's Name: "
+                  name="drName"
+                  onChange={handlePrescChange}
+                  required
+                  value={prescription.drName}
+                  variant="standard"
                 />
               </Grid>
-            ))}
-          {!printReady && (
-            <Grid item md={6}>
-              <TextField
-                fullWidth
-                label="Prescriber's Name: "
-                name="drName"
+            )}
+            <Grid item md={12} xs={12}>
+              <TextareaAutosize
+                className={classes.textArea}
+                minRows={6}
+                name="rx"
                 onChange={handlePrescChange}
+                value={prescription.rx}
                 required
-                value={prescription.drName}
-                variant="standard"
               />
             </Grid>
-          )}
-          <Grid item md={12} xs={12}>
-            <TextareaAutosize
-              className={classes.textArea}
-              minRows={6}
-              name="rx"
-              onChange={handlePrescChange}
-              value={prescription.rx}
-              required
-            />
+            <Grid item xs={6}>
+              <Typography variant="body1">
+                Doctors Name: {prescription.drName}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">
+                Date: {format(new Date(), 'dd/MM/yyyy')}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">Occupation: Doctor</Typography>
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1">
-              Doctors Name: {prescription.drName}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1">
-              Date: {format(new Date(), 'dd/MM/yyyy')}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1">Occupation: Doctor</Typography>
-          </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
-    <Box display="flex" justifyContent="flex-end" p={2}>
-      <Button
-        type="submit"
-        disabled={!isQueried}
-        color="primary"
-        variant="contained"
-        style={{ marginRight: 10 }}
-      >
-        Send Prescription
-      </Button>
-      <Button
-        onClick={handleClick}
-        disabled={!isQueried}
-        color="secondary"
-        variant="contained"
-      >
-        Print
-      </Button>
-    </Box>
-  </>;
+        </CardContent>
+      </Card>
+      <Box display="flex" justifyContent="flex-end" p={2}>
+        <Button
+          type="submit"
+          disabled={!isQueried}
+          color="primary"
+          variant="contained"
+          style={{ marginRight: 10 }}
+        >
+          Send Prescription
+        </Button>
+        <Button
+          onClick={handleClick}
+          disabled={!isQueried}
+          color="secondary"
+          variant="contained"
+        >
+          Print
+        </Button>
+      </Box>
+    </>
+  );
 };
 export default PrescriptionTestForm;

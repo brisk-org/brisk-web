@@ -133,34 +133,34 @@ const ChangeRates = () => {
         {(!testsRateData || !cardPrice || !cardExpirationDate) && (
           <Typography color="error">Please fill all the Prices</Typography>
         )}
-        <form onSubmit={handleSubmit}>
-          <CardRate
-            oldRate={oldCardPrice}
-            oldDate={oldCardExpirationDate}
-            priceState={{ price: cardPrice, setPrice: setCardRate }}
-            dateState={{
-              date: cardExpirationDate,
-              setDate: setCardExpirationDate
-            }}
-          />
-          <LabRates
-            testsState={{
-              tests: laboratoryTestSettingData,
-              setTests: setLaboratoryTestSettingData
-            }}
-          />
-          <PrescriptionRate
-            prescriptionState={{
-              prescription: prescriptionTestSettingData,
-              setPrescription: setPrescriptionSettingData
-            }}
-          />
-          <Box display="flex" justifyContent="flex-end" p={2}>
-            <Button type="submit" color="primary" variant="contained">
-              Update Values
-            </Button>
-          </Box>
-        </form>
+        {/* <form onSubmit={handleSubmit}> */}
+        <CardRate
+          oldRate={oldCardPrice}
+          oldDate={oldCardExpirationDate}
+          priceState={{ price: cardPrice, setPrice: setCardRate }}
+          dateState={{
+            date: cardExpirationDate,
+            setDate: setCardExpirationDate
+          }}
+        />
+        <LabRates
+          testsState={{
+            tests: laboratoryTestSettingData,
+            setTests: setLaboratoryTestSettingData
+          }}
+        />
+        <PrescriptionRate
+          prescriptionState={{
+            prescription: prescriptionTestSettingData,
+            setPrescription: setPrescriptionSettingData
+          }}
+        />
+        <Box display="flex" justifyContent="flex-end" p={2}>
+          <Button type="submit" color="primary" variant="contained">
+            Update Values
+          </Button>
+        </Box>
+        {/* </form> */}
         <SnackbarSuccess
           open={successSnackbarOpen}
           handleClose={handleCloseSnackbar}

@@ -46,10 +46,6 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
   const [isExaminationExpanded, setIsExaminationExpanded] = useState('');
   const [isSubCategoryExpanded, setIsSubCategoryExpanded] = useState('');
   const [newCommonValue, setNewCommonValue] = useState('');
-  const [newSubCategoryDetails, setNewSubCategoryDetails] = useState({
-    name: ''
-  });
-
   const [newAddedField, setNewAddedField] = useState<{
     name: string;
     price?: number;
