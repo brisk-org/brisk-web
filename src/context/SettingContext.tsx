@@ -2,6 +2,10 @@ import React, { useState, createContext, useEffect } from 'react';
 import { testsPlaceHolder } from '../data/testsPlaceHolder';
 import { prescriptionPlaceholder } from '../data/perscriptionPlaceholder';
 import { useSettingQuery } from '../generated/graphql';
+import {
+  defaultLaboratoryTestSeed,
+  LaboratoryTestCatagories
+} from '../data/testsSeed';
 
 export type LaboratorySettingDataType = {
   name: string;
@@ -20,7 +24,7 @@ export type PrescriptionSettingDataType = {
 type ContextType = {
   cardPrice: number;
   cardExpirationDate: number;
-  laboratoryTestSettingData: LaboratorySettingDataType[];
+  laboratoryTestSettingData: LaboratoryTestCatagories[];
   prescriptionTestSettingData: PrescriptionSettingDataType[];
 };
 const SettingsContext = createContext<ContextType>({
@@ -29,8 +33,16 @@ const SettingsContext = createContext<ContextType>({
   laboratoryTestSettingData: [
     {
       name: '',
-      category: '',
-      price: 0
+      price: 0,
+      tests: [
+        {
+          hasIndividualPrice: false,
+          hasNormalValue: false,
+          isInfluencedByCategory: false,
+          name: '',
+          value: ''
+        }
+      ]
     }
   ],
   prescriptionTestSettingData: [
@@ -42,15 +54,8 @@ const SettingsProvider: React.FC = ({ children }) => {
   const [cardPrice, setCardPrice] = useState(0);
   const [cardExpirationDate, setCardExpirationDate] = useState(0);
   const [laboratoryTestSettingData, setLaboratoryTestSettingData] = useState<
-    LaboratorySettingDataType[]
-  >(
-    testsPlaceHolder.map(({ name, price, category, normalValue }) => ({
-      name,
-      category,
-      price,
-      normalValue
-    }))
-  );
+    LaboratoryTestCatagories[]
+  >(defaultLaboratoryTestSeed);
   const [
     prescriptionTestSettingData,
     setPrescriptionTestSettingData
@@ -70,7 +75,7 @@ const SettingsProvider: React.FC = ({ children }) => {
       data.setting.prescription_tests_data
     ) as PrescriptionSettingDataType[];
 
-    setLaboratoryTestSettingData(testRateData);
+    // setLaboratoryTestSettingData(testRateData);
     setPrescriptionTestSettingData(prescriptionRateData);
   }, [data, loading]);
 

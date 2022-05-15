@@ -6,12 +6,11 @@ import {
   AccordionSummary,
   AccordionDetails,
   Checkbox,
-  FormControlLabel,
+  FormControlLabel
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { ExpandMore } from '@mui/icons-material';
-import { PlaceholderTestType } from '../../../../data/testsPlaceHolder';
-import { CheckBoxField } from '../../../../components/helpers/CheckBoxField';
+import { RequestCategories } from '.';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -22,53 +21,52 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface SingleAccordionProps {
-  header: string;
-  fields: PlaceholderTestType[];
+  category: RequestCategories;
   validId: boolean;
-  setFields: React.Dispatch<
-    React.SetStateAction<PlaceholderTestType[] | undefined>
-  >;
+  setCategories: React.Dispatch<React.SetStateAction<RequestCategories[]>>;
 }
 
 const SingleAccordion: React.FC<SingleAccordionProps> = ({
-  header,
-  fields,
-  setFields,
+  category,
+  setCategories,
   validId
 }) => {
   const classes = useStyles();
 
-  const [influencerChecked, setInfluencerChecked] = useState(false);
+  const [categoryChecked, setCategoryChecked] = useState(false);
 
-  const handleInfluencerChange:
+  const handleCategoryClick:
     | ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void)
     | undefined = (event, checked) => {
-    setInfluencerChecked(!influencerChecked);
-    setFields(fields => {
-      if (!fields) return;
-      const influenced = fields.map(field => {
-        const selected = field.influencedBy === event.target.name;
-        if (selected) {
-          field.selected = checked;
-        }
-        return field;
-      });
-      return [...influenced];
-    });
-  };
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFields(fields => {
-      if (!fields) return;
-      const clickedField = fields.find(
-        field => field.name === event.currentTarget.name
-      );
+    setCategoryChecked(!categoryChecked);
 
-      if (clickedField && event.currentTarget.value) {
-        clickedField.value = event.currentTarget.value;
-      } else if (clickedField) {
-        clickedField.selected = !clickedField.selected;
-      }
-      return [...fields];
+    setCategories(prevCategories =>
+      prevCategories?.map(prevCategory => {
+        if (prevCategory.name !== category.name) {
+          return prevCategory;
+        }
+        return { ...prevCategory, selected: checked };
+      })
+    );
+  };
+  const handleTestChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    checked: boolean
+  ) => {
+    setCategories(prevCategories => {
+      return prevCategories.map(prevCategory => {
+        if (prevCategory.name !== category.name) return { ...prevCategory };
+        return {
+          ...prevCategory,
+          tests: prevCategory.tests.map(test => {
+            if (test.name !== event.target.name) return { ...test };
+            if (test.isInfluencedByCategory && category.selected)
+              return { ...test, selected: true };
+            console.log('yoo', test);
+            return { ...test, selected: checked };
+          })
+        };
+      });
     });
   };
 
@@ -85,30 +83,37 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
           onFocus={event => event.stopPropagation()}
           control={
             <Checkbox
-              checked={influencerChecked}
-              onChange={handleInfluencerChange}
-              name={header}
+              checked={categoryChecked}
+              onChange={handleCategoryClick}
+              name={category.name}
               color="primary"
               disabled={!validId}
             />
           }
-          label={header}
+          label={category.name}
         />
       </AccordionSummary>
       <AccordionDetails className={classes.root}>
         <Grid container spacing={3}>
-          {fields.map(({ name, selected }, index) => {
-            return (
-              <Grid key={index} item md={6} xs={12} sm={4}>
-                <CheckBoxField
-                  handleChange={handleChange}
-                  checked={selected}
-                  label={name}
-                  name={name}
-                />
-              </Grid>
-            );
-          })}
+          {category.tests.map((test, index) => (
+            <Grid key={index} item md={6} xs={12} sm={4}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    disabled={!test.hasIndividualPrice}
+                    checked={
+                      test.selected ||
+                      (test.isInfluencedByCategory && category.selected)
+                    }
+                    onChange={handleTestChange}
+                    name={test.name}
+                    color="primary"
+                  />
+                }
+                label={test.name}
+              />
+            </Grid>
+          ))}
         </Grid>
       </AccordionDetails>
     </Accordion>

@@ -10,13 +10,13 @@ import {
   Button
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { PrescriptionSettingDataType } from '../../context/SettingContext';
+import { PrescriptionSettingDataType } from '../../../context/SettingContext';
 import {
   Delete as DeleteIcon,
   Settings as SettingsIcon
 } from '@mui/icons-material';
 import PrescriptionSettingDialog from './PrescriptionSettingDialog';
-import AlertDialog from '../../components/AlertDialog';
+import AlertDialog from '../../../components/AlertDialog';
 
 const useStyles = makeStyles(theme => ({
   root: {

@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react';
+import React from 'react';
 import {
   Accordion,
   AccordionSummary,
@@ -7,23 +7,19 @@ import {
   Grid
 } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
-import { defaultLaboratoryTestSeed } from '../../../data/testsSeed';
-import { LaboratorySettingDataType } from '../../../context/SettingContext';
 import LaboratoryCategoriesAccordion from './LaboratoryCategoriesAccordion';
+import { LaboratoryTestCatagories } from '../../../data/testsSeed';
 
 interface LabRatesProps {
-  testsState: {
-    tests: LaboratorySettingDataType[] | undefined;
-    setTests: React.Dispatch<React.SetStateAction<LaboratorySettingDataType[]>>;
-  };
+  laboratoryTestCategories: LaboratoryTestCatagories[] | undefined;
+  setLaboratoryTestCategories: React.Dispatch<
+    React.SetStateAction<LaboratoryTestCatagories[]>
+  >;
 }
-const LabRates: React.FC<LabRatesProps> = ({
-  testsState: { tests, setTests }
+const LaboratoryTestSettingMainAccordion: React.FC<LabRatesProps> = ({
+  laboratoryTestCategories,
+  setLaboratoryTestCategories
 }) => {
-  const [laboratoryTestCategories, setLaboratoryTestCategories] = useState(
-    defaultLaboratoryTestSeed
-  );
-
   return (
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMore />}>
@@ -31,7 +27,7 @@ const LabRates: React.FC<LabRatesProps> = ({
       </AccordionSummary>
       <AccordionDetails>
         <Grid container spacing={1}>
-          {laboratoryTestCategories.map((category, index) => (
+          {laboratoryTestCategories?.map((category, index) => (
             <LaboratoryCategoriesAccordion
               category={category}
               index={index}
@@ -44,4 +40,4 @@ const LabRates: React.FC<LabRatesProps> = ({
   );
 };
 
-export default LabRates;
+export default LaboratoryTestSettingMainAccordion;

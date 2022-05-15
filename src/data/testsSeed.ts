@@ -76,15 +76,15 @@ export const defaultLaboratoryTestSeed: LaboratoryTestCatagories[] = [
     tests: [
       {
         name: 'Platelet',
-        isInfluencedByCategory: true,
-        hasIndividualPrice: true,
+        isInfluencedByCategory: false,
+        hasIndividualPrice: false,
         value: '',
         hasNormalValue: false
       },
       {
         name: 'ESR',
         isInfluencedByCategory: true,
-        hasIndividualPrice: true,
+        hasIndividualPrice: false,
         value: '',
         hasNormalValue: false
       },
@@ -110,8 +110,8 @@ export const defaultLaboratoryTestSeed: LaboratoryTestCatagories[] = [
     tests: [
       {
         name: 'Gram Stain',
-        isInfluencedByCategory: true,
-        hasIndividualPrice: true,
+        isInfluencedByCategory: false,
+        hasIndividualPrice: false,
         individualPrice: 50,
         value: '',
         hasNormalValue: false

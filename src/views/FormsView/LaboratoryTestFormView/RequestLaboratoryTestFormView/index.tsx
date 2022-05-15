@@ -25,6 +25,10 @@ import {
 import SnackbarSuccess from '../../../../components/SnackbarSuccess';
 import { cardQuery } from '../../../../constants/queries';
 import { SettingsContext } from '../../../../context/SettingContext';
+import {
+  LaboratoryTestCatagories,
+  LaboratoryTestDetails
+} from '../../../../data/testsSeed';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -33,6 +37,14 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(3)
   }
 }));
+
+interface RequestCategoryTest extends LaboratoryTestDetails {
+  selected: boolean;
+}
+export interface RequestCategories extends LaboratoryTestCatagories {
+  selected: boolean;
+  tests: RequestCategoryTest[];
+}
 
 const RequestLaboratoryTestFormView = () => {
   const classes = useStyles();
@@ -44,26 +56,35 @@ const RequestLaboratoryTestFormView = () => {
     id: query.get('id'),
     cardName: query.get('name')
   });
-  const [tests, setTests] = useState<PlaceholderTestType[]>();
-  const { laboratoryTestSettingData: testsRate } = useContext(SettingsContext);
+  // const [tests, setTests] = useState<PlaceholderTestType[]>();
+  const { laboratoryTestSettingData } = useContext(SettingsContext);
+  const categoriesInitialState = laboratoryTestSettingData.map(category => ({
+    ...category,
+    selected: false,
+    tests: [...category.tests.map(test => ({ ...test, selected: false }))]
+  }));
+
+  const [categories, setCategories] = useState<RequestCategories[]>(
+    categoriesInitialState
+  );
 
   const [addLabTest] = useCreateLaboratoryTestMutation({
     onError: err => console.log(err)
   });
 
-  useEffect(() => {
-    if (!testsRate) return;
-    const testsWithRates = testsRate.map((test: LaboratoryTestSettingInput) => {
-      return {
-        ...testsPlaceHolder.find(
-          tplaceholder => tplaceholder.name === test.name
-        ),
-        price: test.price,
-        normalValue: test.normalValue
-      };
-    });
-    setTests(testsWithRates as PlaceholderTestType[]);
-  }, [testsRate]);
+  // useEffect(() => {
+  //   if (!laboratoryTestSettingData) return;
+  //   const testsWithRates = laboratoryTestSettingData.map((test) => {
+  //     return {
+  //       ...testsPlaceHolder.find(
+  //         tplaceholder => tplaceholder.name === test.name
+  //       ),
+  //       price: test.price,
+  //       normalValue: test.normalValue
+  //     };
+  //   });
+  //   setTests(testsWithRates as PlaceholderTestType[]);
+  // }, [laboratoryTestSettingData]);
 
   const handleCloseSnackbar = (
     event?: Event | React.SyntheticEvent,
@@ -79,41 +100,38 @@ const RequestLaboratoryTestFormView = () => {
   const handleSubmit:
     | React.FormEventHandler<HTMLFormElement>
     | undefined = async event => {
-    event.preventDefault();
-
-    try {
-      if (!tests || !fromQuery.id) return;
-      let price = 0;
-      const selectedTests = tests
-        .filter(test => test.selected)
-        .map(({ name, category, price }) => ({ name, category, price }));
-      const result = selectedTests.map(({ name, category }) => ({
-        name,
-        category
-      }));
-
-      selectedTests.forEach(test => (price += test.price));
-
-      const test = await addLabTest({
-        variables: {
-          cardId: fromQuery.id,
-          price,
-          result
-        }
-      });
-      setSuccessSnackbarOpen(true);
-      Object.values(categories).forEach(value => {
-        value = false;
-      });
-      history.push(
-        cardQuery({
-          id: fromQuery.id,
-          testId: test.data?.createLaboratoryTest.id
-        })
-      );
-    } catch (err) {
-      console.error(err);
-    }
+    // event.preventDefault();
+    // try {
+    //   if (!categories || !fromQuery.id) return;
+    //   let price = 0;
+    //   const selectedTests = categories
+    //     .filter(test => test.selected)
+    //     .map(({ name, category, price }) => ({ name, category, price }));
+    //   const result = selectedTests.map(({ name, category }) => ({
+    //     name,
+    //     category
+    //   }));
+    //   selectedTests.forEach(test => (price += test.price));
+    //   const test = await addLabTest({
+    //     variables: {
+    //       cardId: fromQuery.id,
+    //       price,
+    //       result
+    //     }
+    //   });
+    //   setSuccessSnackbarOpen(true);
+    //   Object.values(categories).forEach(value => {
+    //     value = false;
+    //   });
+    //   history.push(
+    //     cardQuery({
+    //       id: fromQuery.id,
+    //       testId: test.data?.createLaboratoryTest.id
+    //     })
+    //   );
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
 
   return (
@@ -144,9 +162,28 @@ const RequestLaboratoryTestFormView = () => {
 
         <form onSubmit={handleSubmit}>
           <Grid container>
-            {Object.keys(categories).map((name, index) => {
-              if (!tests) return null;
-              const selectedFields = tests.filter(
+            {categories.map((category, index) => (
+              <Grid
+                key={index}
+                item
+                md={
+                  category.name === 'Clinical Chemistry' ||
+                  category.name === 'Hormone Test'
+                    ? 12
+                    : 6
+                }
+                xs={12}
+              >
+                <SingleAccordion
+                  category={category}
+                  setCategories={setCategories}
+                  validId={!!fromQuery.id}
+                />
+              </Grid>
+            ))}
+            {/* {Object.keys(categories).map((name, index) => {
+              if (!categories) return null;
+              const selectedFields = categories.filter(
                 field => field.category === name
               );
               return (
@@ -163,12 +200,12 @@ const RequestLaboratoryTestFormView = () => {
                   <SingleAccordion
                     header={name}
                     fields={selectedFields}
-                    setFields={setTests}
+                    setFields={setCategories}
                     validId={!!fromQuery.id}
                   />
                 </Grid>
               );
-            })}
+            })} */}
           </Grid>
 
           <Divider />

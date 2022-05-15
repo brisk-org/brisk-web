@@ -13,7 +13,7 @@ import {
   ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
 import SinglePrescriptionRate from './SinglePrescriptionRate';
-import { PrescriptionSettingDataType } from '../../context/SettingContext';
+import { PrescriptionSettingDataType } from '../../../context/SettingContext';
 import PrescriptionSettingDialog from './PrescriptionSettingDialog';
 
 const initialState: PrescriptionSettingDataType = {
@@ -25,15 +25,14 @@ const initialState: PrescriptionSettingDataType = {
   other: ''
 };
 interface Props {
-  prescriptionState: {
-    prescription: PrescriptionSettingDataType[] | undefined;
-    setPrescription: React.Dispatch<
-      React.SetStateAction<PrescriptionSettingDataType[]>
-    >;
-  };
+  prescription: PrescriptionSettingDataType[] | undefined;
+  setPrescription: React.Dispatch<
+    React.SetStateAction<PrescriptionSettingDataType[]>
+  >;
 }
 const PrescriptionRate: React.FC<Props> = ({
-  prescriptionState: { prescription, setPrescription }
+  prescription,
+  setPrescription
 }) => {
   const [open, setOpen] = useState(false);
   const [newPrescription, setNewPrescription] = useState(initialState);

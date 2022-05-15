@@ -9,8 +9,8 @@ import {
   SelectChangeEvent
 } from '@mui/material';
 import React from 'react';
-import SelectTextField from '../../components/helpers/SelectTextField';
-import { PrescriptionSettingDataType } from '../../context/SettingContext';
+import SelectTextField from '../../../components/helpers/SelectTextField';
+import { PrescriptionSettingDataType } from '../../../context/SettingContext';
 import { perDayOption } from './SinglePrescriptionRate';
 
 interface Props {

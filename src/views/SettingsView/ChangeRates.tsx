@@ -1,15 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  Typography,
-  Box,
-  Button
-} from '@mui/material';
+import { Card, CardHeader, CardContent, Box, Button } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import LabRates from './LaboratoryTestSettingAccordion/LabRates';
+import LaboratoryTestSettingMainAccordion from './LaboratoryTestSettingAccordion';
 import {
   useChangeSettingMutation,
   SettingDocument
@@ -22,8 +15,9 @@ import {
   SettingsContext,
   LaboratorySettingDataType
 } from '../../context/SettingContext';
-import PrescriptionRate from './PrescriptionRate';
+import PrescriptionSettingAccordion from './PrescriptionSettingAccordion';
 import { useHistory } from 'react-router-dom';
+import { LaboratoryTestCatagories } from '../../data/testsSeed';
 
 const useStyles = makeStyles(theme => ({
   root: {}
@@ -47,24 +41,24 @@ const ChangeRates = () => {
   const [cardExpirationDate, setCardExpirationDate] = useState<number>(
     oldCardExpirationDate
   );
-  const [laboratoryTestSettingData, setLaboratoryTestSettingData] = useState<
-    LaboratorySettingDataType[]
+  const [laboratoryTestCategories, setLaboratoryTestCategories] = useState<
+    LaboratoryTestCatagories[]
   >(testsRateData);
   const [prescriptionTestSettingData, setPrescriptionSettingData] = useState<
     PrescriptionSettingDataType[]
   >(prescriptionRateData);
 
-  useEffect(() => {
-    setLaboratoryTestSettingData(
-      testsRateData.map(({ name, category, price, normalValue }) => ({
-        name,
-        category,
-        price,
-        normalValue
-      }))
-    );
-    setPrescriptionSettingData(prescriptionRateData);
-  }, [testsRateData, prescriptionRateData]);
+  // useEffect(() => {
+  //   setLaboratoryTestSettingData(
+  //     testsRateData.map(({ name, category, price, normalValue }) => ({
+  //       name,
+  //       category,
+  //       price,
+  //       normalValue
+  //     }))
+  //   );
+  //   setPrescriptionSettingData(prescriptionRateData);
+  // }, [testsRateData, prescriptionRateData]);
 
   const handleCloseSnackbar = (
     event?: Event | React.SyntheticEvent,
@@ -86,41 +80,55 @@ const ChangeRates = () => {
     ],
     onError: err => console.log(err)
   });
-  const handleSubmit:
-    | React.FormEventHandler<HTMLFormElement>
-    | undefined = async event => {
-    event.preventDefault();
-    if (!laboratoryTestSettingData) return;
-    const emptyTestsField = laboratoryTestSettingData.find(
-      ({ price }) => price === (null || 0)
-    );
-    const emptyPrescField = prescriptionTestSettingData.find(
-      ({ name, quantity, price, forDays, perDay }) =>
-        !name ||
-        !price ||
-        !forDays ||
-        !perDay ||
-        (typeof quantity === 'string' && !quantity)
-    );
-    if (
-      emptyTestsField ||
-      !cardPrice ||
-      !cardExpirationDate ||
-      emptyPrescField
-    ) {
-      setErrorSnackbarOpen(true);
-      return;
-    }
+  // const handleSubmit:
+  //   | React.FormEventHandler<HTMLFormElement>
+  //   | undefined = async event => {
+  //   event.preventDefault();
+  //   if (!laboratoryTestSettingData) return;
+  //   const emptyTestsField = laboratoryTestSettingData.find(
+  //     ({ price }) => price === (null || 0)
+  //   );
+  //   const emptyPrescField = prescriptionTestSettingData.find(
+  //     ({ name, quantity, price, forDays, perDay }) =>
+  //       !name ||
+  //       !price ||
+  //       !forDays ||
+  //       !perDay ||
+  //       (typeof quantity === 'string' && !quantity)
+  //   );
+  //   if (
+  //     emptyTestsField ||
+  //     !cardPrice ||
+  //     !cardExpirationDate ||
+  //     emptyPrescField
+  //   ) {
+  //     setErrorSnackbarOpen(true);
+  //     return;
+  //   }
+  //   const d = await changeSetting({
+  //     variables: {
+  //       card_price: cardPrice,
+  //       card_expiration_date: cardExpirationDate,
+  //       laboratory_tests_data: laboratoryTestSettingData,
+  //       prescription_tests_data: prescriptionTestSettingData
+  //     }
+  //   });
+  //   !d.errors && setSuccessSnackbarOpen(true);
+  //   !d.errors && history.push('/app/dashboard');
+  // };
+  const handleSuccess = async () => {
     const d = await changeSetting({
-      variables: {
-        card_price: cardPrice,
-        card_expiration_date: cardExpirationDate,
-        laboratory_tests_data: laboratoryTestSettingData,
-        prescription_tests_data: prescriptionTestSettingData
-      }
+      // variables: {
+      //   card_price: cardPrice,
+      //   card_expiration_date: cardExpirationDate,
+      //   laboratory_tests_data: laboratoryTestSettingData,
+      //   prescription_tests_data: prescriptionTestSettingData
+      // }
     });
-    !d.errors && setSuccessSnackbarOpen(true);
-    !d.errors && history.push('/app/dashboard');
+    if (!d.errors) {
+      setSuccessSnackbarOpen(true);
+      history.push('/app/dashboard');
+    }
   };
 
   return (
@@ -130,9 +138,9 @@ const ChangeRates = () => {
         title="Prices and Normal Values"
       />
       <CardContent>
-        {(!testsRateData || !cardPrice || !cardExpirationDate) && (
+        {/* {(!testsRateData || !cardPrice || !cardExpirationDate) && (
           <Typography color="error">Please fill all the Prices</Typography>
-        )}
+        )} */}
         {/* <form onSubmit={handleSubmit}> */}
         <CardRate
           oldRate={oldCardPrice}
@@ -143,17 +151,13 @@ const ChangeRates = () => {
             setDate: setCardExpirationDate
           }}
         />
-        <LabRates
-          testsState={{
-            tests: laboratoryTestSettingData,
-            setTests: setLaboratoryTestSettingData
-          }}
+        <LaboratoryTestSettingMainAccordion
+          laboratoryTestCategories={laboratoryTestCategories}
+          setLaboratoryTestCategories={setLaboratoryTestCategories}
         />
-        <PrescriptionRate
-          prescriptionState={{
-            prescription: prescriptionTestSettingData,
-            setPrescription: setPrescriptionSettingData
-          }}
+        <PrescriptionSettingAccordion
+          prescription={prescriptionTestSettingData}
+          setPrescription={setPrescriptionSettingData}
         />
         <Box display="flex" justifyContent="flex-end" p={2}>
           <Button type="submit" color="primary" variant="contained">

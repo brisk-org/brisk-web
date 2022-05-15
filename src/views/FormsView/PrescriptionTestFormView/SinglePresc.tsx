@@ -4,7 +4,7 @@ import { CurrentPrescription } from '.';
 import NumberTextField from '../../../components/helpers/NumberTextField';
 import SelectTextField from '../../../components/helpers/SelectTextField';
 import StringTextField from '../../../components/helpers/StringTextField';
-import { perDayOption } from '../../SettingsView/SinglePrescriptionRate';
+import { perDayOption } from '../../SettingsView/PrescriptionSettingAccordion/SinglePrescriptionRate';
 
 interface SinglePrescProps {
   presc: CurrentPrescription;
