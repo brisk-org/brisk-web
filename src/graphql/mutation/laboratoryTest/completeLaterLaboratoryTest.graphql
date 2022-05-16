@@ -1,5 +1,5 @@
 mutation CompleteLaterLaboratoryTest(
-  $result: [LaboratoryTestInput!]!
+  $result: [LaboratoryTestResult!]!
   $id: ID!
 ) {
   completeLaterLaboratoryTest(result: $result, id: $id) {

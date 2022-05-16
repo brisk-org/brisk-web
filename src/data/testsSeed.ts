@@ -64,7 +64,6 @@ export const defaultLaboratoryTestSeed: LaboratoryTestCatagories[] = [
             value: '',
             hasNormalValue: false
           },
-
           {
             name: 'Hgb',
             value: '',
@@ -160,7 +159,6 @@ export const defaultLaboratoryTestSeed: LaboratoryTestCatagories[] = [
         value: '',
         hasNormalValue: false
       },
-
       {
         name: 'Occult Blood',
         isInfluencedByCategory: true,
@@ -168,7 +166,6 @@ export const defaultLaboratoryTestSeed: LaboratoryTestCatagories[] = [
         value: '',
         hasNormalValue: false
       },
-
       {
         name: 'ASO',
         isInfluencedByCategory: true,

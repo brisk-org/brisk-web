@@ -45,7 +45,12 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
         if (prevCategory.name !== category.name) {
           return prevCategory;
         }
-        return { ...prevCategory, selected: checked };
+        const influenceTest = category.tests.map(test =>
+          test.isInfluencedByCategory
+            ? { ...test, selected: checked }
+            : { ...test }
+        );
+        return { ...prevCategory, selected: checked, tests: influenceTest };
       })
     );
   };
@@ -101,10 +106,7 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
                 control={
                   <Checkbox
                     disabled={!test.hasIndividualPrice}
-                    checked={
-                      test.selected ||
-                      (test.isInfluencedByCategory && category.selected)
-                    }
+                    checked={test.selected}
                     onChange={handleTestChange}
                     name={test.name}
                     color="primary"

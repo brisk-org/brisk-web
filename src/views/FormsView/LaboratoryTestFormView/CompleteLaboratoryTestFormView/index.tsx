@@ -86,46 +86,45 @@ const CompleteLaboratoryTestFormView = () => {
   const handleComplete:
     | React.MouseEventHandler<HTMLButtonElement>
     | undefined = event => {
-    if (!tests) return;
-    const isUnfilledTest = tests.find(test => test.value === '');
-    const now = event.currentTarget.name === 'now';
-
-    if (now && isUnfilledTest) {
-      setErrorSnackbarOpen(true);
-      return;
-    }
-    const completedTest = tests.map(test => {
-      return {
-        name: test.name,
-        category: test.category,
-        value: test.value
-      };
-    });
-    now
-      ? completeLaboratoryTest({
-          variables: { id, result: completedTest },
-          refetchQueries: [
-            {
-              query: CardDocument,
-              variables: {
-                id: data?.laboratoryTest.cardId || ''
-              }
-            }
-          ]
-        })
-      : completeLaboratoryTestLater({
-          variables: { id, result: completedTest },
-          refetchQueries: [
-            {
-              query: CardDocument,
-              variables: {
-                id: data?.laboratoryTest.cardId || ''
-              }
-            }
-          ]
-        });
-    setTests(undefined);
-    history.push('/app/data/laboratory-test');
+    // if (!tests) return;
+    // const isUnfilledTest = tests.find(test => test.value === '');
+    // const now = event.currentTarget.name === 'now';
+    // if (now && isUnfilledTest) {
+    //   setErrorSnackbarOpen(true);
+    //   return;
+    // }
+    // const completedTest = tests.map(test => {
+    //   return {
+    //     name: test.name,
+    //     category: test.category,
+    //     value: test.value
+    //   };
+    // });
+    // now
+    //   ? completeLaboratoryTest({
+    //       variables: { id, result: completedTest },
+    //       refetchQueries: [
+    //         {
+    //           query: CardDocument,
+    //           variables: {
+    //             id: data?.laboratoryTest.cardId || ''
+    //           }
+    //         }
+    //       ]
+    //     })
+    //   : completeLaboratoryTestLater({
+    //       variables: { id, result: completedTest },
+    //       refetchQueries: [
+    //         {
+    //           query: CardDocument,
+    //           variables: {
+    //             id: data?.laboratoryTest.cardId || ''
+    //           }
+    //         }
+    //       ]
+    //     });
+    // setTests(undefined);
+    // history.push('/app/data/laboratory-test');
   };
 
   const handleCloseSnackbar = (

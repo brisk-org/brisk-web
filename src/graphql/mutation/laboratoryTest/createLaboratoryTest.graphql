@@ -1,10 +1,10 @@
 mutation CreateLaboratoryTest(
   $cardId: ID!
-  $result: [LaboratoryTestInput!]!
-  $price: Float!
+  $result: [LaboratoryTestResult!]!
+  $totalPrice: Float!
 ) {
   createLaboratoryTest(
-    input: { cardId: $cardId, result: $result, price: $price }
+    input: { cardId: $cardId, result: $result, totalPrice: $totalPrice }
   ) {
     id
     card {

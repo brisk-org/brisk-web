@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 
 import {
   Box,
@@ -12,16 +12,13 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Page from '../../../../components/Page';
-import {
-  categories,
-  testsPlaceHolder,
-  PlaceholderTestType
-} from '../../../../data/testsPlaceHolder';
+// import {
+//   categories,
+//   testsPlaceHolder,
+//   PlaceholderTestType
+// } from '../../../../data/testsPlaceHolder';
 import SingleAccordion from './SingleAccordion';
-import {
-  LaboratoryTestSettingInput,
-  useCreateLaboratoryTestMutation
-} from '../../../../generated/graphql';
+import { useCreateLaboratoryTestMutation } from '../../../../generated/graphql';
 import SnackbarSuccess from '../../../../components/SnackbarSuccess';
 import { cardQuery } from '../../../../constants/queries';
 import { SettingsContext } from '../../../../context/SettingContext';
@@ -29,6 +26,8 @@ import {
   LaboratoryTestCatagories,
   LaboratoryTestDetails
 } from '../../../../data/testsSeed';
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -50,6 +49,7 @@ const RequestLaboratoryTestFormView = () => {
   const classes = useStyles();
   const query = new URLSearchParams(useLocation().search);
   const history = useHistory();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
   const [fromQuery] = useState({
@@ -100,38 +100,91 @@ const RequestLaboratoryTestFormView = () => {
   const handleSubmit:
     | React.FormEventHandler<HTMLFormElement>
     | undefined = async event => {
-    // event.preventDefault();
-    // try {
-    //   if (!categories || !fromQuery.id) return;
-    //   let price = 0;
-    //   const selectedTests = categories
-    //     .filter(test => test.selected)
-    //     .map(({ name, category, price }) => ({ name, category, price }));
-    //   const result = selectedTests.map(({ name, category }) => ({
-    //     name,
-    //     category
-    //   }));
-    //   selectedTests.forEach(test => (price += test.price));
-    //   const test = await addLabTest({
-    //     variables: {
-    //       cardId: fromQuery.id,
-    //       price,
-    //       result
-    //     }
-    //   });
-    //   setSuccessSnackbarOpen(true);
-    //   Object.values(categories).forEach(value => {
-    //     value = false;
-    //   });
-    //   history.push(
-    //     cardQuery({
-    //       id: fromQuery.id,
-    //       testId: test.data?.createLaboratoryTest.id
-    //     })
-    //   );
-    // } catch (err) {
-    //   console.error(err);
-    // }
+    event.preventDefault();
+    try {
+      if (!fromQuery.id) return;
+      let price = 0;
+      const selectedCategories = categories
+        .map(category => {
+          const selectedTests = category.tests.filter(test => test.selected);
+          console.log(selectedTests);
+          if (!selectedTests[0]) {
+            return;
+          }
+          if (category.selected && !category.price) {
+            enqueueSnackbar(`${category.name} must have a price`, {
+              variant: 'error'
+            });
+            return;
+          }
+          if (category.selected) {
+            price += category.price!;
+          }
+          selectedTests.forEach(test => {
+            if (!test.selected) return;
+            if (
+              !test.hasIndividualPrice ||
+              (category.selected && test.isInfluencedByCategory)
+            ) {
+              return;
+            }
+            if (!test.individualPrice) {
+              enqueueSnackbar(
+                `${test.name} in ${category.name} must have a price to be selected individually`,
+                { variant: 'error' }
+              );
+              return;
+            }
+            price += test.individualPrice;
+          });
+          return {
+            ...category,
+            tests: selectedTests
+          };
+        })
+        .map(category => ({
+          name: category?.name,
+          tests: category?.tests,
+          subCategories: category?.subCategories
+        }));
+      const reducedSelectedCategories = selectedCategories
+        .filter(category => category.name)
+        .map(category => ({
+          ...category,
+          tests: category.tests?.map(test => ({
+            name: test.name,
+            value: test.value
+          })),
+          subCategories: category.subCategories?.map(test => ({
+            name: test.name,
+            tests: test.tests.map(test => ({
+              name: test.name,
+              value: test.value
+            }))
+          }))
+        }));
+      console.log('result', reducedSelectedCategories, price);
+      const test = await addLabTest({
+        variables: {
+          cardId: fromQuery.id,
+          totalPrice: price,
+          result: reducedSelectedCategories as any
+        }
+      });
+      setSuccessSnackbarOpen(true);
+      // Object.values(categories).forEach(value => {
+      //   value = false;
+      // });
+      console.log('test', test);
+      history.push(
+        cardQuery({
+          id: fromQuery.id,
+          testId: test.data?.createLaboratoryTest.id
+        })
+      );
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -139,6 +192,11 @@ const RequestLaboratoryTestFormView = () => {
       <Container maxWidth="lg">
         <Card>
           <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
             display="flex"
             justifyContent="space-between"
             alignItems="center"
@@ -151,11 +209,18 @@ const RequestLaboratoryTestFormView = () => {
               }
               subheader="The information can't be edited"
             />
-            <Link to="/app/card/add" replace>
-              <Button color="primary" variant="contained">
-                Cards
-              </Button>
-            </Link>
+            {fromQuery.id && (
+              <Link to={cardQuery({ id: fromQuery.id })} replace>
+                <Button
+                  startIcon={<ArrowBackIcon />}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                >
+                  Back to Card History
+                </Button>
+              </Link>
+            )}
           </Box>
           <Divider />
         </Card>

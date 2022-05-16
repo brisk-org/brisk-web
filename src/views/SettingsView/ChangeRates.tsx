@@ -29,7 +29,7 @@ const ChangeRates = () => {
   const {
     cardPrice: oldCardPrice,
     cardExpirationDate: oldCardExpirationDate,
-    laboratoryTestSettingData: testsRateData,
+    laboratoryTestSettingData,
     prescriptionTestSettingData: prescriptionRateData
   } = useContext(SettingsContext);
   const history = useHistory();
@@ -43,7 +43,7 @@ const ChangeRates = () => {
   );
   const [laboratoryTestCategories, setLaboratoryTestCategories] = useState<
     LaboratoryTestCatagories[]
-  >(testsRateData);
+  >(laboratoryTestSettingData);
   const [prescriptionTestSettingData, setPrescriptionSettingData] = useState<
     PrescriptionSettingDataType[]
   >(prescriptionRateData);
@@ -80,42 +80,51 @@ const ChangeRates = () => {
     ],
     onError: err => console.log(err)
   });
-  // const handleSubmit:
-  //   | React.FormEventHandler<HTMLFormElement>
-  //   | undefined = async event => {
-  //   event.preventDefault();
-  //   if (!laboratoryTestSettingData) return;
-  //   const emptyTestsField = laboratoryTestSettingData.find(
-  //     ({ price }) => price === (null || 0)
-  //   );
-  //   const emptyPrescField = prescriptionTestSettingData.find(
-  //     ({ name, quantity, price, forDays, perDay }) =>
-  //       !name ||
-  //       !price ||
-  //       !forDays ||
-  //       !perDay ||
-  //       (typeof quantity === 'string' && !quantity)
-  //   );
-  //   if (
-  //     emptyTestsField ||
-  //     !cardPrice ||
-  //     !cardExpirationDate ||
-  //     emptyPrescField
-  //   ) {
-  //     setErrorSnackbarOpen(true);
-  //     return;
-  //   }
-  //   const d = await changeSetting({
-  //     variables: {
-  //       card_price: cardPrice,
-  //       card_expiration_date: cardExpirationDate,
-  //       laboratory_tests_data: laboratoryTestSettingData,
-  //       prescription_tests_data: prescriptionTestSettingData
-  //     }
-  //   });
-  //   !d.errors && setSuccessSnackbarOpen(true);
-  //   !d.errors && history.push('/app/dashboard');
-  // };
+  const handleSubmit:
+    | React.FormEventHandler<HTMLFormElement>
+    | undefined = async event => {
+    event.preventDefault();
+    if (!laboratoryTestSettingData) return;
+    // const emptyTestsField = laboratoryTestSettingData.find(
+    //   ({ price }) => price === (null || 0)
+    // );
+    // const emptyPrescField = prescriptionTestSettingData.find(
+    //   ({ name, quantity, price, forDays, perDay }) =>
+    //     !name ||
+    //     !price ||
+    //     !forDays ||
+    //     !perDay ||
+    //     (typeof quantity === 'string' && !quantity)
+    // );
+    console.log(laboratoryTestSettingData);
+    // if (
+    //   emptyTestsField ||
+    //   !cardPrice ||
+    //   !cardExpirationDate ||
+    //   emptyPrescField
+    // ) {
+    //   setErrorSnackbarOpen(true);
+    //   return;
+    // }
+    const laboratory_tests_data = laboratoryTestSettingData.map(
+      ({ name, subCategories, tests }) => ({
+        name,
+        subCategories,
+        tests
+      })
+    );
+    const d = await changeSetting({
+      variables: {
+        card_price: cardPrice,
+        card_expiration_date: cardExpirationDate,
+        laboratory_tests_data: laboratoryTestSettingData,
+        prescription_tests_data: prescriptionTestSettingData
+      }
+    });
+    console.log(d);
+    !d.errors && setSuccessSnackbarOpen(true);
+    !d.errors && history.push('/app/dashboard');
+  };
   const handleSuccess = async () => {
     const d = await changeSetting({
       // variables: {
@@ -141,30 +150,30 @@ const ChangeRates = () => {
         {/* {(!testsRateData || !cardPrice || !cardExpirationDate) && (
           <Typography color="error">Please fill all the Prices</Typography>
         )} */}
-        {/* <form onSubmit={handleSubmit}> */}
-        <CardRate
-          oldRate={oldCardPrice}
-          oldDate={oldCardExpirationDate}
-          priceState={{ price: cardPrice, setPrice: setCardRate }}
-          dateState={{
-            date: cardExpirationDate,
-            setDate: setCardExpirationDate
-          }}
-        />
-        <LaboratoryTestSettingMainAccordion
-          laboratoryTestCategories={laboratoryTestCategories}
-          setLaboratoryTestCategories={setLaboratoryTestCategories}
-        />
-        <PrescriptionSettingAccordion
-          prescription={prescriptionTestSettingData}
-          setPrescription={setPrescriptionSettingData}
-        />
-        <Box display="flex" justifyContent="flex-end" p={2}>
-          <Button type="submit" color="primary" variant="contained">
-            Update Values
-          </Button>
-        </Box>
-        {/* </form> */}
+        <form onSubmit={handleSubmit}>
+          <CardRate
+            oldRate={oldCardPrice}
+            oldDate={oldCardExpirationDate}
+            priceState={{ price: cardPrice, setPrice: setCardRate }}
+            dateState={{
+              date: cardExpirationDate,
+              setDate: setCardExpirationDate
+            }}
+          />
+          <LaboratoryTestSettingMainAccordion
+            laboratoryTestCategories={laboratoryTestCategories}
+            setLaboratoryTestCategories={setLaboratoryTestCategories}
+          />
+          <PrescriptionSettingAccordion
+            prescription={prescriptionTestSettingData}
+            setPrescription={setPrescriptionSettingData}
+          />
+          <Box display="flex" justifyContent="flex-end" p={2}>
+            <Button type="submit" color="primary" variant="contained">
+              Update Values
+            </Button>
+          </Box>
+        </form>
         <SnackbarSuccess
           open={successSnackbarOpen}
           handleClose={handleCloseSnackbar}

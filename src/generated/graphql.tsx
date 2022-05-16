@@ -58,7 +58,7 @@ export type CardSales = {
 export type ChangeSettingsInput = {
   card_price: Scalars['Float'];
   card_expiration_date: Scalars['Float'];
-  laboratory_tests_data: Array<LaboratoryTestSettingInput>;
+  laboratory_tests_data: Array<LaboratoryTestResult>;
   prescription_tests_data: Array<PrescriptionInput>;
 };
 
@@ -74,8 +74,8 @@ export type CompleteQuickPrescriptionTestInput = {
 
 export type CreateLaboratoryTestInput = {
   cardId: Scalars['ID'];
-  price: Scalars['Float'];
-  result: Array<LaboratoryTestInput>;
+  totalPrice: Scalars['Float'];
+  result: Array<LaboratoryTestResult>;
 };
 
 export type CreatePrescriptionTestInput = {
@@ -121,6 +121,11 @@ export type History = {
   updated_at: Scalars['String'];
 };
 
+export type LaboratorySubCategoryInput = {
+  name: Scalars['String'];
+  tests: Array<LaboratoryTestInput>;
+};
+
 export type LaboratoryTest = {
   __typename?: 'LaboratoryTest';
   id: Scalars['ID'];
@@ -137,15 +142,13 @@ export type LaboratoryTest = {
 
 export type LaboratoryTestInput = {
   name: Scalars['String'];
-  category: Scalars['String'];
-  value?: Maybe<Scalars['String']>;
+  value: Scalars['String'];
 };
 
-export type LaboratoryTestSettingInput = {
+export type LaboratoryTestResult = {
   name: Scalars['String'];
-  category: Scalars['String'];
-  price: Scalars['Float'];
-  normalValue?: Maybe<Scalars['String']>;
+  subCategories?: Maybe<Array<LaboratorySubCategoryInput>>;
+  tests?: Maybe<Array<LaboratoryTestInput>>;
 };
 
 export type Mutation = {
@@ -226,13 +229,13 @@ export type MutationCreateLaboratoryTestArgs = {
 
 
 export type MutationCompleteLaboratoryTestArgs = {
-  result: Array<LaboratoryTestInput>;
+  result: Array<LaboratoryTestResult>;
   id: Scalars['ID'];
 };
 
 
 export type MutationCompleteLaterLaboratoryTestArgs = {
-  result: Array<LaboratoryTestInput>;
+  result: Array<LaboratoryTestResult>;
   id: Scalars['ID'];
 };
 
@@ -771,7 +774,7 @@ export type UpdateHistoryMutation = (
 );
 
 export type CompleteLaboratoryTestMutationVariables = Exact<{
-  result: Array<LaboratoryTestInput> | LaboratoryTestInput;
+  result: Array<LaboratoryTestResult> | LaboratoryTestResult;
   id: Scalars['ID'];
 }>;
 
@@ -789,7 +792,7 @@ export type CompleteLaboratoryTestMutation = (
 );
 
 export type CompleteLaterLaboratoryTestMutationVariables = Exact<{
-  result: Array<LaboratoryTestInput> | LaboratoryTestInput;
+  result: Array<LaboratoryTestResult> | LaboratoryTestResult;
   id: Scalars['ID'];
 }>;
 
@@ -808,8 +811,8 @@ export type CompleteLaterLaboratoryTestMutation = (
 
 export type CreateLaboratoryTestMutationVariables = Exact<{
   cardId: Scalars['ID'];
-  result: Array<LaboratoryTestInput> | LaboratoryTestInput;
-  price: Scalars['Float'];
+  result: Array<LaboratoryTestResult> | LaboratoryTestResult;
+  totalPrice: Scalars['Float'];
 }>;
 
 
@@ -1069,7 +1072,7 @@ export type MarkQuickPrescriptionTestAsSeenMutation = (
 export type ChangeSettingMutationVariables = Exact<{
   card_price: Scalars['Float'];
   card_expiration_date: Scalars['Float'];
-  laboratory_tests_data: Array<LaboratoryTestSettingInput> | LaboratoryTestSettingInput;
+  laboratory_tests_data: Array<LaboratoryTestResult> | LaboratoryTestResult;
   prescription_tests_data: Array<PrescriptionInput> | PrescriptionInput;
 }>;
 
@@ -2023,7 +2026,7 @@ export type UpdateHistoryMutationHookResult = ReturnType<typeof useUpdateHistory
 export type UpdateHistoryMutationResult = Apollo.MutationResult<UpdateHistoryMutation>;
 export type UpdateHistoryMutationOptions = Apollo.BaseMutationOptions<UpdateHistoryMutation, UpdateHistoryMutationVariables>;
 export const CompleteLaboratoryTestDocument = gql`
-    mutation CompleteLaboratoryTest($result: [LaboratoryTestInput!]!, $id: ID!) {
+    mutation CompleteLaboratoryTest($result: [LaboratoryTestResult!]!, $id: ID!) {
   completeLaboratoryTest(result: $result, id: $id) {
     id
     result
@@ -2067,7 +2070,7 @@ export type CompleteLaboratoryTestMutationHookResult = ReturnType<typeof useComp
 export type CompleteLaboratoryTestMutationResult = Apollo.MutationResult<CompleteLaboratoryTestMutation>;
 export type CompleteLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<CompleteLaboratoryTestMutation, CompleteLaboratoryTestMutationVariables>;
 export const CompleteLaterLaboratoryTestDocument = gql`
-    mutation CompleteLaterLaboratoryTest($result: [LaboratoryTestInput!]!, $id: ID!) {
+    mutation CompleteLaterLaboratoryTest($result: [LaboratoryTestResult!]!, $id: ID!) {
   completeLaterLaboratoryTest(result: $result, id: $id) {
     id
     result
@@ -2111,8 +2114,10 @@ export type CompleteLaterLaboratoryTestMutationHookResult = ReturnType<typeof us
 export type CompleteLaterLaboratoryTestMutationResult = Apollo.MutationResult<CompleteLaterLaboratoryTestMutation>;
 export type CompleteLaterLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<CompleteLaterLaboratoryTestMutation, CompleteLaterLaboratoryTestMutationVariables>;
 export const CreateLaboratoryTestDocument = gql`
-    mutation CreateLaboratoryTest($cardId: ID!, $result: [LaboratoryTestInput!]!, $price: Float!) {
-  createLaboratoryTest(input: {cardId: $cardId, result: $result, price: $price}) {
+    mutation CreateLaboratoryTest($cardId: ID!, $result: [LaboratoryTestResult!]!, $totalPrice: Float!) {
+  createLaboratoryTest(
+    input: {cardId: $cardId, result: $result, totalPrice: $totalPrice}
+  ) {
     id
     card {
       name
@@ -2138,7 +2143,7 @@ export type CreateLaboratoryTestMutationFn = Apollo.MutationFunction<CreateLabor
  *   variables: {
  *      cardId: // value for 'cardId'
  *      result: // value for 'result'
- *      price: // value for 'price'
+ *      totalPrice: // value for 'totalPrice'
  *   },
  * });
  */
@@ -2797,7 +2802,7 @@ export type MarkQuickPrescriptionTestAsSeenMutationHookResult = ReturnType<typeo
 export type MarkQuickPrescriptionTestAsSeenMutationResult = Apollo.MutationResult<MarkQuickPrescriptionTestAsSeenMutation>;
 export type MarkQuickPrescriptionTestAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkQuickPrescriptionTestAsSeenMutation, MarkQuickPrescriptionTestAsSeenMutationVariables>;
 export const ChangeSettingDocument = gql`
-    mutation ChangeSetting($card_price: Float!, $card_expiration_date: Float!, $laboratory_tests_data: [LaboratoryTestSettingInput!]!, $prescription_tests_data: [PrescriptionInput!]!) {
+    mutation ChangeSetting($card_price: Float!, $card_expiration_date: Float!, $laboratory_tests_data: [LaboratoryTestResult!]!, $prescription_tests_data: [PrescriptionInput!]!) {
   changeSetting(
     setting: {card_price: $card_price, card_expiration_date: $card_expiration_date, laboratory_tests_data: $laboratory_tests_data, prescription_tests_data: $prescription_tests_data}
   ) {
