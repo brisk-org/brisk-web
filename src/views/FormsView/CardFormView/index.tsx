@@ -4,7 +4,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../../components/Page';
 import { AuthContext } from '../../../context/AuthContext';
 import { useLocation } from 'react-router-dom';
-import AddCardForm from './AddCardForm';
+import CardForm from './CardForm';
 import HistoryForm from './HistoryForm';
 
 const useStyles = makeStyles(theme => ({
@@ -23,13 +23,15 @@ const CardFormView = () => {
   const history = query.get('history') === 'true';
 
   return (
-    <Page title="Add Card">
+    <Page
+      title={
+        occupation === 'DOCTOR' && history
+          ? 'Register Patient History'
+          : 'Register Patient Card'
+      }
+    >
       <Container className={classes.root} maxWidth="lg">
-        {!history ? (
-          <AddCardForm />
-        ) : (
-          occupation === 'DOCTOR' && <HistoryForm />
-        )}
+        {!history ? <CardForm /> : occupation === 'DOCTOR' && <HistoryForm />}
         <Divider />
       </Container>
     </Page>

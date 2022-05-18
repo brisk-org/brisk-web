@@ -254,13 +254,13 @@ export const allCardHistoryFormInfo: CardHistoryFormInfoType = {
 
 export const initialCardFormState: InitialCardFormStateType = query => ({
   name: query.get('name') || '',
-  age: query.get('age') || '00',
+  age: query.get('age') || '',
   gender: query.get('gender') || 'male',
   phone: query.get('phone') || '09',
   address: query.get('address') || '',
-  house_no: query.get('house_no') || '0000',
+  house_no: query.get('house_no') || '',
   k_ketema: query.get('address') || '',
-  kebele: query.get('kebele') || '1'
+  kebele: query.get('kebele') || ''
 });
 export const initialCardHistoryState: InitialCardHistoryStateType = query => ({
   bp: query.get('bp') || '',
@@ -284,11 +284,11 @@ export const initialCardHistoryState: InitialCardHistoryStateType = query => ({
 export const nullCardValue: CardProfileFormStateType = {
   name: '',
   gender: 'male',
-  age: '0',
+  age: '',
   phone: '09',
-  house_no: '0000',
+  house_no: '',
   address: '',
-  kebele: '1',
+  kebele: '',
   k_ketema: ''
 };
 

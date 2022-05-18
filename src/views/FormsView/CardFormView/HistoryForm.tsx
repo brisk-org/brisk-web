@@ -9,11 +9,11 @@ import {
   Box,
   Button,
   ButtonGroup,
-  TextField,
-  SelectChangeEvent
+  SelectChangeEvent,
+  TextareaAutosize,
+  Typography
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import TextArea from './TextArea';
 import StringTextField from '../../../components/helpers/StringTextField';
 import SelectTextField from '../../../components/helpers/SelectTextField';
 import NumberTextField from '../../../components/helpers/NumberTextField';
@@ -221,13 +221,18 @@ const HistoryForm: React.FC<HistoryFormProps> = () => {
                         />
                       )) ||
                       (type === 'textArea' && (
-                        <TextArea
-                          name={key}
-                          handleChange={handleChange}
-                          label={label}
-                          value={value}
-                          required={required}
-                        />
+                        <>
+                          <Typography variant="body1" color="textSecondary">
+                            {label}
+                          </Typography>
+                          <TextareaAutosize
+                            name={key}
+                            onChange={handleChange}
+                            placeholder={`"${label}" content goes Here`}
+                            value={value}
+                            required={required}
+                          />
+                        </>
                       ))}
                   </Grid>
                 );

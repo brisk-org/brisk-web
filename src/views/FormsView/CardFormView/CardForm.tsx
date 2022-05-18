@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -7,7 +7,9 @@ import {
   Grid,
   Button,
   Box,
-  SelectChangeEvent
+  SelectChangeEvent,
+  Icon,
+  TextField
 } from '@mui/material';
 
 import makeStyles from '@mui/styles/makeStyles';
@@ -28,6 +30,7 @@ import {
   useCreateCardMutation,
   useUpdateCardMutation
 } from '../../../generated/graphql';
+import { Oval, useLoading } from '@agney/react-loading';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -46,7 +49,7 @@ const genderOptions = [
   }
 ];
 
-const AddCardForm = () => {
+const CardForm = () => {
   const classes = useStyles();
 
   const query = new URLSearchParams(useLocation().search);
@@ -55,16 +58,22 @@ const AddCardForm = () => {
     initialCardFormState(query)
   );
 
-  const id = query.get('id');
-  const isNewCard = !id;
+  const queryId = query.get('id');
 
-  const [createCard] = useCreateCardMutation({
+  const [createCard, { loading: createCardLoading }] = useCreateCardMutation({
     onError: err => console.log(err)
   });
-  const [editCard] = useUpdateCardMutation({
+  const [editCard, { loading: editCardLoading }] = useUpdateCardMutation({
     onError: err => console.log(err)
   });
-
+  useEffect(() => {
+    console.log(createCardLoading);
+  }, [createCardLoading]);
+  console.log(createCardLoading, editCardLoading);
+  const { indicatorEl } = useLoading({
+    loading: createCardLoading || editCardLoading,
+    indicator: <Oval />
+  });
   const handleChange = (
     event:
       | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -80,12 +89,15 @@ const AddCardForm = () => {
     | React.FormEventHandler<HTMLFormElement>
     | undefined = async event => {
     event.preventDefault();
-    isNewCard
-      ? await createCard({ variables: { ...card } })
-      : id &&
-        (await editCard({
-          variables: { id, ...card }
-        }));
+
+    if (!queryId) {
+      await createCard({ variables: { ...card } });
+      setCard(nullCardValue);
+      return;
+    }
+    await editCard({
+      variables: { id: queryId, ...card }
+    });
 
     setCard(nullCardValue);
   };
@@ -114,23 +126,28 @@ const AddCardForm = () => {
                 return (
                   <Grid item md={inputSizeMd} xs={inputSizeXs}>
                     {(type === 'number' && (
-                      <NumberTextField
+                      <TextField
+                        fullWidth
+                        type="number"
+                        helperText={helperText}
                         label={label}
                         name={key}
-                        handleChange={handleChange}
-                        value={Number(value)}
-                        helperText={helperText}
+                        onChange={handleChange}
                         required={!!required}
+                        value={value}
+                        variant="standard"
                       />
                     )) ||
                       (type === 'string' && (
-                        <StringTextField
+                        <TextField
+                          fullWidth
+                          helperText={helperText}
                           label={label}
                           name={key}
-                          handleChange={handleChange}
-                          value={value}
-                          helperText={helperText}
+                          onChange={handleChange}
                           required={!!required}
+                          value={value}
+                          variant="standard"
                         />
                       )) ||
                       (type === 'select' && (
@@ -151,8 +168,13 @@ const AddCardForm = () => {
         </CardContent>
 
         <Box display="flex" justifyContent="flex-end" m={2}>
-          <Button color="primary" variant="contained" name="none" type="submit">
-            {isNewCard ? 'Add Card' : 'Update Card'}
+          <Button
+            variant="contained"
+            type="submit"
+            disabled={!!indicatorEl}
+            endIcon={indicatorEl && <Icon>{indicatorEl}</Icon>}
+          >
+            {!queryId ? 'Add Card' : 'Update Card'}
           </Button>
         </Box>
       </Card>
@@ -160,4 +182,4 @@ const AddCardForm = () => {
   );
 };
 
-export default AddCardForm;
+export default CardForm;

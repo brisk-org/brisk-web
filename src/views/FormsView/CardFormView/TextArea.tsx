@@ -31,21 +31,7 @@ const TextArea: React.FC<StringTextFieldProps> = ({
 }) => {
   const classes = useStyles();
 
-  return (
-    <>
-      <Typography variant="body1" color="textSecondary">
-        {label}
-      </Typography>
-      <TextareaAutosize
-        className={classes.root}
-        name={name}
-        onChange={handleChange}
-        placeholder={`"${label}" content goes Here`}
-        value={value}
-        required={required}
-      />
-    </>
-  );
+  return <></>;
 };
 
 export default TextArea;
