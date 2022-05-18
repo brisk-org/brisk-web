@@ -130,7 +130,7 @@ const SingleDetailedPrescription: React.FC<{
                     secondary={
                       <>
                         <Typography variant="body2">
-                          {prescription.quantity}
+                          {prescription.strength}
                         </Typography>
                         <Typography variant="body2">
                           {prescription.perDay}

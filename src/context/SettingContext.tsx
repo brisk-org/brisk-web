@@ -14,7 +14,8 @@ export type LaboratorySettingDataType = {
 };
 export type PrescriptionSettingDataType = {
   name: string;
-  quantity?: string;
+  strength?: string;
+  inStock: number;
   price: number;
   perDay: 'bid' | 'stat';
   forDays: number;

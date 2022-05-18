@@ -11,13 +11,18 @@ import {
   ButtonGroup,
   SelectChangeEvent,
   TextareaAutosize,
-  Typography
+  Typography,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  FormControlLabel,
+  InputLabel
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import StringTextField from '../../../components/helpers/StringTextField';
 import SelectTextField from '../../../components/helpers/SelectTextField';
 import NumberTextField from '../../../components/helpers/NumberTextField';
-import clsx from 'clsx';
 import { useLocation, useHistory } from 'react-router-dom';
 import {
   allCardHistoryFormInfo,
@@ -44,12 +49,6 @@ import {
   convertJSONToPlaneHistoryResult
 } from '../../../utils/historyResultsJson';
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    margin: '25px 0'
-  }
-}));
-
 const gaOptions = [
   {
     value: 'good',
@@ -64,9 +63,17 @@ const gaOptions = [
     label: 'Acutely sick looking'
   }
 ];
-interface HistoryFormProps {}
-
-const HistoryForm: React.FC<HistoryFormProps> = () => {
+const useStyles = makeStyles(theme => ({
+  textarea: {
+    backgroundColor: theme.palette.background.paper,
+    border: '1px solid gray',
+    maxWidth: '100%',
+    width: '100%',
+    padding: '20px 10px',
+    minHeight: '100px'
+  }
+}));
+const HistoryForm = () => {
   const classes = useStyles();
   const query = new URLSearchParams(useLocation().search);
   const { occupation } = useContext(AuthContext);
@@ -79,14 +86,18 @@ const HistoryForm: React.FC<HistoryFormProps> = () => {
   const [history, setHistory] = useState<CardHistoryStateType>(
     initialCardHistoryState(query)
   );
-  const [file, setFile] = useState<File>();
-  const [fileName, setFileName] = useState('');
   const [clickedButton, setClickedButton] = useState('');
 
-  const [createHistory] = useCreateHistoryMutation({
+  const [
+    createHistory,
+    { loading: createHistoryLoading }
+  ] = useCreateHistoryMutation({
     onError: err => console.log(err)
   });
-  const [updateHistory] = useUpdateHistoryMutation({
+  const [
+    updateHistory,
+    { loading: updateHistoryLoading }
+  ] = useUpdateHistoryMutation({
     onError: err => console.log(err),
     refetchQueries: [
       {
@@ -111,6 +122,7 @@ const HistoryForm: React.FC<HistoryFormProps> = () => {
       toBeEditedHistoryData.history.result
     );
     setHistory(result);
+    console.log('here', result);
   }, [toBeEditedHistoryData]);
 
   const handleClick:
@@ -128,15 +140,6 @@ const HistoryForm: React.FC<HistoryFormProps> = () => {
       ...history,
       [event.target.name]: event.target.value
     }));
-  };
-
-  const handleFileChange:
-    | React.ChangeEventHandler<HTMLInputElement>
-    | undefined = event => {
-    const file = event.currentTarget.files;
-    if (!file) return;
-    setFile(file[0]);
-    setFileName(file[0].name);
   };
 
   const handleSubmit:
@@ -171,11 +174,11 @@ const HistoryForm: React.FC<HistoryFormProps> = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={clsx(classes.root)}>
-      <Card className={classes.root}>
+    <form onSubmit={handleSubmit}>
+      <Card sx={{ my: '25px' }}>
         <CardHeader
-          subheader="The information can not be edited"
-          title="Patient's History"
+          title={`History form for ${query.get('name')}`}
+          subheader="history can be comleted later on"
         />
         <Divider />
         <CardContent>
@@ -192,33 +195,48 @@ const HistoryForm: React.FC<HistoryFormProps> = () => {
                 }: CardFormInfoValueType = valueObj;
                 const value = (history as any)[key];
                 return (
-                  <Grid item md={inputSizeMd} sm={inputSizeSm} xs={inputSizeXs}>
+                  <Grid
+                    key={index}
+                    item
+                    md={inputSizeMd}
+                    sm={inputSizeSm}
+                    xs={inputSizeXs}
+                  >
                     {(type === 'number' && (
-                      <NumberTextField
+                      <TextField
+                        fullWidth
+                        type="number"
                         label={label}
                         name={key}
-                        handleChange={handleChange}
-                        value={Number(value)}
-                        required={required}
+                        onChange={handleChange}
+                        required={!!required}
+                        value={value}
+                        variant="standard"
                       />
                     )) ||
                       (type === 'string' && (
-                        <StringTextField
+                        <TextField
+                          fullWidth
                           label={label}
                           name={key}
-                          handleChange={handleChange}
+                          onChange={handleChange}
+                          required={!!required}
                           value={value}
-                          required={required}
+                          variant="standard"
                         />
                       )) ||
                       (type === 'select' && (
-                        <SelectTextField
-                          label={label}
-                          name={key}
-                          handleChange={handleChange}
-                          value={value}
-                          options={gaOptions}
-                        />
+                        <FormControl fullWidth>
+                          <InputLabel>{label}</InputLabel>
+                          <SelectTextField
+                            label={label}
+                            name={key}
+                            handleChange={handleChange}
+                            value={value}
+                            options={gaOptions}
+                            required={!!required}
+                          />
+                        </FormControl>
                       )) ||
                       (type === 'textArea' && (
                         <>
@@ -226,6 +244,7 @@ const HistoryForm: React.FC<HistoryFormProps> = () => {
                             {label}
                           </Typography>
                           <TextareaAutosize
+                            className={classes.textarea}
                             name={key}
                             onChange={handleChange}
                             placeholder={`"${label}" content goes Here`}
@@ -242,7 +261,11 @@ const HistoryForm: React.FC<HistoryFormProps> = () => {
         </CardContent>
 
         <Box display="flex" justifyContent="flex-end" p={2}>
-          <ButtonGroup color="primary" variant="contained">
+          <ButtonGroup
+            color="primary"
+            variant="contained"
+            disabled={createHistoryLoading || updateHistoryLoading}
+          >
             <Button onClick={handleClick} name="none" type="submit">
               {isNewHistory ? 'Create History' : 'Update History'}
             </Button>

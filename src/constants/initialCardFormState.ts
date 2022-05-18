@@ -228,7 +228,7 @@ export const allCardHistoryFormInfo: CardHistoryFormInfoType = {
     inputSizeSm: 6,
     inputSizeXs: 12,
     type: 'select',
-    required: true
+    required: false
   },
   asst: {
     label: 'ASST',

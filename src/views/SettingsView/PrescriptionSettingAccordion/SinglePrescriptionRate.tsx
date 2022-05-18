@@ -17,11 +17,15 @@ import {
 } from '@mui/icons-material';
 import PrescriptionSettingDialog from './PrescriptionSettingDialog';
 import AlertDialog from '../../../components/AlertDialog';
+import { color } from '@mui/system';
 
 const useStyles = makeStyles(theme => ({
   root: {
     width: '33.3%',
     display: 'inline-block'
+  },
+  lowInStock: {
+    backgroundColor: 'yellow'
   }
 }));
 export const perDayOption = [
@@ -98,7 +102,9 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({
             primary={prescription.name}
             secondary={
               <>
-                <Typography variant="caption">9 in stock</Typography>
+                <Typography variant="caption">
+                  {prescription.inStock} in stock
+                </Typography>
               </>
             }
           />
@@ -107,6 +113,7 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({
       </ListItem>
       <></>
       <PrescriptionSettingDialog
+        use="settings"
         title={`Change Settings For ${prescription.name}`}
         open={openSettingDialog}
         prescription={prescriptionEdit}

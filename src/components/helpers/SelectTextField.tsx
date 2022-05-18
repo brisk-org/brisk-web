@@ -23,14 +23,14 @@ const SelectTextField: React.FC<SelectTextFieldProps> = ({
   return (
     <Select
       fullWidth
+      sx={{ height: '100%' }}
       label={label}
       name={name}
       onChange={handleChange}
       required={required}
       value={value}
-      variant="standard"
       margin="dense"
-      defaultValue={value}
+      variant="standard"
     >
       {options.map((option, index) => (
         <MenuItem key={index} value={option.value}>

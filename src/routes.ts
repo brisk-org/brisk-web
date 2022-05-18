@@ -16,7 +16,7 @@ import {
 
 import { Occupation } from './context/AuthContext';
 import DashboardView from './views/DashboardView';
-import CardFormView from './views/FormsView/CardFormView';
+import CardFormView from './views/FormsView/PatientFormView';
 import QuickLaboratoryTestFormView from './views/FormsView/QuickLaboratoryTestFormView';
 import QuickPrescriptionFormView from './views/FormsView/QuickPrescriptionFormView';
 import MedicalRequestFormView from './views/FormsView/MedicalRequestFormView';

@@ -9,7 +9,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Grid,
+  Grid
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { MoreHorizRounded } from '@mui/icons-material';
@@ -83,9 +83,10 @@ const MainContainerTable: React.FC<MainContainerTableProps> = ({
   const handlePageChange = (_: any, newPage: number) => {
     setPage(newPage);
   };
-  const handleLable = ({ from, to }: any) => {
+  const handleLable = ({ from }: any) => {
     setSkip(from - 1);
-    return `${from} -${skip + take}`;
+    const to = skip + take;
+    return `${from} -${to < (count || 0) ? to : skip + (count || 0)}`;
   };
 
   return (

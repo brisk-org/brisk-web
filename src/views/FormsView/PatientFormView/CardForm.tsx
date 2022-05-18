@@ -14,10 +14,7 @@ import {
 
 import makeStyles from '@mui/styles/makeStyles';
 
-import StringTextField from '../../../components/helpers/StringTextField';
-import NumberTextField from '../../../components/helpers/NumberTextField';
 import SelectTextField from '../../../components/helpers/SelectTextField';
-import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import {
   allCardProfileFormInfo,
@@ -32,12 +29,6 @@ import {
 } from '../../../generated/graphql';
 import { Oval, useLoading } from '@agney/react-loading';
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    margin: '25px 0'
-  }
-}));
-
 const genderOptions = [
   {
     value: 'male',
@@ -50,8 +41,6 @@ const genderOptions = [
 ];
 
 const CardForm = () => {
-  const classes = useStyles();
-
   const query = new URLSearchParams(useLocation().search);
 
   const [card, setCard] = useState<CardProfileFormStateType>(
@@ -103,11 +92,11 @@ const CardForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={clsx(classes.root)}>
-      <Card className={classes.root}>
+    <form onSubmit={handleSubmit}>
+      <Card sx={{ my: '25px' }}>
         <CardHeader
-          subheader="The information can be edited"
-          title="Patient's Profile"
+          title="New Patient Information"
+          subheader="information can be edited later"
         />
         <Divider />
         <CardContent>
@@ -134,7 +123,7 @@ const CardForm = () => {
                         name={key}
                         onChange={handleChange}
                         required={!!required}
-                        value={value}
+                        value={value === 0 ? '' : value}
                         variant="standard"
                       />
                     )) ||

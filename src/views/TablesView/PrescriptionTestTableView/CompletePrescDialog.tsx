@@ -10,7 +10,7 @@ import {
   Box,
   colors,
   Fab,
-  Grid,
+  Grid
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import {
@@ -122,13 +122,13 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
                 (JSON.parse(
                   data.prescriptionTest.result
                 ) as PrescriptionSettingDataType[]).map(
-                  ({ name, quantity, forDays, perDay, other }, index) => (
+                  ({ name, strength, forDays, perDay, other }, index) => (
                     <Grid item md={6} sm={12} key={index}>
                       <Fab className={classes.doneAllIcon} size="large">
                         <DoneAllRounded />
                       </Fab>
                       <Typography>
-                        {name} {quantity && ` - ${quantity}`}
+                        {name} {strength && ` - ${strength}`}
                       </Typography>
                       <Typography>{perDay}</Typography>
                       <Typography>For {forDays} days</Typography>

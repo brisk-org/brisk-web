@@ -21,7 +21,8 @@ const initialState: PrescriptionSettingDataType = {
   forDays: 1,
   perDay: 'stat',
   price: 0,
-  quantity: '',
+  inStock: 0,
+  strength: '',
   other: ''
 };
 interface Props {
@@ -83,6 +84,7 @@ const PrescriptionRate: React.FC<Props> = ({
         </AccordionSummary>
       </Accordion>
       <PrescriptionSettingDialog
+        use="settings"
         title="Add new Prescription"
         open={open}
         prescription={newPrescription}

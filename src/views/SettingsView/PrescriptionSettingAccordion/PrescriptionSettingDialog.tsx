@@ -14,6 +14,7 @@ import { PrescriptionSettingDataType } from '../../../context/SettingContext';
 import { perDayOption } from './SinglePrescriptionRate';
 
 interface Props {
+  use?: 'settings' | 'registeration';
   open: boolean;
   onClose: () => void;
   title: string;
@@ -31,6 +32,7 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
   prescription,
   setPrescription,
   handleSubmit,
+  use = 'registeration',
   children
 }) => {
   const handleChange = (
@@ -40,8 +42,12 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
   ) => {
     const eventName = event.target.name;
     let value: number | string = event.target.value;
-    if (eventName === 'price' || eventName === 'forDays') {
-      value = parseInt(event.target.value) || 0;
+    if (
+      eventName === 'price' ||
+      eventName === 'forDays' ||
+      eventName === 'inStock'
+    ) {
+      value = parseInt(event.target.value) || '';
     }
     setPrescription(
       prevPrescription =>
@@ -57,25 +63,38 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
         <DialogTitle>{title}</DialogTitle>
         <DialogContent sx={{ width: '400px' }}>
           <FormControl fullWidth>
-            <TextField
-              required
-              name="name"
-              value={prescription.name}
-              label="Name"
-              onChange={handleChange}
-              autoFocus
-              variant="standard"
-              margin="dense"
-            />
-            <TextField
-              required
-              name="price"
-              value={prescription.price}
-              label="Price"
-              onChange={handleChange}
-              variant="standard"
-              margin="dense"
-            />
+            {use === 'settings' && (
+              <>
+                <TextField
+                  required
+                  name="name"
+                  value={prescription.name}
+                  label="Name"
+                  onChange={handleChange}
+                  autoFocus
+                  variant="standard"
+                  margin="dense"
+                />
+                <TextField
+                  required
+                  name="price"
+                  value={prescription.price}
+                  label="Price"
+                  onChange={handleChange}
+                  variant="standard"
+                  margin="dense"
+                />
+                <TextField
+                  required
+                  name="inStock"
+                  value={prescription.inStock}
+                  label="In Stock"
+                  onChange={handleChange}
+                  variant="standard"
+                  margin="dense"
+                />
+              </>
+            )}
             <TextField
               required
               name="forDays"
@@ -86,12 +105,12 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
               helperText="in days"
               variant="standard"
             />
-            {typeof prescription.quantity === 'string' && (
+            {typeof prescription.strength === 'string' && (
               <TextField
                 required
-                name="quantity"
-                value={prescription.quantity}
-                label="Default Quantity"
+                name="strength"
+                value={prescription.strength}
+                label="Default Strength"
                 onChange={handleChange}
                 margin="dense"
                 variant="standard"
