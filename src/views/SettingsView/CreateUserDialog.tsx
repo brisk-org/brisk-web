@@ -10,7 +10,9 @@ import {
   Typography,
   Select,
   MenuItem,
-  SelectChangeEvent
+  SelectChangeEvent,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import { useRegisterMutation } from '../../generated/graphql';
 import { Occupation } from '../../context/AuthContext';
@@ -101,7 +103,7 @@ const CreateUserDialog: React.FC<{
         <TextField
           autoFocus
           fullWidth
-          label="Enter Your Job Classification"
+          label="Username"
           margin="normal"
           name="username"
           onChange={handleChange}
@@ -121,21 +123,23 @@ const CreateUserDialog: React.FC<{
           required
           variant="outlined"
         />
-        <Select
-          fullWidth
-          label="Occupation"
-          name="occupation"
-          onChange={handleSelectChange}
-          value={user.occupation}
-          variant="outlined"
-          required
-        >
-          {occupationOptions.map((option, index) => (
-            <MenuItem key={index} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Select>
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Occupation</InputLabel>
+          <Select
+            label="Occupation"
+            name="occupation"
+            onChange={handleSelectChange}
+            value={user.occupation}
+            variant="outlined"
+            required
+          >
+            {occupationOptions.map((option, index) => (
+              <MenuItem key={index} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>

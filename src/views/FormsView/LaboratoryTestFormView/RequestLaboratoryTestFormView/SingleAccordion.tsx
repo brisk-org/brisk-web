@@ -23,7 +23,9 @@ const useStyles = makeStyles(() => ({
 interface SingleAccordionProps {
   category: RequestCategories;
   validId: boolean;
-  setCategories: React.Dispatch<React.SetStateAction<RequestCategories[]>>;
+  setCategories: React.Dispatch<
+    React.SetStateAction<RequestCategories[] | undefined>
+  >;
 }
 
 const SingleAccordion: React.FC<SingleAccordionProps> = ({
@@ -59,7 +61,7 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
     checked: boolean
   ) => {
     setCategories(prevCategories => {
-      return prevCategories.map(prevCategory => {
+      return prevCategories?.map(prevCategory => {
         if (prevCategory.name !== category.name) return { ...prevCategory };
         return {
           ...prevCategory,

@@ -1,5 +1,4 @@
 import React, { useState, createContext, useEffect } from 'react';
-import { testsPlaceHolder } from '../data/testsPlaceHolder';
 import { prescriptionPlaceholder } from '../data/perscriptionPlaceholder';
 import { useSettingQuery } from '../generated/graphql';
 import {
@@ -22,40 +21,19 @@ export type PrescriptionSettingDataType = {
   other?: string;
 };
 type ContextType = {
-  cardPrice: number;
-  cardExpirationDate: number;
-  laboratoryTestSettingData: LaboratoryTestCatagories[];
-  prescriptionTestSettingData: PrescriptionSettingDataType[];
+  cardPrice?: number;
+  cardExpirationDate?: number;
+  laboratoryTestSettingData?: LaboratoryTestCatagories[];
+  prescriptionTestSettingData?: PrescriptionSettingDataType[];
 };
-const SettingsContext = createContext<ContextType>({
-  cardPrice: 0,
-  cardExpirationDate: 0,
-  laboratoryTestSettingData: [
-    {
-      name: '',
-      price: 0,
-      tests: [
-        {
-          hasIndividualPrice: false,
-          hasNormalValue: false,
-          isInfluencedByCategory: false,
-          name: '',
-          value: ''
-        }
-      ]
-    }
-  ],
-  prescriptionTestSettingData: [
-    { name: '', price: 0, forDays: 1, perDay: 'bid' }
-  ]
-});
+const SettingsContext = createContext<ContextType>({});
 
 const SettingsProvider: React.FC = ({ children }) => {
-  const [cardPrice, setCardPrice] = useState(0);
-  const [cardExpirationDate, setCardExpirationDate] = useState(0);
+  const [cardPrice, setCardPrice] = useState<number>();
+  const [cardExpirationDate, setCardExpirationDate] = useState<number>();
   const [laboratoryTestSettingData, setLaboratoryTestSettingData] = useState<
     LaboratoryTestCatagories[]
-  >(defaultLaboratoryTestSeed);
+  >();
   const [
     prescriptionTestSettingData,
     setPrescriptionTestSettingData
@@ -70,12 +48,13 @@ const SettingsProvider: React.FC = ({ children }) => {
     setCardExpirationDate(data.setting.card_expiration_date);
     const testRateData = JSON.parse(
       data.setting.laboratory_tests_data
-    ) as LaboratorySettingDataType[];
+    ) as LaboratoryTestCatagories[];
+    console.log(data.setting, testRateData[0].name, 'Hi');
     const prescriptionRateData = JSON.parse(
       data.setting.prescription_tests_data
     ) as PrescriptionSettingDataType[];
 
-    // setLaboratoryTestSettingData(testRateData);
+    setLaboratoryTestSettingData(testRateData);
     setPrescriptionTestSettingData(prescriptionRateData);
   }, [data, loading]);
 

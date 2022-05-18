@@ -34,7 +34,9 @@ const useStyles = makeStyles(theme => ({
 interface Props {
   index: number;
   category: LaboratoryTestCatagories;
-  setCategory: React.Dispatch<React.SetStateAction<LaboratoryTestCatagories[]>>;
+  setCategory: React.Dispatch<
+    React.SetStateAction<LaboratoryTestCatagories[] | undefined>
+  >;
 }
 const LaboratoryCategoriesAccordion: React.FC<Props> = ({
   index,
@@ -59,6 +61,7 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({
   const handleDuplicateCategoryToMain: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     setCategory(prevCategories => {
+      if (!prevCategories) return;
       return [
         ...prevCategories.map((prevCategory, prevCategoryIndex) => {
           if (prevCategoryIndex !== index) {

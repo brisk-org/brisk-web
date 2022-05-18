@@ -1,4 +1,4 @@
-mutation CompleteLaboratoryTest($result: [LaboratoryTestResult!]!, $id: ID!) {
+mutation CompleteLaboratoryTest($result: String!, $id: ID!) {
   completeLaboratoryTest(result: $result, id: $id) {
     id
     result

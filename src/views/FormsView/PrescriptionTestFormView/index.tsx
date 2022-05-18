@@ -52,7 +52,7 @@ const PrescriptionTestFormView = () => {
     name: query.get('name') || '',
     gender: query.get('gender') || 'male',
     age: query.get('age') || '',
-    detailedPrescription: prescriptionTestSettingData.map((data, index) => ({
+    detailedPrescription: prescriptionTestSettingData!.map((data, index) => ({
       ...data,
       selected: false,
       changeDetails: false,
@@ -112,7 +112,7 @@ const PrescriptionTestFormView = () => {
       gender: '',
       cardId: '',
       drName: '',
-      detailedPrescription: prescriptionTestSettingData.map((rate, index) => ({
+      detailedPrescription: prescriptionTestSettingData!.map((rate, index) => ({
         ...rate,
         selected: false,
         changeDetails: false,

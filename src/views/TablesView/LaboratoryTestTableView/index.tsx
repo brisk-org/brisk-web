@@ -73,7 +73,7 @@ const LaboratoryTestTableView = () => {
       const newCreatedLaboratoryTest = subscriptionData.data;
       if (!newCreatedLaboratoryTest) return prev;
       return Object.assign({}, prev, {
-        laboratoryTests: prev
+        laboratoryTests: prev.laboratoryTests
           ? [newCreatedLaboratoryTest, ...prev.laboratoryTests]
           : [newCreatedLaboratoryTest]
       });

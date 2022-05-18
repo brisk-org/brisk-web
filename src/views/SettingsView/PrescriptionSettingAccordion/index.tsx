@@ -27,7 +27,7 @@ const initialState: PrescriptionSettingDataType = {
 interface Props {
   prescription: PrescriptionSettingDataType[] | undefined;
   setPrescription: React.Dispatch<
-    React.SetStateAction<PrescriptionSettingDataType[]>
+    React.SetStateAction<PrescriptionSettingDataType[] | undefined>
   >;
 }
 const PrescriptionRate: React.FC<Props> = ({
@@ -42,7 +42,11 @@ const PrescriptionRate: React.FC<Props> = ({
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
-    setPrescription(prevPrescription => [...prevPrescription, newPrescription]);
+    setPrescription(prevPrescription =>
+      prevPrescription
+        ? [...prevPrescription, newPrescription]
+        : [newPrescription]
+    );
     setNewPrescription(initialState);
     onClose();
   };

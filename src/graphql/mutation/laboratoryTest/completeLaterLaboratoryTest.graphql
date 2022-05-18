@@ -1,8 +1,5 @@
-mutation CompleteLaterLaboratoryTest(
-  $result: [LaboratoryTestResult!]!
-  $id: ID!
-) {
-  completeLaterLaboratoryTest(result: $result, id: $id) {
+mutation SaveLaboratoryTest($result: String!, $id: ID!) {
+  saveLaboratoryTest(result: $result, id: $id) {
     id
     result
     paid

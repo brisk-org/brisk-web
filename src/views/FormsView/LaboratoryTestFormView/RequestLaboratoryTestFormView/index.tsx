@@ -7,7 +7,8 @@ import {
   CardHeader,
   Container,
   Divider,
-  Grid
+  Grid,
+  Typography
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Link, useHistory, useLocation } from 'react-router-dom';
@@ -49,8 +50,9 @@ const RequestLaboratoryTestFormView = () => {
   const classes = useStyles();
   const query = new URLSearchParams(useLocation().search);
   const history = useHistory();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
+  const [faitalError, setFaitalError] = useState(false);
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
   const [fromQuery] = useState({
     id: query.get('id'),
@@ -58,13 +60,13 @@ const RequestLaboratoryTestFormView = () => {
   });
   // const [tests, setTests] = useState<PlaceholderTestType[]>();
   const { laboratoryTestSettingData } = useContext(SettingsContext);
-  const categoriesInitialState = laboratoryTestSettingData.map(category => ({
+  const categoriesInitialState = laboratoryTestSettingData?.map(category => ({
     ...category,
     selected: false,
     tests: [...category.tests.map(test => ({ ...test, selected: false }))]
   }));
 
-  const [categories, setCategories] = useState<RequestCategories[]>(
+  const [categories, setCategories] = useState<RequestCategories[] | undefined>(
     categoriesInitialState
   );
 
@@ -100,18 +102,20 @@ const RequestLaboratoryTestFormView = () => {
   const handleSubmit:
     | React.FormEventHandler<HTMLFormElement>
     | undefined = async event => {
+    setFaitalError(false);
     event.preventDefault();
     try {
       if (!fromQuery.id) return;
       let price = 0;
       const selectedCategories = categories
-        .map(category => {
+        ?.map(category => {
           const selectedTests = category.tests.filter(test => test.selected);
           console.log(selectedTests);
           if (!selectedTests[0]) {
             return;
           }
           if (category.selected && !category.price) {
+            setFaitalError(true);
             enqueueSnackbar(`${category.name} must have a price`, {
               variant: 'error'
             });
@@ -129,6 +133,7 @@ const RequestLaboratoryTestFormView = () => {
               return;
             }
             if (!test.individualPrice) {
+              setFaitalError(true);
               enqueueSnackbar(
                 `${test.name} in ${category.name} must have a price to be selected individually`,
                 { variant: 'error' }
@@ -142,33 +147,17 @@ const RequestLaboratoryTestFormView = () => {
             tests: selectedTests
           };
         })
-        .map(category => ({
-          name: category?.name,
-          tests: category?.tests,
-          subCategories: category?.subCategories
-        }));
-      const reducedSelectedCategories = selectedCategories
-        .filter(category => category.name)
-        .map(category => ({
-          ...category,
-          tests: category.tests?.map(test => ({
-            name: test.name,
-            value: test.value
-          })),
-          subCategories: category.subCategories?.map(test => ({
-            name: test.name,
-            tests: test.tests.map(test => ({
-              name: test.name,
-              value: test.value
-            }))
-          }))
-        }));
-      console.log('result', reducedSelectedCategories, price);
+        .filter(category => category?.name);
+      if (faitalError) {
+        return;
+      }
+
+      console.log('result', selectedCategories, price);
       const test = await addLabTest({
         variables: {
           cardId: fromQuery.id,
           totalPrice: price,
-          result: reducedSelectedCategories as any
+          result: JSON.stringify(selectedCategories)
         }
       });
       setSuccessSnackbarOpen(true);
@@ -176,12 +165,12 @@ const RequestLaboratoryTestFormView = () => {
       //   value = false;
       // });
       console.log('test', test);
-      history.push(
-        cardQuery({
-          id: fromQuery.id,
-          testId: test.data?.createLaboratoryTest.id
-        })
-      );
+      // history.push(
+      //   cardQuery({
+      //     id: fromQuery.id,
+      //     testId: test.data?.createLaboratoryTest.id
+      //   })
+      // );
     } catch (err) {
       console.error(err);
     }
@@ -227,50 +216,31 @@ const RequestLaboratoryTestFormView = () => {
 
         <form onSubmit={handleSubmit}>
           <Grid container>
-            {categories.map((category, index) => (
-              <Grid
-                key={index}
-                item
-                md={
-                  category.name === 'Clinical Chemistry' ||
-                  category.name === 'Hormone Test'
-                    ? 12
-                    : 6
-                }
-                xs={12}
-              >
-                <SingleAccordion
-                  category={category}
-                  setCategories={setCategories}
-                  validId={!!fromQuery.id}
-                />
-              </Grid>
-            ))}
-            {/* {Object.keys(categories).map((name, index) => {
-              if (!categories) return null;
-              const selectedFields = categories.filter(
-                field => field.category === name
-              );
-              return (
+            {categories ? (
+              categories.map((category, index) => (
                 <Grid
                   key={index}
                   item
                   md={
-                    name === 'Clinical Chemistry' || name === 'Hormone Test'
+                    category.name === 'Clinical Chemistry' ||
+                    category.name === 'Hormone Test'
                       ? 12
                       : 6
                   }
                   xs={12}
                 >
                   <SingleAccordion
-                    header={name}
-                    fields={selectedFields}
-                    setFields={setCategories}
+                    category={category}
+                    setCategories={setCategories}
                     validId={!!fromQuery.id}
                   />
                 </Grid>
-              );
-            })} */}
+              ))
+            ) : (
+              <Typography>
+                Go to the settings and add some laboratory tests
+              </Typography>
+            )}
           </Grid>
 
           <Divider />

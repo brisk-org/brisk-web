@@ -37,7 +37,7 @@ export const perDayOption = [
 interface SingleRateProps {
   prescription: PrescriptionSettingDataType;
   setPrescription: React.Dispatch<
-    React.SetStateAction<PrescriptionSettingDataType[]>
+    React.SetStateAction<PrescriptionSettingDataType[] | undefined>
   >;
 }
 const SinglePrescriptionRate: React.FC<SingleRateProps> = ({
@@ -59,7 +59,7 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({
     if (confirmDelete) {
       onClose();
       setPrescription(prevPrescriptions =>
-        prevPrescriptions.filter(
+        prevPrescriptions?.filter(
           prevPrescription => prevPrescription.name !== prescription.name
         )
       );
@@ -69,7 +69,7 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     setPrescription(prevTests => {
-      return prevTests.map(test => {
+      return prevTests?.map(test => {
         if (test.name === prescription.name) {
           return { ...prescriptionEdit };
         }

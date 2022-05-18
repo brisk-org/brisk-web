@@ -1,6 +1,6 @@
 mutation CreateLaboratoryTest(
   $cardId: ID!
-  $result: [LaboratoryTestResult!]!
+  $result: String!
   $totalPrice: Float!
 ) {
   createLaboratoryTest(

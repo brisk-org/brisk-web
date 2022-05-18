@@ -13,7 +13,7 @@ import { LaboratoryTestCatagories } from '../../../data/testsSeed';
 interface LabRatesProps {
   laboratoryTestCategories: LaboratoryTestCatagories[] | undefined;
   setLaboratoryTestCategories: React.Dispatch<
-    React.SetStateAction<LaboratoryTestCatagories[]>
+    React.SetStateAction<LaboratoryTestCatagories[] | undefined>
   >;
 }
 const LaboratoryTestSettingMainAccordion: React.FC<LabRatesProps> = ({
