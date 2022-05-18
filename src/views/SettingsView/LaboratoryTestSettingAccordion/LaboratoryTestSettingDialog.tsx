@@ -123,7 +123,6 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
               }
             />
             <TextField
-              required
               label="Change Price"
               variant="outlined"
               type="number"

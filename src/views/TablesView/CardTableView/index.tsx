@@ -9,6 +9,7 @@ import Toolbar from '../../../components/Toolbar';
 import { SearchTermsType } from '../../../@types';
 import {
   useCardsCountQuery,
+  useNewCreatedCardSubscription,
   CardsQuery,
   SearchCardsQuery,
   useSearchCardsQuery,
@@ -32,6 +33,7 @@ const CardTableView = () => {
   const [skip, setSkip] = useState(0);
   const [take, setTake] = useState(10);
   const { data: countData } = useCardsCountQuery();
+  const { data: newCreatedCard } = useNewCreatedCardSubscription();
 
   const [terms, setTerms] = useState<SearchTermsType>({
     name: '',
@@ -82,19 +84,28 @@ const CardTableView = () => {
     })();
   }, [fullCardsData, searchedCardsData, terms]);
 
+  // useEffect(() => {
+  //   if (!newCreatedCard) return;
+  //   setAllCards(prevCards => ({
+  //     ...prevCards,
+  //     cards: prevCards
+  //       ? [newCreatedCard.newCreatedCard, ...prevCards.cards]
+  //       : [newCreatedCard.newCreatedCard]
+  //   }));
+  // }, [newCreatedCard]);
+
   useEffect(() => {
     subscribeToMore({
       document: NewCreatedCardDocument,
-      updateQuery: (prev, { subscriptionData }) => {
-        const newCreatedCard = subscriptionData.data;
-        if (!newCreatedCard) return prev;
-        return Object.assign({}, prev, {
-          cards: prev.cards ? [newCreatedCard, ...prev.cards] : [newCreatedCard]
-        });
-      },
-      onError: err => console.log(err)
+      updateQuery: (prev, { subscriptionData: { data } }) =>
+        Object.assign({}, prev, {
+          cards: prev.cards ? [data, ...prev.cards] : [data]
+        }),
+      onError: err => console.log('here', err)
     });
   }, []);
+
+  console.log(newCreatedCard);
 
   return (
     <Page className={classes.root} title="Customers">

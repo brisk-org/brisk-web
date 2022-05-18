@@ -165,12 +165,12 @@ const RequestLaboratoryTestFormView = () => {
       //   value = false;
       // });
       console.log('test', test);
-      // history.push(
-      //   cardQuery({
-      //     id: fromQuery.id,
-      //     testId: test.data?.createLaboratoryTest.id
-      //   })
-      // );
+      history.push(
+        cardQuery({
+          id: fromQuery.id,
+          testId: test.data?.createLaboratoryTest.id
+        })
+      );
     } catch (err) {
       console.error(err);
     }

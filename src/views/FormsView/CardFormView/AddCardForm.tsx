@@ -46,8 +46,7 @@ const genderOptions = [
   }
 ];
 
-interface ProfileFormProps {}
-const ProfileForm: React.FC<ProfileFormProps> = () => {
+const AddCardForm = () => {
   const classes = useStyles();
 
   const query = new URLSearchParams(useLocation().search);
@@ -161,4 +160,4 @@ const ProfileForm: React.FC<ProfileFormProps> = () => {
   );
 };
 
-export default ProfileForm;
+export default AddCardForm;
