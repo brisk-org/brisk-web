@@ -11,9 +11,7 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Close, Edit } from '@mui/icons-material';
-import { LaboratorySettingDataType } from '../../../context/SettingContext';
 import {
-  LaboratoryTestCatagories,
   LaboratoryTestDetails,
   SubCategoryLaboratoryTestDetails
 } from '../../../data/testsSeed';
@@ -49,7 +47,7 @@ const SingleRate: React.FC<SingleRateProps> = ({
 
   return (
     <ListItem className={clsx({ [classes.root]: testDetails.hasNormalValue })}>
-      <ListItemText primary={testDetails.name} secondary={testDetails.name} />
+      {/* <ListItemText primary={testDetails.name} secondary={testDetails.} /> */}
       {open && (
         <Box
           display="flex"
@@ -59,7 +57,6 @@ const SingleRate: React.FC<SingleRateProps> = ({
         >
           <TextField
             name="price"
-            // value={testDetails.individualPrice}
             type="number"
             label="New Price"
             onChange={e => {
@@ -72,7 +69,6 @@ const SingleRate: React.FC<SingleRateProps> = ({
                 }
               });
             }}
-            // onChange={handlePriceChange}
           />
           {testDetails.hasNormalValue && (
             <TextField

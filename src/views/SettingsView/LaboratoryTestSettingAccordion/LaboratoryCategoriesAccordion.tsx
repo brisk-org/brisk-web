@@ -8,7 +8,10 @@ import {
   Typography,
   IconButton,
   AccordionDetails,
-  List
+  List,
+  Divider,
+  ListItem,
+  ListItemText
 } from '@mui/material';
 import { ExpandMore, Settings } from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
@@ -44,7 +47,7 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({
   setCategory
 }) => {
   const classes = useStyles();
-  const [duplicateCategory, dispatch] = useReducer(
+  const [singleCategoryEdit, dispatch] = useReducer(
     laboaratoryTestSettingReducer,
     {
       ...category,
@@ -67,7 +70,7 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({
           if (prevCategoryIndex !== index) {
             return { ...prevCategory };
           }
-          return { ...duplicateCategory };
+          return { ...singleCategoryEdit };
         })
       ];
     });
@@ -110,39 +113,71 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({
                   <List dense>
                     {subCategory &&
                       subCategory.tests.map((test, index) => (
-                        <AccordionDetails
-                          className={clsx({
-                            [classes.details]: false
-                            // category === 'Clinical Chemistry'
-                          })}
-                        >
-                          <SingleLabTestRate
+                        <ListItem>
+                          <ListItemText
+                            primary={test.name}
+                            secondary={
+                              test.normalValue && (
+                                <Typography
+                                  sx={{ display: 'block' }}
+                                  variant="caption"
+                                >
+                                  nv: {test.normalValue}
+                                </Typography>
+                              )
+                            }
+                          />
+
+                          <Divider />
+                        </ListItem>
+                        // <AccordionDetails
+                        //   className={clsx({
+
+                        //     [classes.details]: false
+                        //     // category === 'Clinical Chemistry'
+                        //   })}
+                        // >
+                        /* <SingleLabTestRate
                             key={index}
                             testDetails={{ ...test }}
                             categoryName={category.name}
                             subCategoryName={subCategory.name}
                             dispatch={dispatch}
-                          />
-                        </AccordionDetails>
+                          /> */
+                        // </AccordionDetails>
                       ))}
                   </List>
                 </Accordion>
               ))}
             {category.tests &&
-              category.tests.map((test, index) => (
-                <AccordionDetails
-                  className={clsx({
-                    [classes.details]: false
-                    // category === 'Clinical Chemistry'
-                  })}
-                >
-                  <SingleLabTestRate
-                    key={index}
-                    testDetails={{ ...test }}
-                    categoryName={category.name}
-                    dispatch={dispatch}
-                  />
-                </AccordionDetails>
+              category.tests.map(test => (
+                <>
+                  <Divider />
+                  <ListItem sx={{ mt: 1 }}>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body1">
+                          {test.name}{' '}
+                          {test.hasIndividualPrice && (
+                            <Typography variant="caption">
+                              ({test.individualPrice}birr)
+                            </Typography>
+                          )}
+                        </Typography>
+                      }
+                      secondary={
+                        test.normalValue && (
+                          <Typography
+                            sx={{ display: 'block' }}
+                            variant="caption"
+                          >
+                            nv: {test.normalValue}
+                          </Typography>
+                        )
+                      }
+                    />
+                  </ListItem>
+                </>
               ))}
           </List>
         </Accordion>
@@ -151,7 +186,7 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({
         open={parentAccordionDialogOpen}
         handleClose={handleParentAccordionDialogClose}
         handleSubmit={handleDuplicateCategoryToMain}
-        category={duplicateCategory}
+        category={singleCategoryEdit}
         dispatch={dispatch}
       />
     </Grid>
