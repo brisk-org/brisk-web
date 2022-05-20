@@ -1,15 +1,12 @@
 import {
   Button,
   Checkbox,
-  FormControlLabel,
-  IconButton,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Typography
 } from '@mui/material';
-import { Box } from '@mui/system';
 import React, { useState } from 'react';
 import { SelectablePrescription } from '.';
 import { PrescriptionSettingDataType } from '../../../context/SettingContext';

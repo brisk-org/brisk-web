@@ -83,13 +83,14 @@ const CreateUserDialog: React.FC<{
     }));
   };
 
-  const handleSuccess = () => {
-    register();
-    handleClose();
+  const handleSuccess = async () => {
+    const res = await register();
+    console.log(res);
+    !res.data?.register.errors && handleClose();
   };
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Subscribe</DialogTitle>
+      <DialogTitle>Add a new User</DialogTitle>
       <DialogContent>
         <DialogContentText>
           To subscribe to this website, please enter your email address here. We
@@ -143,7 +144,7 @@ const CreateUserDialog: React.FC<{
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSuccess}>Subscribe</Button>
+        <Button onClick={handleSuccess}>Add</Button>
       </DialogActions>
     </Dialog>
   );

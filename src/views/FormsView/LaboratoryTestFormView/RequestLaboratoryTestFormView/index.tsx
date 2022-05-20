@@ -20,7 +20,7 @@ import Page from '../../../../components/Page';
 // } from '../../../../data/testsPlaceHolder';
 import SingleAccordion from './SingleAccordion';
 import { useCreateLaboratoryTestMutation } from '../../../../generated/graphql';
-import SnackbarSuccess from '../../../../components/SnackbarSuccess';
+// import SnackbarSuccess from '../../../../components/AlertSnackbar';
 import { cardQuery } from '../../../../constants/queries';
 import { SettingsContext } from '../../../../context/SettingContext';
 import {
@@ -255,11 +255,11 @@ const RequestLaboratoryTestFormView = () => {
             </Button>
           </Box>
         </form>
-        <SnackbarSuccess
+        {/* <SnackbarSuccess
           open={successSnackbarOpen}
           handleClose={handleCloseSnackbar}
           text="You have Successfully Send A Lab Request"
-        />
+        /> */}
       </Container>
     </Page>
   );

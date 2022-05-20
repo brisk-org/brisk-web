@@ -17,7 +17,6 @@ import {
 } from '@mui/icons-material';
 import PrescriptionSettingDialog from './PrescriptionSettingDialog';
 import AlertDialog from '../../../components/AlertDialog';
-import { color } from '@mui/system';
 
 const useStyles = makeStyles(theme => ({
   root: {

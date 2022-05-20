@@ -120,7 +120,7 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
             <SelectTextField
               name="perDay"
               value={prescription.perDay}
-              label="Per Day"
+              label="Interval Per Day"
               handleChange={handleChange}
               options={perDayOption}
             />

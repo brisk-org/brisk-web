@@ -5,7 +5,14 @@ import {
   defaultLaboratoryTestSeed,
   LaboratoryTestCatagories
 } from '../data/testsSeed';
-
+export type PrescriptionPerDay = 'bid' | 'stat';
+export type PrescriptionCheckIn = {
+  perDay: PrescriptionPerDay;
+  day: string;
+  price: number;
+  isPaid: boolean;
+  completed: boolean;
+};
 export type LaboratorySettingDataType = {
   name: string;
   price: number;
@@ -17,10 +24,12 @@ export type PrescriptionSettingDataType = {
   strength?: string;
   inStock: number;
   price: number;
-  perDay: 'bid' | 'stat';
+  perDay: PrescriptionPerDay;
   forDays: number;
+  checkIn: PrescriptionCheckIn[];
   other?: string;
 };
+
 type ContextType = {
   cardPrice?: number;
   cardExpirationDate?: number;

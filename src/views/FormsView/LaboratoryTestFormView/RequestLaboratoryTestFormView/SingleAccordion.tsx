@@ -94,7 +94,7 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
               onChange={handleCategoryClick}
               name={category.name}
               color="primary"
-              disabled={!validId}
+              disabled={!validId || !category.price}
             />
           }
           label={category.name}

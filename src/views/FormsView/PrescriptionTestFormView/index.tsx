@@ -22,7 +22,7 @@ import {
 import { AuthContext } from '../../../context/AuthContext';
 import { useCreatePrescriptionTestMutation } from '../../../generated/graphql';
 import { cardQuery } from '../../../constants/queries';
-import { format } from 'date-fns';
+import { add, format } from 'date-fns';
 import { useReactToPrint } from 'react-to-print';
 import PrintHeader from '../../../components/PrintHeader';
 import SinglePresc from './SinglePresc';
@@ -82,7 +82,6 @@ const PrescriptionTestFormView = () => {
     documentTitle: `Prescription for ${prescriptionInfo.name}`,
     onAfterPrint: () => setPrintReady(false)
   });
-
   useEffect(() => {
     if (printReady) {
       handlePrint && handlePrint();
@@ -100,29 +99,40 @@ const PrescriptionTestFormView = () => {
     }
   }, [query]);
   const handleSubmit = async () => {
-    const selectedDetailedPrescription = prescriptions
+    const selectedPrescriptions = prescriptions
       .filter(presc => presc.selected)
-      .map(({ name, price, perDay, forDays, strength, other }) => ({
-        name,
-        price,
-        perDay,
-        forDays,
-        strength,
-        other
-      }));
+      .map(prescription => {
+        const checkIn = [];
+        const perDay = prescription.perDay === 'stat' ? 1 : 2;
+        for (let i = perDay; i > 0; i--) {
+          for (let j = 0; j < prescription.forDays; j++) {
+            checkIn.push({
+              day: format(add(new Date(), { days: j }), 'iii'),
+              perDay: prescription.perDay,
+              price: prescription.price / prescription.forDays / perDay,
+              isPaid: false,
+              completed: false
+            });
+          }
+        }
+        return {
+          ...prescription,
+          checkIn: JSON.stringify(checkIn)
+        };
+      });
 
+    if (!selectedPrescriptions) {
+    }
     let price = 0;
-    selectedDetailedPrescription.forEach(
-      ({ price: prescPrice, forDays, perDay }) => {
-        const perDayValue = perDay === 'stat' ? 1 : 2;
-        price += prescPrice * forDays * perDayValue;
-      }
-    );
+    selectedPrescriptions.forEach(prescription => {
+      const perDay = prescription.perDay === 'stat' ? 1 : 2;
+      price += prescription.price * prescription.forDays * perDay;
+    });
     if (!prescriptionInfo.cardId) return;
     const createdPresc = await createPrescriptionTest({
       variables: {
         cardId: prescriptionInfo.cardId,
-        result: selectedDetailedPrescription,
+        result: selectedPrescriptions,
         rx: prescriptionInfo.rx,
         price
       }

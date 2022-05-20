@@ -81,6 +81,7 @@ const LoginView = () => {
               {error && <Typography color="red">{error}</Typography>}
               <Box maxWidth={400}>
                 <TextField
+                  autoFocus
                   fullWidth
                   label="Username"
                   margin="normal"

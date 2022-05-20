@@ -13,6 +13,7 @@ import { SnackbarProvider } from 'notistack';
 import { SettingsProvider } from './context/SettingContext';
 import { IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import AlertSnackBar from './components/AlertSnackbar';
 
 const App = () => {
   globalStyles();

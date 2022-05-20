@@ -7,7 +7,7 @@ import {
   useChangeSettingMutation,
   SettingDocument
 } from '../../generated/graphql';
-import SnackbarSuccess from '../../components/SnackbarSuccess';
+// import SnackbarSuccess from '../../components/AlertSnackbar';
 import CardRate from './CardRate';
 import SnackbarError from '../../components/SnackbarError';
 import {
@@ -110,7 +110,12 @@ const ChangeRates = () => {
         card_price: cardPrice,
         card_expiration_date: cardExpirationDate,
         laboratory_tests_data: JSON.stringify(laboratoryTestCategories),
-        prescription_tests_data: prescriptionTestSettingData
+        prescription_tests_data: prescriptionTestSettingData.map(
+          prescription => ({
+            ...prescription,
+            checkIn: JSON.stringify(prescription.checkIn)
+          })
+        )
       }
     });
     console.log(d);
@@ -167,11 +172,11 @@ const ChangeRates = () => {
             Update Values
           </Button>
         </Box>
-        <SnackbarSuccess
+        {/* <SnackbarSuccess
           open={successSnackbarOpen}
           handleClose={handleCloseSnackbar}
           text="You have Successfully Updated the pricing"
-        />
+        /> */}
         <SnackbarError
           open={errorSnackbarOpen}
           handleClose={handleCloseSnackbar}

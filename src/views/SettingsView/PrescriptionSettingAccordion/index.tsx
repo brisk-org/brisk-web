@@ -20,6 +20,7 @@ const initialState: PrescriptionSettingDataType = {
   name: '',
   forDays: 1,
   perDay: 'stat',
+  checkIn: [],
   price: 0,
   inStock: 0,
   strength: '',

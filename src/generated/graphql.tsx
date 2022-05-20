@@ -385,8 +385,10 @@ export type Notification = {
 export type PrescriptionInput = {
   name: Scalars['String'];
   price: Scalars['Float'];
-  quantity?: Maybe<Scalars['String']>;
+  inStock: Scalars['Float'];
+  strength?: Maybe<Scalars['String']>;
   perDay: Scalars['String'];
+  checkIn: Scalars['String'];
   forDays: Scalars['Float'];
   other?: Maybe<Scalars['String']>;
 };

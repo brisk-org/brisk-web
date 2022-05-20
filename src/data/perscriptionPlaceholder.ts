@@ -5,6 +5,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'ceftriaxone',
     strength: '18m',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -12,6 +13,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
   {
     name: 'plasil',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -20,6 +22,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'N/S',
     strength: '18m',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -28,6 +31,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'Cimetidine',
     strength: '400mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -36,6 +40,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'R/L',
     strength: '400mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -44,6 +49,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'V.B complex #01',
     strength: '400mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -51,6 +57,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
   {
     name: 'V.B complex #02',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -58,6 +65,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
   {
     name: '40% glucose #02',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -65,6 +73,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
   {
     name: '40% glucose #01',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -72,6 +81,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
   {
     name: 'BP',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -79,6 +89,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
   {
     name: 'Injection Service: IM',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -86,6 +97,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
   {
     name: 'Injection Service: IV',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -94,6 +106,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'Diclofenac',
     strength: '75mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -102,6 +115,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'Dexamethasone',
     strength: '8mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -110,6 +124,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'Tramadol',
     strength: '8mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -118,6 +133,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'Hydrocortisone',
     strength: '8mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -126,6 +142,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'hyocin',
     strength: '8mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -134,6 +151,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'adrenaline',
     strength: '8mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -142,6 +160,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'lasix',
     strength: '8mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -150,6 +169,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'Aminophine',
     strength: '8mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
@@ -158,6 +178,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'Gentamycin',
     strength: '8mg',
     price: 50,
+    checkIn: [],
     perDay: 'stat',
     inStock: 10,
     forDays: 1
