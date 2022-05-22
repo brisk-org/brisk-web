@@ -6,6 +6,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../../components/Page';
 import Toolbar from '../../../components/Toolbar';
 import {
+  Card,
   NewCreatedPrescriptionTestDocument,
   PrescriptionTestsQuery,
   SearchPrescriptionTestsQuery,
@@ -18,6 +19,10 @@ import MainContainerTable from '../../../components/MainContainerTable';
 import { defaultTableHeads } from '../../../constants/tableHeads';
 import SinglePrescriptionRow from './SinglePrescriptionRow';
 import { AuthContext } from '../../../context/AuthContext';
+import {
+  PrescriptionCheckIn,
+  PrescriptionSettingDataType
+} from '../../../context/SettingContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -27,6 +32,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+export type PrescriptionTest = {
+  id: string;
+  card: { id: string; name: string; age: string; gender: string };
+  rx: string;
+  result: PrescriptionSettingDataType[];
+  paid: boolean;
+  price: number;
+  completed: boolean;
+  new: boolean;
+  created_at: string;
+  updated_at: string;
+};
 const PrescriptionTestTableView = () => {
   const classes = useStyles();
 
@@ -41,7 +58,7 @@ const PrescriptionTestTableView = () => {
   const { data: countData } = usePrescriptionTestsCountQuery();
 
   const [allPrescriptions, setAllPrescriptions] = useState<
-    PrescriptionTestsQuery
+    PrescriptionTest[]
   >();
   const [searchedPrescriptions, setSearchedPrescriptions] = useState<
     SearchPrescriptionTestsQuery
@@ -105,10 +122,40 @@ const PrescriptionTestTableView = () => {
 
   useEffect(() => {
     (function() {
-      isBeingSearched && setAllPrescriptions(undefined);
-      isBeingSearched
-        ? setSearchedPrescriptions(searchedPrescriptionData)
-        : setAllPrescriptions(allPrescriptionsData);
+      if (isBeingSearched) {
+        //  setSearchedPrescriptions(searchedPrescriptionData?.searchPrescriptionTests)
+        setAllPrescriptions(
+          searchedPrescriptions?.searchPrescriptionTests.map(prescription => ({
+            ...prescription,
+            result: (JSON.parse(
+              prescription.result
+            ) as PrescriptionSettingDataType[]).map(result => ({
+              ...result,
+              checkIn: JSON.parse(
+                (result.checkIn as unknown) as string
+              ) as PrescriptionCheckIn[]
+            }))
+          }))
+        );
+        return;
+      }
+      console.log(allPrescriptions);
+      setAllPrescriptions(
+        allPrescriptionsData?.prescriptionTests.map(prescription => ({
+          ...prescription,
+          result: (JSON.parse(
+            prescription.result
+          ) as PrescriptionSettingDataType[]).map(
+            result =>
+              result && {
+                ...result,
+                checkIn: JSON.parse(
+                  (result.checkIn as unknown) as string
+                ) as PrescriptionCheckIn[]
+              }
+          )
+        }))
+      );
     })();
   }, [allPrescriptionsData, searchedPrescriptionData]);
 
@@ -121,12 +168,46 @@ const PrescriptionTestTableView = () => {
           disablePhoneSearchField={true}
         />
         <Box mt={3}>
-          {!allPrescriptions?.prescriptionTests[0] &&
-            !searchedPrescriptions?.searchPrescriptionTests[0] &&
+          {allPrescriptions && !allPrescriptions[0] && 'No result'}
+          {(allPrescriptionsLoading || searchedPrescriptionsLoading) &&
+            'Loading...'}
+          {allPrescriptions && (
+            <MainContainerTable
+              tableHead={defaultTableHeads}
+              count={countData?.prescriptionTestsCount}
+              skipState={{ skip, setSkip }}
+              takeState={{ take, setTake }}
+            >
+              {allPrescriptions.map((prescription, index) => {
+                return occupation === 'NURSE' ? (
+                  prescription.paid && (
+                    <SinglePrescriptionRow
+                      key={index}
+                      prescription={prescription}
+                    />
+                  )
+                ) : occupation === 'RECEPTION' ? (
+                  !prescription.paid && (
+                    <SinglePrescriptionRow
+                      key={index}
+                      prescription={prescription}
+                    />
+                  )
+                ) : (
+                  <SinglePrescriptionRow
+                    key={index}
+                    prescription={prescription}
+                  />
+                );
+              })}
+            </MainContainerTable>
+          )}
+          {/*    {!allPrescriptions [0] &&
+            !searchedPrescriptions[0] &&
             'No result'}
           {(allPrescriptionsLoading || searchedPrescriptionsLoading) &&
             'Loading...'}
-          {allPrescriptions?.prescriptionTests ? (
+          {allPrescriptions ? (
             <MainContainerTable
               tableHead={defaultTableHeads}
               count={countData?.prescriptionTestsCount}
@@ -190,7 +271,7 @@ const PrescriptionTestTableView = () => {
                 }
               )}
             </MainContainerTable>
-          )}
+          )} */}
         </Box>
       </Container>
     </Page>

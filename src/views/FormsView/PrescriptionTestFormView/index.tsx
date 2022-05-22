@@ -16,6 +16,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../../components/Page';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
+  PrescriptionCheckIn,
   PrescriptionSettingDataType,
   SettingsContext
 } from '../../../context/SettingContext';
@@ -102,21 +103,27 @@ const PrescriptionTestFormView = () => {
     const selectedPrescriptions = prescriptions
       .filter(presc => presc.selected)
       .map(prescription => {
-        const checkIn = [];
+        const checkIn: PrescriptionCheckIn[] = [];
         const perDay = prescription.perDay === 'stat' ? 1 : 2;
         for (let i = perDay; i > 0; i--) {
           for (let j = 0; j < prescription.forDays; j++) {
             checkIn.push({
-              day: format(add(new Date(), { days: j }), 'iii'),
+              date: add(new Date(), { days: j }).toISOString(),
               perDay: prescription.perDay,
-              price: prescription.price / prescription.forDays / perDay,
+              price: prescription.price,
               isPaid: false,
               completed: false
             });
           }
         }
         return {
-          ...prescription,
+          name: prescription.name,
+          perDay: prescription.perDay,
+          price: prescription.price,
+          forDays: prescription.forDays,
+          inStock: prescription.inStock,
+          other: prescription.other,
+          strength: prescription.strength,
           checkIn: JSON.stringify(checkIn)
         };
       });

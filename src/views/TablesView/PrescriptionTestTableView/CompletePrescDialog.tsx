@@ -22,7 +22,7 @@ import {
   useMarkPrescriptionTestAsCompletedMutation,
   usePrescriptionTestQuery
 } from '../../../generated/graphql';
-import { PrescriptionTestType } from '../../../@types/PrescriptionTest';
+import { PrescriptionTest } from '.';
 import { PrescriptionSettingDataType } from '../../../context/SettingContext';
 
 const useStyles = makeStyles(theme => ({
@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  prescription: PrescriptionTestType;
+  prescription: PrescriptionTest;
 }
 const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
   open,

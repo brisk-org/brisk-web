@@ -14,5 +14,6 @@ query SearchPrescriptionTests($term: String!, $skip: Float!, $take: Float!) {
     new
     rx
     created_at
+    updated_at
   }
 }

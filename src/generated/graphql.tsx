@@ -1375,7 +1375,7 @@ export type PrescriptionTestsQuery = (
   { __typename?: 'Query' }
   & { prescriptionTests: Array<(
     { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
+    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
@@ -1416,7 +1416,7 @@ export type SearchPrescriptionTestsQuery = (
   { __typename?: 'Query' }
   & { searchPrescriptionTests: Array<(
     { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at'>
+    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
@@ -3618,6 +3618,7 @@ export const PrescriptionTestsDocument = gql`
       age
       gender
     }
+    result
     paid
     price
     completed
@@ -3745,6 +3746,7 @@ export const SearchPrescriptionTestsDocument = gql`
     new
     rx
     created_at
+    updated_at
   }
 }
     `;

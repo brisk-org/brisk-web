@@ -1,6 +1,13 @@
 import React, { useContext, useState } from 'react';
 
-import { TableRow, TableCell, IconButton, Typography, Box, colors } from '@mui/material';
+import {
+  TableRow,
+  TableCell,
+  IconButton,
+  Typography,
+  Box,
+  colors
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import {
   CancelPresentationRounded,
@@ -13,10 +20,10 @@ import { BallTriangle, useLoading } from '@agney/react-loading';
 import clsx from 'clsx';
 import { useHistory } from 'react-router';
 import { cardQuery } from '../../../constants/queries';
-import { PrescriptionTestType } from '../../../@types/PrescriptionTest';
 import ConfirmationDialog from './ConfirmationDialog';
 import CompletePrescDialog from './CompletePrescDialog';
 import { useMarkPrescriptionTestAsSeenMutation } from '../../../generated/graphql';
+import { PrescriptionTest } from '.';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -51,7 +58,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SinglePrescriptionRow: React.FC<{
-  prescription: PrescriptionTestType;
+  prescription: PrescriptionTest;
 }> = ({ prescription }) => {
   const classes = useStyles();
   const { containerProps, indicatorEl } = useLoading({
@@ -115,16 +122,6 @@ const SinglePrescriptionRow: React.FC<{
           <IconButton onClick={handleClick} size="medium">
             <UnfoldMore />
           </IconButton>
-          <ConfirmationDialog
-            open={paymentDialogOpen}
-            setOpen={setPaymentDialogOpen}
-            prescription={prescription}
-          />
-          <CompletePrescDialog
-            open={completePrescDialogOpen}
-            setOpen={setCompletePrescDialogOpen}
-            prescription={prescription}
-          />
         </TableCell>
         <TableCell>
           <Typography color="textPrimary" variant="body1" noWrap>
@@ -149,6 +146,16 @@ const SinglePrescriptionRow: React.FC<{
           {format(Number(prescription.created_at), 'dd/MM/yyyy')}
         </TableCell>
       </TableRow>
+      <ConfirmationDialog
+        open={paymentDialogOpen}
+        setOpen={setPaymentDialogOpen}
+        prescription={prescription}
+      />
+      <CompletePrescDialog
+        open={completePrescDialogOpen}
+        setOpen={setCompletePrescDialogOpen}
+        prescription={prescription}
+      />
     </>
   );
 };

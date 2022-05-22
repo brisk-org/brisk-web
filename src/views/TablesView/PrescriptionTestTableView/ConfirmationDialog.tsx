@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DialogActions,
   DialogTitle,
@@ -8,12 +8,13 @@ import {
   Dialog,
   Button,
   Box,
-  colors,
+  colors
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { AttachMoney, Close } from '@mui/icons-material';
 import { useMarkPrescriptionTestAsPaidMutation } from '../../../generated/graphql';
-import { PrescriptionTestType } from '../../../@types/PrescriptionTest';
+import { PrescriptionTest } from '.';
+import PriceStepper from './PriceStepper';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -33,10 +34,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+export type CheckInPrice = { name: string; paid: number; remaining: number };
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  prescription: PrescriptionTestType;
+  prescription: PrescriptionTest;
 }
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,
@@ -44,8 +46,32 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   prescription
 }) => {
   const classes = useStyles();
+  const [checkInPrices, setCheckInPrices] = useState<CheckInPrice[]>();
+
+  useEffect(() => {
+    console.log(open);
+    if (!open) return;
+    console.log(checkInPrices);
+    setCheckInPrices(undefined);
+    prescription.result.forEach(prescription => {
+      const checkInPrice = {
+        name: prescription.name,
+        remaining: prescription.checkIn.reduce(
+          (prevValue, currentCheckIn) => prevValue + currentCheckIn.price,
+          0
+        ),
+        paid: 0
+      };
+      setCheckInPrices(prevCheckInPrices =>
+        !prevCheckInPrices
+          ? [checkInPrice]
+          : [...prevCheckInPrices, checkInPrice]
+      );
+    });
+  }, [open]);
 
   const [markPrescriptionTestAsPaid] = useMarkPrescriptionTestAsPaidMutation();
+  console.log(prescription);
 
   const handleClose = () => {
     setOpen(false);
@@ -56,12 +82,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   };
 
   return (
-    <Dialog
-      className={classes.root}
-      onClose={handleClose}
-      aria-labelledby="customized-dialog-title"
-      open={open}
-    >
+    <Dialog className={classes.root} onClose={handleClose} open={open}>
       <DialogTitle>
         <Typography variant="h6">
           Verify Payment for {prescription.card?.name}
@@ -85,9 +106,33 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           </IconButton>
         </Box>
         <Typography gutterBottom>
-          The Prescription for {prescription.card?.name} Costs{' '}
+          The Prescription for {prescription.card?.name} Costs a total of{' '}
           {prescription.price} birr
         </Typography>
+        <Typography variant="body1" gutterBottom>
+          Paid(
+          {checkInPrices?.reduce(
+            (prevPrice, currentCheckInPrices) =>
+              prevPrice + currentCheckInPrices.paid,
+            0
+          )}
+          ) Remaining(
+          {checkInPrices?.reduce(
+            (prevPrice, currentCheckInPrices) =>
+              prevPrice + currentCheckInPrices.remaining,
+            0
+          )}
+          )
+        </Typography>
+        <Typography gutterBottom></Typography>
+        {prescription.result.map(({ checkIn, name }) => (
+          <PriceStepper
+            checkIn={checkIn}
+            checkInPrices={checkInPrices}
+            setCheckInPrices={setCheckInPrices}
+            name={name}
+          />
+        ))}
       </DialogContent>
       <DialogActions>
         <Button autoFocus onClick={handleSuccess} color="primary">

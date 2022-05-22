@@ -8,7 +8,7 @@ import {
 export type PrescriptionPerDay = 'bid' | 'stat';
 export type PrescriptionCheckIn = {
   perDay: PrescriptionPerDay;
-  day: string;
+  date: string;
   price: number;
   isPaid: boolean;
   completed: boolean;
