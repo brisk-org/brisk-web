@@ -299,12 +299,12 @@ export type MutationCreatePrescriptionTestArgs = {
 
 
 export type MutationMarkPrescriptionTestAsCompletedArgs = {
-  id: Scalars['ID'];
+  main: UpdatePrescriptionTestInput;
 };
 
 
 export type MutationMarkPrescriptionTestAsPaidArgs = {
-  id: Scalars['ID'];
+  main: UpdatePrescriptionTestInput;
 };
 
 
@@ -615,6 +615,12 @@ export type Subscription = {
   deleteNotificationSubscription: Notification;
 };
 
+export type UpdatePrescriptionTestInput = {
+  id: Scalars['ID'];
+  done: Scalars['Boolean'];
+  result: Array<PrescriptionInput>;
+};
+
 export type User = {
   __typename?: 'User';
   id: Scalars['ID'];
@@ -904,6 +910,8 @@ export type DeletePrescriptionTestMutation = (
 
 export type MarkPrescriptionTestAsCompletedMutationVariables = Exact<{
   id: Scalars['ID'];
+  result: Array<PrescriptionInput> | PrescriptionInput;
+  done: Scalars['Boolean'];
 }>;
 
 
@@ -917,6 +925,8 @@ export type MarkPrescriptionTestAsCompletedMutation = (
 
 export type MarkPrescriptionTestAsPaidMutationVariables = Exact<{
   id: Scalars['ID'];
+  result: Array<PrescriptionInput> | PrescriptionInput;
+  done: Scalars['Boolean'];
 }>;
 
 
@@ -2378,8 +2388,8 @@ export type DeletePrescriptionTestMutationHookResult = ReturnType<typeof useDele
 export type DeletePrescriptionTestMutationResult = Apollo.MutationResult<DeletePrescriptionTestMutation>;
 export type DeletePrescriptionTestMutationOptions = Apollo.BaseMutationOptions<DeletePrescriptionTestMutation, DeletePrescriptionTestMutationVariables>;
 export const MarkPrescriptionTestAsCompletedDocument = gql`
-    mutation MarkPrescriptionTestAsCompleted($id: ID!) {
-  markPrescriptionTestAsCompleted(id: $id) {
+    mutation MarkPrescriptionTestAsCompleted($id: ID!, $result: [PrescriptionInput!]!, $done: Boolean!) {
+  markPrescriptionTestAsCompleted(main: {id: $id, result: $result, done: $done}) {
     id
     new
   }
@@ -2401,6 +2411,8 @@ export type MarkPrescriptionTestAsCompletedMutationFn = Apollo.MutationFunction<
  * const [markPrescriptionTestAsCompletedMutation, { data, loading, error }] = useMarkPrescriptionTestAsCompletedMutation({
  *   variables: {
  *      id: // value for 'id'
+ *      result: // value for 'result'
+ *      done: // value for 'done'
  *   },
  * });
  */
@@ -2412,8 +2424,8 @@ export type MarkPrescriptionTestAsCompletedMutationHookResult = ReturnType<typeo
 export type MarkPrescriptionTestAsCompletedMutationResult = Apollo.MutationResult<MarkPrescriptionTestAsCompletedMutation>;
 export type MarkPrescriptionTestAsCompletedMutationOptions = Apollo.BaseMutationOptions<MarkPrescriptionTestAsCompletedMutation, MarkPrescriptionTestAsCompletedMutationVariables>;
 export const MarkPrescriptionTestAsPaidDocument = gql`
-    mutation MarkPrescriptionTestAsPaid($id: ID!) {
-  markPrescriptionTestAsPaid(id: $id) {
+    mutation MarkPrescriptionTestAsPaid($id: ID!, $result: [PrescriptionInput!]!, $done: Boolean!) {
+  markPrescriptionTestAsPaid(main: {id: $id, result: $result, done: $done}) {
     id
     paid
   }
@@ -2435,6 +2447,8 @@ export type MarkPrescriptionTestAsPaidMutationFn = Apollo.MutationFunction<MarkP
  * const [markPrescriptionTestAsPaidMutation, { data, loading, error }] = useMarkPrescriptionTestAsPaidMutation({
  *   variables: {
  *      id: // value for 'id'
+ *      result: // value for 'result'
+ *      done: // value for 'done'
  *   },
  * });
  */

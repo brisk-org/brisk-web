@@ -105,16 +105,14 @@ const PrescriptionTestFormView = () => {
       .map(prescription => {
         const checkIn: PrescriptionCheckIn[] = [];
         const perDay = prescription.perDay === 'stat' ? 1 : 2;
-        for (let i = perDay; i > 0; i--) {
-          for (let j = 0; j < prescription.forDays; j++) {
-            checkIn.push({
-              date: add(new Date(), { days: j }).toISOString(),
-              perDay: prescription.perDay,
-              price: prescription.price,
-              isPaid: false,
-              completed: false
-            });
-          }
+        for (let j = 0; j < prescription.forDays; j++) {
+          checkIn.push({
+            date: add(new Date(), { days: j }).toISOString(),
+            perDay: prescription.perDay,
+            price: prescription.price,
+            isPaid: false,
+            completed: false
+          });
         }
         return {
           name: prescription.name,

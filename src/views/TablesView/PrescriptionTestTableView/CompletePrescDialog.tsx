@@ -71,9 +71,9 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
     setOpen(false);
   };
   const handleSuccess = async () => {
-    markPrescriptionTestAsCompleted({
-      variables: { id: prescription.id }
-    });
+    // markPrescriptionTestAsCompleted({
+    //   variables: { id: prescription.id }
+    // });
     setOpen(false);
   };
 

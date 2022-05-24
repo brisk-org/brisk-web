@@ -15,6 +15,8 @@ import { AttachMoney, Close } from '@mui/icons-material';
 import { useMarkPrescriptionTestAsPaidMutation } from '../../../generated/graphql';
 import { PrescriptionTest } from '.';
 import PriceStepper from './PriceStepper';
+import { PrescriptionCheckIn } from '../../../context/SettingContext';
+import AlertDialog from '../../../components/AlertDialog';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -34,7 +36,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export type CheckInPrice = { name: string; paid: number; remaining: number };
+// export type CheckInPrice = { name: string; };
+export type PrescriptionCheckIns = {
+  name: string;
+  paid: number;
+  remaining: number;
+  paidToday: number;
+  checkIn: PrescriptionCheckIn[];
+};
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -46,100 +55,167 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   prescription
 }) => {
   const classes = useStyles();
-  const [checkInPrices, setCheckInPrices] = useState<CheckInPrice[]>();
+
+  const [alertDialogToggle, setAlertDialogToggle] = useState(false);
+  const [proceedToAction, setProceedToAction] = useState(false);
+
+  // const [checkInPrices, setCheckInPrices] = useState<CheckInPrice[]>();
+  const [prescriptionsCheckIn, setPrescriptionsCheckIn] = useState<
+    PrescriptionCheckIns[]
+  >();
+  console.log(prescriptionsCheckIn, prescription.result);
 
   useEffect(() => {
-    console.log(open);
     if (!open) return;
-    console.log(checkInPrices);
-    setCheckInPrices(undefined);
-    prescription.result.forEach(prescription => {
-      const checkInPrice = {
-        name: prescription.name,
-        remaining: prescription.checkIn.reduce(
+    // setCheckInPrices(undefined);
+    setPrescriptionsCheckIn(
+      prescription.result.map(({ name, checkIn: checkInArray }) => ({
+        name,
+        remaining: checkInArray.reduce(
           (prevValue, currentCheckIn) => prevValue + currentCheckIn.price,
           0
         ),
-        paid: 0
-      };
-      setCheckInPrices(prevCheckInPrices =>
-        !prevCheckInPrices
-          ? [checkInPrice]
-          : [...prevCheckInPrices, checkInPrice]
-      );
-    });
-  }, [open]);
+        paid: 0,
+        paidToday: 0,
+        checkIn: checkInArray.map(checkIn => ({
+          ...checkIn,
+          price: checkIn.perDay === 'bid' ? checkIn.price * 2 : checkIn.price
+        }))
+      }))
+    );
+    // prescription.result.forEach(prescription => {
+    //   const checkInPrice = {
+    //     name: prescription.name,
 
-  const [markPrescriptionTestAsPaid] = useMarkPrescriptionTestAsPaidMutation();
-  console.log(prescription);
+    //   };
+    //   setCheckInPrices(prevCheckInPrices =>
+    //     !prevCheckInPrices
+    //       ? [checkInPrice]
+    //       : [...prevCheckInPrices, checkInPrice]
+    //   );
+    // });
+  }, [open, prescription.result]);
+
+  useEffect(() => {
+    if (proceedToAction) {
+      handleSuccess();
+    }
+  }, [proceedToAction]);
+
+  const [
+    markPrescriptionTestAsPaid,
+    { loading }
+  ] = useMarkPrescriptionTestAsPaidMutation();
 
   const handleClose = () => {
     setOpen(false);
   };
-  const handleSuccess = () => {
-    markPrescriptionTestAsPaid({ variables: { id: prescription.id } });
+  const handleSuccess = async () => {
+    await markPrescriptionTestAsPaid({
+      variables: {
+        id: prescription.id,
+        result: prescription.result.map(result => ({
+          ...result,
+          checkIn: JSON.stringify(
+            prescriptionsCheckIn!.find(
+              prescriptionsCheckIn => prescriptionsCheckIn.name === result.name
+            )?.checkIn
+          )
+        })),
+        done: prescriptionsCheckIn!.every(
+          prescriptionCheckIn => prescriptionCheckIn.remaining === 0
+        )
+      }
+    });
     setOpen(false);
   };
 
   return (
-    <Dialog className={classes.root} onClose={handleClose} open={open}>
-      <DialogTitle>
-        <Typography variant="h6">
-          Verify Payment for {prescription.card?.name}
-        </Typography>
-        <IconButton
-          className={classes.closeButton}
-          size="medium"
-          onClick={handleClose}
-        >
-          <Close />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent dividers>
-        <Box textAlign="center">
+    <>
+      <Dialog className={classes.root} onClose={handleClose} open={open}>
+        <DialogTitle>
+          <Typography variant="h6">
+            Verify Payment for {prescription.card?.name}
+          </Typography>
           <IconButton
-            className={classes.moneyIcon}
+            className={classes.closeButton}
             size="medium"
             onClick={handleClose}
           >
-            <AttachMoney fontSize="large" />
+            <Close />
           </IconButton>
-        </Box>
-        <Typography gutterBottom>
-          The Prescription for {prescription.card?.name} Costs a total of{' '}
-          {prescription.price} birr
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          Paid(
-          {checkInPrices?.reduce(
-            (prevPrice, currentCheckInPrices) =>
-              prevPrice + currentCheckInPrices.paid,
-            0
-          )}
-          ) Remaining(
-          {checkInPrices?.reduce(
-            (prevPrice, currentCheckInPrices) =>
-              prevPrice + currentCheckInPrices.remaining,
-            0
-          )}
-          )
-        </Typography>
-        <Typography gutterBottom></Typography>
-        {prescription.result.map(({ checkIn, name }) => (
-          <PriceStepper
-            checkIn={checkIn}
-            checkInPrices={checkInPrices}
-            setCheckInPrices={setCheckInPrices}
-            name={name}
-          />
-        ))}
-      </DialogContent>
-      <DialogActions>
-        <Button autoFocus onClick={handleSuccess} color="primary">
-          Payment Successful
-        </Button>
-      </DialogActions>
-    </Dialog>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Box textAlign="center">
+            <IconButton
+              className={classes.moneyIcon}
+              size="medium"
+              onClick={handleClose}
+            >
+              <AttachMoney fontSize="large" />
+            </IconButton>
+          </Box>
+          <Typography gutterBottom>
+            The Prescription for {prescription.card?.name} Costs a total of{' '}
+            {prescription.price} birr
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            Paid(
+            {prescriptionsCheckIn?.reduce(
+              (prevPrice, currentCheckInPrices) =>
+                prevPrice + currentCheckInPrices.paid,
+              0
+            )}
+            etb) Remaining: (
+            {prescriptionsCheckIn?.reduce(
+              (prevPrice, currentCheckInPrices) =>
+                prevPrice + currentCheckInPrices.remaining,
+              0
+            )}
+            etb)
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            Paid Today: (
+            {prescriptionsCheckIn?.reduce(
+              (prevPrice, currentCheckInPrices) =>
+                prevPrice + currentCheckInPrices.paidToday,
+              0
+            )}
+            etb)
+          </Typography>
+          {prescriptionsCheckIn &&
+            prescriptionsCheckIn.map(prescriptionCheckIn => (
+              <PriceStepper
+                prescriptionCheckIn={prescriptionCheckIn}
+                lastCheckIn={
+                  prescription.result.find(
+                    presc => presc.name === prescriptionCheckIn.name
+                  )?.checkIn
+                }
+                setPrescriptionsCheckIn={setPrescriptionsCheckIn}
+              />
+            ))}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            disabled={loading}
+            autoFocus
+            onClick={handleSuccess}
+            color="primary"
+          >
+            {!loading ? 'Payment Successful' : 'Submitting...'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <AlertDialog
+        dialogText="Are you sure you want to proceed?"
+        state={{
+          dialogToggle: alertDialogToggle,
+          setDialogToggle: setAlertDialogToggle,
+          setProceedToAction
+        }}
+      />
+    </>
   );
 };
 
