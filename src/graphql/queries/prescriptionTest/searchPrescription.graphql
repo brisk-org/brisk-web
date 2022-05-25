@@ -10,6 +10,7 @@ query SearchPrescriptionTests($term: String!, $skip: Float!, $take: Float!) {
     result
     paid
     price
+    started
     completed
     new
     rx

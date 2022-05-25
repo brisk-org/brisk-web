@@ -130,6 +130,11 @@ const SinglePrescriptionRow: React.FC<{
         </TableCell>
         <TableCell>
           <Typography color="textPrimary" variant="body1" noWrap>
+            {prescription.started ? successIcon : pendingIcon}
+          </Typography>
+        </TableCell>
+        <TableCell>
+          <Typography color="textPrimary" variant="body1" noWrap>
             {prescription.paid ? successIcon : pendingIcon}
           </Typography>
         </TableCell>

@@ -6,5 +6,6 @@ mutation MarkPrescriptionTestAsPaid(
   markPrescriptionTestAsPaid(main: { id: $id, result: $result, done: $done }) {
     id
     paid
+    started
   }
 }

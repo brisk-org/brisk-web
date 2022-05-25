@@ -63,11 +63,10 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   const [prescriptionsCheckIn, setPrescriptionsCheckIn] = useState<
     PrescriptionCheckIns[]
   >();
-  console.log(prescriptionsCheckIn, prescription.result);
 
   useEffect(() => {
     if (!open) return;
-    // setCheckInPrices(undefined);
+    console.log(prescription.result);
     setPrescriptionsCheckIn(
       prescription.result.map(({ name, checkIn: checkInArray }) => ({
         name,
@@ -77,23 +76,16 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         ),
         paid: 0,
         paidToday: 0,
-        checkIn: checkInArray.map(checkIn => ({
-          ...checkIn,
-          price: checkIn.perDay === 'bid' ? checkIn.price * 2 : checkIn.price
-        }))
+        checkIn: checkInArray
+          // .filter((checkIn, index) =>
+          //   checkIn.perDay === 'bid' ? index % 2 === 1 : true
+          // )
+          .map(checkIn => ({
+            ...checkIn,
+            price: checkIn.perDay === 'bid' ? checkIn.price * 2 : checkIn.price
+          }))
       }))
     );
-    // prescription.result.forEach(prescription => {
-    //   const checkInPrice = {
-    //     name: prescription.name,
-
-    //   };
-    //   setCheckInPrices(prevCheckInPrices =>
-    //     !prevCheckInPrices
-    //       ? [checkInPrice]
-    //       : [...prevCheckInPrices, checkInPrice]
-    //   );
-    // });
   }, [open, prescription.result]);
 
   useEffect(() => {
@@ -114,14 +106,29 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     await markPrescriptionTestAsPaid({
       variables: {
         id: prescription.id,
-        result: prescription.result.map(result => ({
-          ...result,
-          checkIn: JSON.stringify(
-            prescriptionsCheckIn!.find(
-              prescriptionsCheckIn => prescriptionsCheckIn.name === result.name
-            )?.checkIn
-          )
-        })),
+        result: prescription.result.map(result => {
+          const currentCheckIn = prescriptionsCheckIn!.find(
+            prescriptionsCheckIn => prescriptionsCheckIn.name === result.name
+          )!.checkIn;
+
+          const sortedCheckIn: PrescriptionCheckIn[] = [];
+          if (currentCheckIn[0].perDay === 'bid') {
+            for (let i = 0; i < currentCheckIn.length / 2; i++) {
+              sortedCheckIn.push(currentCheckIn[i]);
+              sortedCheckIn.push(
+                currentCheckIn[Math.floor(currentCheckIn.length / 2 + i)]
+              );
+            }
+          }
+          return {
+            ...result,
+            checkIn: JSON.stringify(
+              currentCheckIn[0].perDay === 'bid'
+                ? sortedCheckIn
+                : currentCheckIn
+            )
+          };
+        }),
         done: prescriptionsCheckIn!.every(
           prescriptionCheckIn => prescriptionCheckIn.remaining === 0
         )
@@ -200,7 +207,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <Button
             disabled={loading}
             autoFocus
-            onClick={handleSuccess}
+            onClick={() => setAlertDialogToggle(true)}
             color="primary"
           >
             {!loading ? 'Payment Successful' : 'Submitting...'}

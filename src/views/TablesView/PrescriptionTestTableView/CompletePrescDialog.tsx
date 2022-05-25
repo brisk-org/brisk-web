@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DialogActions,
   DialogTitle,
@@ -23,7 +23,13 @@ import {
   usePrescriptionTestQuery
 } from '../../../generated/graphql';
 import { PrescriptionTest } from '.';
-import { PrescriptionSettingDataType } from '../../../context/SettingContext';
+import {
+  PrescriptionCheckIn,
+  PrescriptionSettingDataType
+} from '../../../context/SettingContext';
+import PriceStepper from './PriceStepper';
+import { PrescriptionCheckIns } from './ConfirmationDialog';
+import MedicationStepper from './MedicationStepper';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -46,6 +52,13 @@ const useStyles = makeStyles(theme => ({
     background: colors.green[100]
   }
 }));
+export type PrescriptionsCheckIn = {
+  name: string;
+  completed: number;
+  remaining: number;
+  checkIn: PrescriptionCheckIn[];
+};
+
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -58,9 +71,39 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   const classes = useStyles();
 
-  const { data, loading } = usePrescriptionTestQuery({
-    variables: { id: prescription.id }
-  });
+  const [prescriptionsCheckIn, setPrescriptionsCheckIn] = useState<
+    PrescriptionsCheckIn[]
+  >();
+
+  useEffect(() => {
+    if (!open) return;
+    // setCheckInPrices(undefined);
+    setPrescriptionsCheckIn(
+      prescription.result.map(({ name, checkIn: checkInArray }) => {
+        // const sortedCheckIn: PrescriptionCheckIn[] = [];
+        // if (checkInArray[0].perDay === 'bid') {
+        //   for (let i = 0; i < checkInArray.length / 2; i++) {
+        //     sortedCheckIn.push(checkInArray[i]);
+        //     sortedCheckIn.push(
+        //       checkInArray[Math.floor(checkInArray.length / 2 + i)]
+        //     );
+        //   }
+        // }
+        return {
+          name,
+          completed: 0,
+          remaining: 0,
+          completedToday: 0,
+          checkIn: checkInArray
+          // checkInArray[0].perDay === 'bid' ? sortedCheckIn : checkInArray
+        };
+      })
+    );
+  }, [open, prescription.result]);
+
+  // const { data, loading } = usePrescriptionTestQuery({
+  //   variables: { id: prescription.id }
+  // });
   const [
     markPrescriptionTestAsCompleted
   ] = useMarkPrescriptionTestAsCompletedMutation({
@@ -78,13 +121,8 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
   };
 
   return (
-    <Box maxWidth={700}>
-      <Dialog
-        fullWidth
-        className={classes.root}
-        onClose={handleClose}
-        open={open}
-      >
+    <Box>
+      <Dialog className={classes.root} onClose={handleClose} open={open}>
         <DialogTitle>
           <Typography variant="h6">
             Prescription test for {prescription.card?.name}
@@ -115,10 +153,22 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
                 {prescription.card?.gender}
               </Typography>
             </Typography>
-
+            {prescriptionsCheckIn &&
+              prescriptionsCheckIn.map(prescriptionCheckIn => (
+                <MedicationStepper
+                  prescriptionCheckIn={prescriptionCheckIn}
+                  lastCheckIn={
+                    prescription.result.find(
+                      presc => presc.name === prescriptionCheckIn.name
+                    )?.checkIn
+                  }
+                  setPrescriptionsCheckIn={setPrescriptionsCheckIn}
+                />
+              ))}
             <Grid container>
-              {loading && 'Loading...'}
-              {data &&
+              {/* {loading && 'Loading...'} */}
+
+              {/* {data &&
                 (JSON.parse(
                   data.prescriptionTest.result
                 ) as PrescriptionSettingDataType[]).map(
@@ -135,7 +185,7 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
                       <Typography>{other}</Typography>
                     </Grid>
                   )
-                )}
+                )} */}
             </Grid>
           </Box>
         </DialogContent>

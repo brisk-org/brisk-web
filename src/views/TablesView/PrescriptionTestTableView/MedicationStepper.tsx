@@ -17,6 +17,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import { PrescriptionCheckIns } from './ConfirmationDialog';
 import clsx from 'clsx';
+import { PrescriptionsCheckIn } from './CompletePrescDialog';
 
 const useStyles = makeStyles(theme => ({
   stepSuccess: {
@@ -26,18 +27,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 interface Props {
-  prescriptionCheckIn: PrescriptionCheckIns;
+  prescriptionCheckIn: PrescriptionsCheckIn;
   lastCheckIn?: PrescriptionCheckIn[];
   // checkInPrices?: CheckInPrice[];
   setPrescriptionsCheckIn: React.Dispatch<
-    React.SetStateAction<PrescriptionCheckIns[] | undefined>
+    React.SetStateAction<PrescriptionsCheckIn[] | undefined>
   >;
   // setCheckInPrices: React.Dispatch<
   //   React.SetStateAction<CheckInPrice[] | undefined>
   // >;
 }
 
-const PriceStepper: React.FC<Props> = ({
+const MedicationStepper: React.FC<Props> = ({
   prescriptionCheckIn,
   lastCheckIn,
   setPrescriptionsCheckIn
@@ -45,48 +46,30 @@ const PriceStepper: React.FC<Props> = ({
   const classes = useStyles();
 
   const [activeStep, setActiveStep] = useState(
-    prescriptionCheckIn.checkIn.findIndex(checkIn => !checkIn.isPaid)
+    prescriptionCheckIn.checkIn.findIndex(checkIn => !checkIn.completed)
   );
 
   useEffect(() => {
-    const paid = prescriptionCheckIn.checkIn.reduce(
-      (prevValue, currentCheckInEdit) =>
-        currentCheckInEdit.isPaid
-          ? prevValue + currentCheckInEdit.price
-          : prevValue,
-      0
-    );
-    const totalPrice = prescriptionCheckIn.checkIn.reduce(
-      (prevValue, currentCheckInEdit) => prevValue + currentCheckInEdit.price,
-      0
-    );
-    const paidToday = prescriptionCheckIn.checkIn.reduce(
-      (prevPrice, currentCheckIn, index) =>
-        lastCheckIn && !lastCheckIn[index].isPaid
-          ? currentCheckIn.isPaid
-            ? currentCheckIn.price + prevPrice
-            : prevPrice
-          : prevPrice,
+    const completed = prescriptionCheckIn.checkIn.reduce(
+      (count, checkIn) => (checkIn.completed ? count + 1 : count),
       0
     );
 
     setPrescriptionsCheckIn(prevCheckInPrices =>
-      prevCheckInPrices?.map(prevCheckInPrice => {
-        if (prevCheckInPrice.name === prescriptionCheckIn.name) {
-          return {
-            ...prevCheckInPrice,
-            paid,
-            paidToday: paidToday,
-            remaining: totalPrice - paid
-          };
-        }
-        return { ...prevCheckInPrice };
-      })
+      prevCheckInPrices?.map(prevCheckInPrice =>
+        prevCheckInPrice.name === prescriptionCheckIn.name
+          ? {
+              ...prevCheckInPrice,
+              completed,
+              remaining: prescriptionCheckIn.checkIn.length - completed
+            }
+          : { ...prevCheckInPrice }
+      )
     );
   }, [activeStep]);
 
   const handleStepperClick = (index: number) => {
-    if (lastCheckIn && lastCheckIn[index].isPaid) return;
+    if (lastCheckIn && lastCheckIn[index].completed) return;
 
     setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
       prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn =>
@@ -96,7 +79,7 @@ const PriceStepper: React.FC<Props> = ({
               checkIn: prevPrescriptionCheckIn.checkIn.map(
                 (checkIn, checkInIndex) => ({
                   ...checkIn,
-                  isPaid: index >= checkInIndex
+                  completed: index >= checkInIndex
                 })
               )
             }
@@ -115,7 +98,7 @@ const PriceStepper: React.FC<Props> = ({
               ...prevPrescriptionCheckIn,
               checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) =>
                 index === activeStep
-                  ? { ...checkIn, isPaid: true }
+                  ? { ...checkIn, completed: true }
                   : { ...checkIn }
               )
             }
@@ -129,7 +112,7 @@ const PriceStepper: React.FC<Props> = ({
 
   const handleBack = () => {
     if (activeStep < 1) return;
-    if (lastCheckIn && lastCheckIn[activeStep - 1].isPaid) return;
+    if (lastCheckIn && lastCheckIn[activeStep - 1].completed) return;
     setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
       prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn =>
         prevPrescriptionCheckIn.name === prescriptionCheckIn.name
@@ -137,7 +120,7 @@ const PriceStepper: React.FC<Props> = ({
               ...prevPrescriptionCheckIn,
               checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) =>
                 index === activeStep - 1
-                  ? { ...checkIn, isPaid: false }
+                  ? { ...checkIn, completed: false }
                   : { ...checkIn }
               )
             }
@@ -149,6 +132,7 @@ const PriceStepper: React.FC<Props> = ({
     setActiveStep(prevActiveStep => prevActiveStep - 1);
   };
 
+  console.log(lastCheckIn);
   return (
     <Box
       sx={{
@@ -161,7 +145,7 @@ const PriceStepper: React.FC<Props> = ({
       {prescriptionCheckIn.checkIn.length === activeStep && (
         <Chip
           size="small"
-          label="All Paid"
+          label="All completed"
           sx={{ borderRadius: '7px' }}
           color="success"
           variant="outlined"
@@ -180,15 +164,8 @@ const PriceStepper: React.FC<Props> = ({
             ({prescriptionCheckIn.checkIn[0].perDay})
           </Typography>
           <Typography variant="caption" component="p">
-            paid: (
-            {
-              // prescriptionCheckIn.find(prescriptionCheckIn => prescriptionCheckIn. === name)
-              prescriptionCheckIn.paid
-            }
-            ) remaining: ({prescriptionCheckIn.remaining})
-          </Typography>
-          <Typography variant="caption" component="p">
-            Paid Today: {prescriptionCheckIn.paidToday}
+            paid: ({prescriptionCheckIn.completed}) remaining: (
+            {prescriptionCheckIn.remaining})
           </Typography>
         </Typography>
         <div>
@@ -213,19 +190,20 @@ const PriceStepper: React.FC<Props> = ({
         {prescriptionCheckIn.checkIn.map((checkIn, index) => (
           <Step
             onClick={() => handleStepperClick(index)}
-            sx={{ cursor: 'pointer' }}
+            sx={{ cursor: 'pointer', mx: 1 }}
             key={index}
-            completed={checkIn.isPaid}
+            completed={checkIn.completed}
           >
             <StepLabel
               error={
                 isBefore(
                   new Date(checkIn.date),
                   sub(new Date(), { hours: 1 })
-                ) && !checkIn.isPaid
+                ) && !checkIn.completed
               }
               className={clsx({
-                [classes.stepSuccess]: lastCheckIn && !lastCheckIn[index].isPaid
+                [classes.stepSuccess]:
+                  lastCheckIn && !lastCheckIn[index].completed
               })}
               optional={
                 isToday(new Date(checkIn.date)) && (
@@ -242,13 +220,8 @@ const PriceStepper: React.FC<Props> = ({
           </Step>
         ))}
       </Stepper>
-      {/* <Box sx={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
-        <Button size="small" sx={{ textTransform: 'capitalize' }}>
-          Confirm
-        </Button>
-      </Box> */}
     </Box>
   );
 };
 
-export default PriceStepper;
+export default MedicationStepper;

@@ -104,16 +104,24 @@ const PrescriptionTestFormView = () => {
       .filter(presc => presc.selected)
       .map(prescription => {
         const checkIn: PrescriptionCheckIn[] = [];
-        const perDay = prescription.perDay === 'stat' ? 1 : 2;
-        for (let j = 0; j < prescription.forDays; j++) {
+        for (let i = 0; i < prescription.forDays; i++) {
           checkIn.push({
-            date: add(new Date(), { days: j }).toISOString(),
+            date: add(new Date(), { days: i }).toISOString(),
             perDay: prescription.perDay,
             price: prescription.price,
             isPaid: false,
             completed: false
           });
         }
+
+        const sortedCheckIn: PrescriptionCheckIn[] = [];
+        if (prescription.perDay === 'bid') {
+          for (let i = 0; i < checkIn.length / 2; i++) {
+            sortedCheckIn.push(checkIn[i]);
+            sortedCheckIn.push(checkIn[Math.floor(checkIn.length / 2 + i)]);
+          }
+        }
+
         return {
           name: prescription.name,
           perDay: prescription.perDay,
@@ -122,7 +130,9 @@ const PrescriptionTestFormView = () => {
           inStock: prescription.inStock,
           other: prescription.other,
           strength: prescription.strength,
-          checkIn: JSON.stringify(checkIn)
+          checkIn: JSON.stringify(
+            prescription.perDay === 'bid' ? sortedCheckIn : prescription.checkIn
+          )
         };
       });
 

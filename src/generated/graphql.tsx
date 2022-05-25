@@ -401,6 +401,7 @@ export type PrescriptionTest = {
   result: Scalars['String'];
   rx: Scalars['String'];
   paid: Scalars['Boolean'];
+  started: Scalars['Boolean'];
   price: Scalars['Float'];
   completed: Scalars['Boolean'];
   new: Scalars['Boolean'];
@@ -919,7 +920,7 @@ export type MarkPrescriptionTestAsCompletedMutation = (
   { __typename?: 'Mutation' }
   & { markPrescriptionTestAsCompleted: (
     { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'new'>
+    & Pick<PrescriptionTest, 'id' | 'new' | 'started'>
   ) }
 );
 
@@ -934,7 +935,7 @@ export type MarkPrescriptionTestAsPaidMutation = (
   { __typename?: 'Mutation' }
   & { markPrescriptionTestAsPaid: (
     { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'paid'>
+    & Pick<PrescriptionTest, 'id' | 'paid' | 'started'>
   ) }
 );
 
@@ -1367,7 +1368,7 @@ export type PrescriptionTestQuery = (
   { __typename?: 'Query' }
   & { prescriptionTest: (
     { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at'>
+    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'started' | 'price' | 'completed' | 'new' | 'rx' | 'created_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
@@ -1385,7 +1386,7 @@ export type PrescriptionTestsQuery = (
   { __typename?: 'Query' }
   & { prescriptionTests: Array<(
     { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
+    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'started' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
@@ -1426,7 +1427,7 @@ export type SearchPrescriptionTestsQuery = (
   { __typename?: 'Query' }
   & { searchPrescriptionTests: Array<(
     { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
+    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'price' | 'started' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
@@ -2392,6 +2393,7 @@ export const MarkPrescriptionTestAsCompletedDocument = gql`
   markPrescriptionTestAsCompleted(main: {id: $id, result: $result, done: $done}) {
     id
     new
+    started
   }
 }
     `;
@@ -2428,6 +2430,7 @@ export const MarkPrescriptionTestAsPaidDocument = gql`
   markPrescriptionTestAsPaid(main: {id: $id, result: $result, done: $done}) {
     id
     paid
+    started
   }
 }
     `;
@@ -3586,6 +3589,7 @@ export const PrescriptionTestDocument = gql`
     }
     result
     paid
+    started
     price
     completed
     new
@@ -3634,6 +3638,7 @@ export const PrescriptionTestsDocument = gql`
     }
     result
     paid
+    started
     price
     completed
     new
@@ -3756,6 +3761,7 @@ export const SearchPrescriptionTestsDocument = gql`
     result
     paid
     price
+    started
     completed
     new
     rx

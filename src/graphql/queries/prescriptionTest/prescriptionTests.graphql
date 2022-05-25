@@ -9,6 +9,7 @@ query PrescriptionTests($skip: Float!, $take: Float!) {
     }
     result
     paid
+    started
     price
     completed
     new

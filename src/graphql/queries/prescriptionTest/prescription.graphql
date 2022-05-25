@@ -9,10 +9,12 @@ query PrescriptionTest($id: ID!) {
     }
     result
     paid
+    started
     price
     completed
     new
     rx
     created_at
+    updated_at
   }
 }
