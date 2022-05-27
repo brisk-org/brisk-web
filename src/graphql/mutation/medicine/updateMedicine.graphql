@@ -1,0 +1,15 @@
+mutation UpdateMedicine(
+  $id: ID!
+  $name: String!
+  $price: Float!
+  $inStock: Float!
+) {
+  updateMedicine(id: $id, name: $name, price: $price, inStock: $inStock) {
+    id
+    name
+    price
+    inStock
+    created_at
+    updated_at
+  }
+}

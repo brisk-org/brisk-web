@@ -2,7 +2,7 @@ mutation ChangeSetting(
   $card_price: Float!
   $card_expiration_date: Float!
   $laboratory_tests_data: String!
-  $prescription_tests_data: [PrescriptionInput!]!
+  $prescription_tests_data: String!
 ) {
   changeSetting(
     setting: {

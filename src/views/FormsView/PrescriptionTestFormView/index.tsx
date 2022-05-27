@@ -112,15 +112,25 @@ const PrescriptionTestFormView = () => {
             isPaid: false,
             completed: false
           });
-        }
-
-        const sortedCheckIn: PrescriptionCheckIn[] = [];
-        if (prescription.perDay === 'bid') {
-          for (let i = 0; i < checkIn.length / 2; i++) {
-            sortedCheckIn.push(checkIn[i]);
-            sortedCheckIn.push(checkIn[Math.floor(checkIn.length / 2 + i)]);
+          if (prescription.perDay === 'bid') {
+            checkIn.push({
+              date: add(new Date(), { days: i }).toISOString(),
+              perDay: prescription.perDay,
+              price: prescription.price,
+              isPaid: false,
+              completed: false
+            });
           }
         }
+
+        // const sortedCheckIn: PrescriptionCheckIn[] = [];
+        // if (prescription.perDay === 'bid') {
+        //   for (let i = 0; i < Math.floor(checkIn.length / 2); i++) {
+        //     sortedCheckIn.push(checkIn[i]);
+        //     sortedCheckIn.push(checkIn[Math.floor(checkIn.length / 2 + i)]);
+        //   }
+        // }
+        // console.log(sortedCheckIn, checkIn);
 
         return {
           name: prescription.name,
@@ -131,7 +141,8 @@ const PrescriptionTestFormView = () => {
           other: prescription.other,
           strength: prescription.strength,
           checkIn: JSON.stringify(
-            prescription.perDay === 'bid' ? sortedCheckIn : prescription.checkIn
+            checkIn
+            // prescription.perDay === 'bid' ? sortedCheckIn : prescription.checkIn
           )
         };
       });

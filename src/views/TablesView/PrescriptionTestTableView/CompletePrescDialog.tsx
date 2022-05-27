@@ -114,9 +114,23 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
     setOpen(false);
   };
   const handleSuccess = async () => {
-    // markPrescriptionTestAsCompleted({
-    //   variables: { id: prescription.id }
-    // });
+    markPrescriptionTestAsCompleted({
+      variables: {
+        id: prescription.id,
+        result: prescription.result.map(prescription => ({
+          ...prescription,
+          checkIn: JSON.stringify(
+            prescriptionsCheckIn!.find(
+              prescriptionsCheckIn =>
+                prescriptionsCheckIn.name === prescription.name
+            )!.checkIn
+          )
+        })),
+        done: prescriptionsCheckIn!.every(
+          prescriptionCheckIn => prescriptionCheckIn.remaining === 0
+        )
+      }
+    });
     setOpen(false);
   };
 

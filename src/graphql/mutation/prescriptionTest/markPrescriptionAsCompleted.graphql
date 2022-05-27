@@ -8,6 +8,6 @@ mutation MarkPrescriptionTestAsCompleted(
   ) {
     id
     new
-    started
+    inrolled
   }
 }

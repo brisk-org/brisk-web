@@ -18,7 +18,7 @@ export type Card = {
   __typename?: 'Card';
   id: Scalars['ID'];
   laboratory_tests?: Maybe<Array<LaboratoryTest>>;
-  prescription_tests?: Maybe<Array<PrescriptionTest>>;
+  prescription_tests?: Maybe<Array<Prescription>>;
   name: Scalars['String'];
   phone: Scalars['String'];
   age: Scalars['String'];
@@ -59,7 +59,7 @@ export type ChangeSettingsInput = {
   card_price: Scalars['Float'];
   card_expiration_date: Scalars['Float'];
   laboratory_tests_data: Scalars['String'];
-  prescription_tests_data: Array<PrescriptionInput>;
+  prescription_tests_data: Scalars['String'];
 };
 
 export type CompleteQuickLabTestInput = {
@@ -82,12 +82,6 @@ export type CreatePrescriptionTestInput = {
   cardId: Scalars['ID'];
   price: Scalars['Float'];
   result: Array<PrescriptionInput>;
-};
-
-export type CreateProductInput = {
-  name: Scalars['String'];
-  price: Scalars['Float'];
-  desc: Scalars['String'];
 };
 
 export type CreateQuickLabTestInput = {
@@ -135,6 +129,17 @@ export type LaboratoryTest = {
   updated_at: Scalars['String'];
 };
 
+export type Medicine = {
+  __typename?: 'Medicine';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  prescription: PrescriptionMedication;
+  price: Scalars['Float'];
+  inStock: Scalars['Float'];
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   register: UserResponse;
@@ -155,14 +160,17 @@ export type Mutation = {
   markCardAsNew: Card;
   markCardAsSeen: Card;
   invalidateCard: Card;
+  addMedicine: Medicine;
+  updateMedicine: Medicine;
+  deleteMedicine: Scalars['Boolean'];
   createHistory: History;
   updateHistory: History;
   deleteHistory: Scalars['Boolean'];
-  createPrescriptionTest: PrescriptionTest;
-  markPrescriptionTestAsCompleted: PrescriptionTest;
-  markPrescriptionTestAsPaid: PrescriptionTest;
+  createPrescriptionTest: Prescription;
+  markPrescriptionTestAsCompleted: Prescription;
+  markPrescriptionTestAsPaid: Prescription;
   deletePrescriptionTest: Scalars['Boolean'];
-  markPrescriptionTestAsSeen: PrescriptionTest;
+  markPrescriptionTestAsSeen: Prescription;
   createQuickPrescriptionTest: QuickPrescriptionTest;
   completeQuickPrescriptionTest: QuickPrescriptionTest;
   markQuickPrescriptionTestAsPaid: QuickPrescriptionTest;
@@ -173,7 +181,6 @@ export type Mutation = {
   markQuickLaboratoryTestAsSeen: QuickLaboratoryTest;
   deleteNotification: Scalars['Boolean'];
   clearNotification: Scalars['Boolean'];
-  createProduct: Product;
 };
 
 
@@ -275,6 +282,26 @@ export type MutationInvalidateCardArgs = {
 };
 
 
+export type MutationAddMedicineArgs = {
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock: Scalars['Float'];
+};
+
+
+export type MutationUpdateMedicineArgs = {
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock: Scalars['Float'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationDeleteMedicineArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationCreateHistoryArgs = {
   result: Scalars['String'];
   id: Scalars['ID'];
@@ -364,11 +391,6 @@ export type MutationDeleteNotificationArgs = {
   id: Scalars['ID'];
 };
 
-
-export type MutationCreateProductArgs = {
-  product: CreateProductInput;
-};
-
 export type Notification = {
   __typename?: 'Notification';
   id: Scalars['ID'];
@@ -382,6 +404,23 @@ export type Notification = {
   created_at: Scalars['String'];
 };
 
+export type Prescription = {
+  __typename?: 'Prescription';
+  id: Scalars['ID'];
+  cardId: Scalars['Float'];
+  card: Card;
+  result: Scalars['String'];
+  prescription_medication: Array<PrescriptionMedication>;
+  rx: Scalars['String'];
+  paid: Scalars['Boolean'];
+  inrolled: Scalars['Boolean'];
+  price: Scalars['Float'];
+  completed: Scalars['Boolean'];
+  new: Scalars['Boolean'];
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
+};
+
 export type PrescriptionInput = {
   name: Scalars['String'];
   price: Scalars['Float'];
@@ -393,28 +432,16 @@ export type PrescriptionInput = {
   other?: Maybe<Scalars['String']>;
 };
 
-export type PrescriptionTest = {
-  __typename?: 'PrescriptionTest';
+export type PrescriptionMedication = {
+  __typename?: 'PrescriptionMedication';
   id: Scalars['ID'];
-  cardId: Scalars['Float'];
-  card: Card;
-  result: Scalars['String'];
-  rx: Scalars['String'];
-  paid: Scalars['Boolean'];
-  started: Scalars['Boolean'];
-  price: Scalars['Float'];
-  completed: Scalars['Boolean'];
-  new: Scalars['Boolean'];
-  created_at: Scalars['String'];
-  updated_at: Scalars['String'];
-};
-
-export type Product = {
-  __typename?: 'Product';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  price: Scalars['Float'];
-  desc: Scalars['String'];
+  medicine: Medicine;
+  prescription: Prescription;
+  strength?: Maybe<Scalars['String']>;
+  perDay: Scalars['String'];
+  checkIn: Scalars['String'];
+  forDays: Scalars['Float'];
+  other?: Maybe<Scalars['String']>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
@@ -432,23 +459,22 @@ export type Query = {
   cards: Array<Card>;
   card: Card;
   searchCards: Array<Card>;
+  medicineCount: Scalars['Float'];
+  medicines: Array<Medicine>;
+  medicine: Medicine;
   cardSales: Array<CardSales>;
   histories: Array<History>;
   weeklyHistory: Array<History>;
   history: History;
   prescriptionTestsCount: Scalars['Float'];
-  prescriptionTests: Array<PrescriptionTest>;
-  prescriptionTest: PrescriptionTest;
-  searchPrescriptionTests: Array<PrescriptionTest>;
+  prescriptionTests: Array<Prescription>;
+  prescriptionTest: Prescription;
+  searchPrescriptionTests: Array<Prescription>;
   quickPrescriptionTestsCount: Scalars['Float'];
   quickPrescriptionTests: Array<QuickPrescriptionTest>;
   quickLaboratoryTestsCount: Scalars['Float'];
   quickLaboratoryTests: Array<QuickLaboratoryTest>;
   notifications: Array<Notification>;
-  productsCount: Scalars['Float'];
-  products: Array<Product>;
-  product: Product;
-  searchProducts: Array<Product>;
 };
 
 
@@ -490,6 +516,11 @@ export type QuerySearchCardsArgs = {
   phone?: Maybe<Scalars['String']>;
   skip: Scalars['Float'];
   take: Scalars['Float'];
+};
+
+
+export type QueryMedicineArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -537,24 +568,6 @@ export type QueryQuickLaboratoryTestsArgs = {
   take: Scalars['Float'];
   from?: Maybe<Scalars['String']>;
   to?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryProductsArgs = {
-  skip: Scalars['Float'];
-  take: Scalars['Float'];
-};
-
-
-export type QueryProductArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QuerySearchProductsArgs = {
-  name?: Maybe<Scalars['String']>;
-  skip: Scalars['Float'];
-  take: Scalars['Float'];
 };
 
 export type QuickLaboratoryTest = {
@@ -609,7 +622,7 @@ export type Subscription = {
   __typename?: 'Subscription';
   newCreatedLaboratoryTest: LaboratoryTest;
   newCreatedCard: Card;
-  newCreatedPrescriptionTest: PrescriptionTest;
+  newCreatedPrescriptionTest: Prescription;
   newCreatedQuickPrescriptionTest: QuickPrescriptionTest;
   newCreatedQuickLaboratoryTest: QuickLaboratoryTest;
   newNotificationSubscription: Notification;
@@ -861,6 +874,37 @@ export type PayForLaboratoryTestMutation = (
   ) }
 );
 
+export type AddMedicineMutationVariables = Exact<{
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock: Scalars['Float'];
+}>;
+
+
+export type AddMedicineMutation = (
+  { __typename?: 'Mutation' }
+  & { addMedicine: (
+    { __typename?: 'Medicine' }
+    & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock' | 'created_at' | 'updated_at'>
+  ) }
+);
+
+export type UpdateMedicineMutationVariables = Exact<{
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock: Scalars['Float'];
+}>;
+
+
+export type UpdateMedicineMutation = (
+  { __typename?: 'Mutation' }
+  & { updateMedicine: (
+    { __typename?: 'Medicine' }
+    & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock' | 'created_at' | 'updated_at'>
+  ) }
+);
+
 export type ClearNotificationMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -890,8 +934,8 @@ export type CreatePrescriptionTestMutationVariables = Exact<{
 export type CreatePrescriptionTestMutation = (
   { __typename?: 'Mutation' }
   & { createPrescriptionTest: (
-    { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'price' | 'result' | 'rx'>
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'price' | 'result' | 'rx'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'name'>
@@ -919,8 +963,8 @@ export type MarkPrescriptionTestAsCompletedMutationVariables = Exact<{
 export type MarkPrescriptionTestAsCompletedMutation = (
   { __typename?: 'Mutation' }
   & { markPrescriptionTestAsCompleted: (
-    { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'new' | 'started'>
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'new' | 'inrolled'>
   ) }
 );
 
@@ -934,8 +978,8 @@ export type MarkPrescriptionTestAsPaidMutationVariables = Exact<{
 export type MarkPrescriptionTestAsPaidMutation = (
   { __typename?: 'Mutation' }
   & { markPrescriptionTestAsPaid: (
-    { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'paid' | 'started'>
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'paid' | 'inrolled'>
   ) }
 );
 
@@ -947,8 +991,8 @@ export type MarkPrescriptionTestAsSeenMutationVariables = Exact<{
 export type MarkPrescriptionTestAsSeenMutation = (
   { __typename?: 'Mutation' }
   & { markPrescriptionTestAsSeen: (
-    { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'new'>
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'new'>
   ) }
 );
 
@@ -1070,7 +1114,7 @@ export type ChangeSettingMutationVariables = Exact<{
   card_price: Scalars['Float'];
   card_expiration_date: Scalars['Float'];
   laboratory_tests_data: Scalars['String'];
-  prescription_tests_data: Array<PrescriptionInput> | PrescriptionInput;
+  prescription_tests_data: Scalars['String'];
 }>;
 
 
@@ -1161,8 +1205,8 @@ export type CardQuery = (
       { __typename?: 'CardSales' }
       & Pick<CardSales, 'price' | 'created_at'>
     )>>, prescription_tests?: Maybe<Array<(
-      { __typename?: 'PrescriptionTest' }
-      & Pick<PrescriptionTest, 'id' | 'cardId' | 'result' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
+      { __typename?: 'Prescription' }
+      & Pick<Prescription, 'id' | 'cardId' | 'result' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
     )>>, laboratory_tests?: Maybe<Array<(
       { __typename?: 'LaboratoryTest' }
       & Pick<LaboratoryTest, 'id' | 'cardId' | 'result' | 'paid' | 'new' | 'completed' | 'price' | 'created_at' | 'updated_at'>
@@ -1367,8 +1411,8 @@ export type PrescriptionTestQueryVariables = Exact<{
 export type PrescriptionTestQuery = (
   { __typename?: 'Query' }
   & { prescriptionTest: (
-    { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'started' | 'price' | 'completed' | 'new' | 'rx' | 'created_at'>
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'result' | 'paid' | 'inrolled' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
@@ -1385,8 +1429,8 @@ export type PrescriptionTestsQueryVariables = Exact<{
 export type PrescriptionTestsQuery = (
   { __typename?: 'Query' }
   & { prescriptionTests: Array<(
-    { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'started' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'result' | 'paid' | 'inrolled' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
@@ -1411,8 +1455,8 @@ export type PrescriptionTestsForDashboardQueryVariables = Exact<{
 export type PrescriptionTestsForDashboardQuery = (
   { __typename?: 'Query' }
   & { prescriptionTests: Array<(
-    { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'paid' | 'price' | 'updated_at'>
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'paid' | 'price' | 'updated_at'>
   )> }
 );
 
@@ -1426,62 +1470,12 @@ export type SearchPrescriptionTestsQueryVariables = Exact<{
 export type SearchPrescriptionTestsQuery = (
   { __typename?: 'Query' }
   & { searchPrescriptionTests: Array<(
-    { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'result' | 'paid' | 'price' | 'started' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'result' | 'paid' | 'price' | 'inrolled' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
     ) }
-  )> }
-);
-
-export type ProductQueryVariables = Exact<{
-  id: Scalars['ID'];
-}>;
-
-
-export type ProductQuery = (
-  { __typename?: 'Query' }
-  & { product: (
-    { __typename?: 'Product' }
-    & Pick<Product, 'id' | 'name' | 'desc' | 'price' | 'created_at' | 'updated_at'>
-  ) }
-);
-
-export type ProductsCountQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ProductsCountQuery = (
-  { __typename?: 'Query' }
-  & Pick<Query, 'productsCount'>
-);
-
-export type ProductsQueryVariables = Exact<{
-  skip: Scalars['Float'];
-  take: Scalars['Float'];
-}>;
-
-
-export type ProductsQuery = (
-  { __typename?: 'Query' }
-  & { products: Array<(
-    { __typename?: 'Product' }
-    & Pick<Product, 'id' | 'name' | 'desc' | 'price' | 'created_at' | 'updated_at'>
-  )> }
-);
-
-export type SearchProductsQueryVariables = Exact<{
-  name?: Maybe<Scalars['String']>;
-  skip: Scalars['Float'];
-  take: Scalars['Float'];
-}>;
-
-
-export type SearchProductsQuery = (
-  { __typename?: 'Query' }
-  & { searchProducts: Array<(
-    { __typename?: 'Product' }
-    & Pick<Product, 'id' | 'name' | 'desc' | 'price' | 'created_at' | 'updated_at'>
   )> }
 );
 
@@ -1640,8 +1634,8 @@ export type NewCreatedPrescriptionTestSubscriptionVariables = Exact<{ [key: stri
 export type NewCreatedPrescriptionTestSubscription = (
   { __typename?: 'Subscription' }
   & { newCreatedPrescriptionTest: (
-    { __typename?: 'PrescriptionTest' }
-    & Pick<PrescriptionTest, 'id' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'paid' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name'>
@@ -2251,6 +2245,87 @@ export function usePayForLaboratoryTestMutation(baseOptions?: Apollo.MutationHoo
 export type PayForLaboratoryTestMutationHookResult = ReturnType<typeof usePayForLaboratoryTestMutation>;
 export type PayForLaboratoryTestMutationResult = Apollo.MutationResult<PayForLaboratoryTestMutation>;
 export type PayForLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<PayForLaboratoryTestMutation, PayForLaboratoryTestMutationVariables>;
+export const AddMedicineDocument = gql`
+    mutation AddMedicine($name: String!, $price: Float!, $inStock: Float!) {
+  addMedicine(name: $name, price: $price, inStock: $inStock) {
+    id
+    name
+    price
+    inStock
+    created_at
+    updated_at
+  }
+}
+    `;
+export type AddMedicineMutationFn = Apollo.MutationFunction<AddMedicineMutation, AddMedicineMutationVariables>;
+
+/**
+ * __useAddMedicineMutation__
+ *
+ * To run a mutation, you first call `useAddMedicineMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddMedicineMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addMedicineMutation, { data, loading, error }] = useAddMedicineMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      price: // value for 'price'
+ *      inStock: // value for 'inStock'
+ *   },
+ * });
+ */
+export function useAddMedicineMutation(baseOptions?: Apollo.MutationHookOptions<AddMedicineMutation, AddMedicineMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddMedicineMutation, AddMedicineMutationVariables>(AddMedicineDocument, options);
+      }
+export type AddMedicineMutationHookResult = ReturnType<typeof useAddMedicineMutation>;
+export type AddMedicineMutationResult = Apollo.MutationResult<AddMedicineMutation>;
+export type AddMedicineMutationOptions = Apollo.BaseMutationOptions<AddMedicineMutation, AddMedicineMutationVariables>;
+export const UpdateMedicineDocument = gql`
+    mutation UpdateMedicine($id: ID!, $name: String!, $price: Float!, $inStock: Float!) {
+  updateMedicine(id: $id, name: $name, price: $price, inStock: $inStock) {
+    id
+    name
+    price
+    inStock
+    created_at
+    updated_at
+  }
+}
+    `;
+export type UpdateMedicineMutationFn = Apollo.MutationFunction<UpdateMedicineMutation, UpdateMedicineMutationVariables>;
+
+/**
+ * __useUpdateMedicineMutation__
+ *
+ * To run a mutation, you first call `useUpdateMedicineMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMedicineMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateMedicineMutation, { data, loading, error }] = useUpdateMedicineMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *      price: // value for 'price'
+ *      inStock: // value for 'inStock'
+ *   },
+ * });
+ */
+export function useUpdateMedicineMutation(baseOptions?: Apollo.MutationHookOptions<UpdateMedicineMutation, UpdateMedicineMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateMedicineMutation, UpdateMedicineMutationVariables>(UpdateMedicineDocument, options);
+      }
+export type UpdateMedicineMutationHookResult = ReturnType<typeof useUpdateMedicineMutation>;
+export type UpdateMedicineMutationResult = Apollo.MutationResult<UpdateMedicineMutation>;
+export type UpdateMedicineMutationOptions = Apollo.BaseMutationOptions<UpdateMedicineMutation, UpdateMedicineMutationVariables>;
 export const ClearNotificationDocument = gql`
     mutation ClearNotification {
   clearNotification
@@ -2393,7 +2468,7 @@ export const MarkPrescriptionTestAsCompletedDocument = gql`
   markPrescriptionTestAsCompleted(main: {id: $id, result: $result, done: $done}) {
     id
     new
-    started
+    inrolled
   }
 }
     `;
@@ -2430,7 +2505,7 @@ export const MarkPrescriptionTestAsPaidDocument = gql`
   markPrescriptionTestAsPaid(main: {id: $id, result: $result, done: $done}) {
     id
     paid
-    started
+    inrolled
   }
 }
     `;
@@ -2805,7 +2880,7 @@ export type MarkQuickPrescriptionTestAsSeenMutationHookResult = ReturnType<typeo
 export type MarkQuickPrescriptionTestAsSeenMutationResult = Apollo.MutationResult<MarkQuickPrescriptionTestAsSeenMutation>;
 export type MarkQuickPrescriptionTestAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkQuickPrescriptionTestAsSeenMutation, MarkQuickPrescriptionTestAsSeenMutationVariables>;
 export const ChangeSettingDocument = gql`
-    mutation ChangeSetting($card_price: Float!, $card_expiration_date: Float!, $laboratory_tests_data: String!, $prescription_tests_data: [PrescriptionInput!]!) {
+    mutation ChangeSetting($card_price: Float!, $card_expiration_date: Float!, $laboratory_tests_data: String!, $prescription_tests_data: String!) {
   changeSetting(
     setting: {card_price: $card_price, card_expiration_date: $card_expiration_date, laboratory_tests_data: $laboratory_tests_data, prescription_tests_data: $prescription_tests_data}
   ) {
@@ -3589,12 +3664,13 @@ export const PrescriptionTestDocument = gql`
     }
     result
     paid
-    started
+    inrolled
     price
     completed
     new
     rx
     created_at
+    updated_at
   }
 }
     `;
@@ -3638,7 +3714,7 @@ export const PrescriptionTestsDocument = gql`
     }
     result
     paid
-    started
+    inrolled
     price
     completed
     new
@@ -3761,7 +3837,7 @@ export const SearchPrescriptionTestsDocument = gql`
     result
     paid
     price
-    started
+    inrolled
     completed
     new
     rx
@@ -3800,161 +3876,6 @@ export function useSearchPrescriptionTestsLazyQuery(baseOptions?: Apollo.LazyQue
 export type SearchPrescriptionTestsQueryHookResult = ReturnType<typeof useSearchPrescriptionTestsQuery>;
 export type SearchPrescriptionTestsLazyQueryHookResult = ReturnType<typeof useSearchPrescriptionTestsLazyQuery>;
 export type SearchPrescriptionTestsQueryResult = Apollo.QueryResult<SearchPrescriptionTestsQuery, SearchPrescriptionTestsQueryVariables>;
-export const ProductDocument = gql`
-    query Product($id: ID!) {
-  product(id: $id) {
-    id
-    name
-    desc
-    price
-    created_at
-    updated_at
-  }
-}
-    `;
-
-/**
- * __useProductQuery__
- *
- * To run a query within a React component, call `useProductQuery` and pass it any options that fit your needs.
- * When your component renders, `useProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useProductQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useProductQuery(baseOptions: Apollo.QueryHookOptions<ProductQuery, ProductQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ProductQuery, ProductQueryVariables>(ProductDocument, options);
-      }
-export function useProductLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProductQuery, ProductQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ProductQuery, ProductQueryVariables>(ProductDocument, options);
-        }
-export type ProductQueryHookResult = ReturnType<typeof useProductQuery>;
-export type ProductLazyQueryHookResult = ReturnType<typeof useProductLazyQuery>;
-export type ProductQueryResult = Apollo.QueryResult<ProductQuery, ProductQueryVariables>;
-export const ProductsCountDocument = gql`
-    query ProductsCount {
-  productsCount
-}
-    `;
-
-/**
- * __useProductsCountQuery__
- *
- * To run a query within a React component, call `useProductsCountQuery` and pass it any options that fit your needs.
- * When your component renders, `useProductsCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useProductsCountQuery({
- *   variables: {
- *   },
- * });
- */
-export function useProductsCountQuery(baseOptions?: Apollo.QueryHookOptions<ProductsCountQuery, ProductsCountQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ProductsCountQuery, ProductsCountQueryVariables>(ProductsCountDocument, options);
-      }
-export function useProductsCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProductsCountQuery, ProductsCountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ProductsCountQuery, ProductsCountQueryVariables>(ProductsCountDocument, options);
-        }
-export type ProductsCountQueryHookResult = ReturnType<typeof useProductsCountQuery>;
-export type ProductsCountLazyQueryHookResult = ReturnType<typeof useProductsCountLazyQuery>;
-export type ProductsCountQueryResult = Apollo.QueryResult<ProductsCountQuery, ProductsCountQueryVariables>;
-export const ProductsDocument = gql`
-    query Products($skip: Float!, $take: Float!) {
-  products(skip: $skip, take: $take) {
-    id
-    name
-    desc
-    price
-    created_at
-    updated_at
-  }
-}
-    `;
-
-/**
- * __useProductsQuery__
- *
- * To run a query within a React component, call `useProductsQuery` and pass it any options that fit your needs.
- * When your component renders, `useProductsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useProductsQuery({
- *   variables: {
- *      skip: // value for 'skip'
- *      take: // value for 'take'
- *   },
- * });
- */
-export function useProductsQuery(baseOptions: Apollo.QueryHookOptions<ProductsQuery, ProductsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ProductsQuery, ProductsQueryVariables>(ProductsDocument, options);
-      }
-export function useProductsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProductsQuery, ProductsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ProductsQuery, ProductsQueryVariables>(ProductsDocument, options);
-        }
-export type ProductsQueryHookResult = ReturnType<typeof useProductsQuery>;
-export type ProductsLazyQueryHookResult = ReturnType<typeof useProductsLazyQuery>;
-export type ProductsQueryResult = Apollo.QueryResult<ProductsQuery, ProductsQueryVariables>;
-export const SearchProductsDocument = gql`
-    query SearchProducts($name: String, $skip: Float!, $take: Float!) {
-  searchProducts(name: $name, skip: $skip, take: $take) {
-    id
-    name
-    desc
-    price
-    created_at
-    updated_at
-  }
-}
-    `;
-
-/**
- * __useSearchProductsQuery__
- *
- * To run a query within a React component, call `useSearchProductsQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchProductsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSearchProductsQuery({
- *   variables: {
- *      name: // value for 'name'
- *      skip: // value for 'skip'
- *      take: // value for 'take'
- *   },
- * });
- */
-export function useSearchProductsQuery(baseOptions: Apollo.QueryHookOptions<SearchProductsQuery, SearchProductsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SearchProductsQuery, SearchProductsQueryVariables>(SearchProductsDocument, options);
-      }
-export function useSearchProductsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchProductsQuery, SearchProductsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SearchProductsQuery, SearchProductsQueryVariables>(SearchProductsDocument, options);
-        }
-export type SearchProductsQueryHookResult = ReturnType<typeof useSearchProductsQuery>;
-export type SearchProductsLazyQueryHookResult = ReturnType<typeof useSearchProductsLazyQuery>;
-export type SearchProductsQueryResult = Apollo.QueryResult<SearchProductsQuery, SearchProductsQueryVariables>;
 export const QuickLaboratoryTestsDocument = gql`
     query QuickLaboratoryTests($skip: Float!, $take: Float!) {
   quickLaboratoryTests(skip: $skip, take: $take) {

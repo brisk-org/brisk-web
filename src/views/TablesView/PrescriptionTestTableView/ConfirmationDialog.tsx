@@ -77,9 +77,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         paid: 0,
         paidToday: 0,
         checkIn: checkInArray
-          // .filter((checkIn, index) =>
-          //   checkIn.perDay === 'bid' ? index % 2 === 1 : true
-          // )
+          .filter((checkIn, index) =>
+            checkIn.perDay === 'bid' ? index % 2 === 1 : true
+          )
           .map(checkIn => ({
             ...checkIn,
             price: checkIn.perDay === 'bid' ? checkIn.price * 2 : checkIn.price
@@ -112,12 +112,25 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           )!.checkIn;
 
           const sortedCheckIn: PrescriptionCheckIn[] = [];
+          //           if (currentCheckIn[0].perDay === 'bid') {
+          //             for (let i = 0; i < currentCheckIn.length / 2; i++) {
+          //               sortedCheckIn.push({...currentCheckIn[i], price: currentCheckIn[i].price / 2});
+          //               sortedCheckIn.push(
+          // {...currentCheckIn[equivalent], price: currentCheckIn[i].price / 2}
+
+          //               );
+          //             }
+          //           }
           if (currentCheckIn[0].perDay === 'bid') {
-            for (let i = 0; i < currentCheckIn.length / 2; i++) {
-              sortedCheckIn.push(currentCheckIn[i]);
-              sortedCheckIn.push(
-                currentCheckIn[Math.floor(currentCheckIn.length / 2 + i)]
-              );
+            for (let i = 0; i < currentCheckIn.length; i++) {
+              sortedCheckIn.push({
+                ...currentCheckIn[i],
+                price: currentCheckIn[i].price / 2
+              });
+              sortedCheckIn.push({
+                ...currentCheckIn[i],
+                price: currentCheckIn[i].price / 2
+              });
             }
           }
           return {

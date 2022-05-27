@@ -9,7 +9,7 @@ query PrescriptionTest($id: ID!) {
     }
     result
     paid
-    started
+    inrolled
     price
     completed
     new
