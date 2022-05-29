@@ -5,7 +5,7 @@ import {
   defaultLaboratoryTestSeed,
   LaboratoryTestCatagories
 } from '../data/testsSeed';
-export type PrescriptionPerDay = 'bid' | 'stat';
+export type PrescriptionPerDay = 'BID' | 'STAT';
 export type PrescriptionCheckIn = {
   perDay: PrescriptionPerDay;
   date: string;
@@ -34,7 +34,7 @@ type ContextType = {
   cardPrice?: number;
   cardExpirationDate?: number;
   laboratoryTestSettingData?: LaboratoryTestCatagories[];
-  prescriptionTestSettingData?: PrescriptionSettingDataType[];
+  prescriptionettingData?: PrescriptionSettingDataType[];
 };
 const SettingsContext = createContext<ContextType>({});
 
@@ -44,10 +44,9 @@ const SettingsProvider: React.FC = ({ children }) => {
   const [laboratoryTestSettingData, setLaboratoryTestSettingData] = useState<
     LaboratoryTestCatagories[]
   >();
-  const [
-    prescriptionTestSettingData,
-    setPrescriptionTestSettingData
-  ] = useState<PrescriptionSettingDataType[]>(prescriptionPlaceholder);
+  const [prescriptionettingData, setprescriptionettingData] = useState<
+    PrescriptionSettingDataType[]
+  >(prescriptionPlaceholder);
 
   const { data, loading } = useSettingQuery({
     onError: err => console.error(err)
@@ -61,11 +60,11 @@ const SettingsProvider: React.FC = ({ children }) => {
     ) as LaboratoryTestCatagories[];
     console.log(data.setting, testRateData[0].name, 'Hi');
     const prescriptionRateData = JSON.parse(
-      data.setting.prescription_tests_data
+      data.setting.prescription_data
     ) as PrescriptionSettingDataType[];
 
     setLaboratoryTestSettingData(testRateData);
-    setPrescriptionTestSettingData(prescriptionRateData);
+    setprescriptionettingData(prescriptionRateData);
   }, [data, loading]);
 
   return (
@@ -74,7 +73,7 @@ const SettingsProvider: React.FC = ({ children }) => {
         cardPrice,
         cardExpirationDate,
         laboratoryTestSettingData,
-        prescriptionTestSettingData
+        prescriptionettingData
       }}
     >
       {children}

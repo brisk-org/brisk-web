@@ -15,7 +15,7 @@ import {
   SettingsContext,
   LaboratorySettingDataType
 } from '../../context/SettingContext';
-import PrescriptionSettingAccordion from './PrescriptionSettingAccordion';
+import MedicineAccordion from './MedicineAccordion';
 import { useHistory } from 'react-router-dom';
 import { LaboratoryTestCatagories } from '../../data/testsSeed';
 
@@ -30,7 +30,7 @@ const ChangeRates = () => {
     cardPrice: oldCardPrice,
     cardExpirationDate: oldCardExpirationDate,
     laboratoryTestSettingData,
-    prescriptionTestSettingData: prescriptionRateData
+    prescriptionettingData: prescriptionRateData
   } = useContext(SettingsContext);
   const history = useHistory();
 
@@ -44,7 +44,7 @@ const ChangeRates = () => {
   const [laboratoryTestCategories, setLaboratoryTestCategories] = useState(
     laboratoryTestSettingData
   );
-  const [prescriptionTestSettingData, setPrescriptionSettingData] = useState(
+  const [prescriptionettingData, setPrescriptionSettingData] = useState(
     prescriptionRateData
   );
 
@@ -52,10 +52,10 @@ const ChangeRates = () => {
     setCardRate(oldCardPrice);
     setCardExpirationDate(oldCardExpirationDate);
     setLaboratoryTestCategories(laboratoryTestSettingData);
-    setPrescriptionSettingData(prescriptionTestSettingData);
+    setPrescriptionSettingData(prescriptionettingData);
   }, [
     laboratoryTestSettingData,
-    prescriptionTestSettingData,
+    prescriptionettingData,
     oldCardPrice,
     oldCardExpirationDate
   ]);
@@ -82,12 +82,12 @@ const ChangeRates = () => {
   });
   const handleSubmit = async () => {
     if (!laboratoryTestSettingData) return;
-    if (!prescriptionTestSettingData) return;
+    if (!prescriptionettingData) return;
     if (!cardPrice || !cardExpirationDate) {
       setErrorSnackbarOpen(true);
       return;
     }
-    // const emptyPrescField = prescriptionTestSettingData.find(
+    // const emptyPrescField = prescriptionettingData.find(
     //   ({ name, quantity, price, forDays, perDay }) =>
     //     !name ||
     //     !price ||
@@ -110,12 +110,13 @@ const ChangeRates = () => {
         card_price: cardPrice,
         card_expiration_date: cardExpirationDate,
         laboratory_tests_data: JSON.stringify(laboratoryTestCategories),
-        prescription_tests_data: prescriptionTestSettingData.map(
-          prescription => ({
-            ...prescription,
-            checkIn: JSON.stringify(prescription.checkIn)
-          })
-        )
+        prescription_data: ''
+        // prescription_tests_data: prescriptionettingData.map(
+        //   prescription => ({
+        //     ...prescription,
+        //     checkIn: JSON.stringify(prescription.checkIn)
+        //   })
+        // )
       }
     });
     console.log(d);
@@ -128,7 +129,7 @@ const ChangeRates = () => {
       //   card_price: cardPrice,
       //   card_expiration_date: cardExpirationDate,
       //   laboratory_tests_data: laboratoryTestSettingData,
-      //   prescription_tests_data: prescriptionTestSettingData
+      //   prescription_tests_data: prescriptionettingData
       // }
     });
     if (!d.errors) {
@@ -158,9 +159,9 @@ const ChangeRates = () => {
           laboratoryTestCategories={laboratoryTestCategories}
           setLaboratoryTestCategories={setLaboratoryTestCategories}
         />
-        <PrescriptionSettingAccordion
-          prescription={prescriptionTestSettingData}
-          setPrescription={setPrescriptionSettingData}
+        <MedicineAccordion
+        // prescription={prescriptionettingData}
+        // setPrescription={setPrescriptionSettingData}
         />
         <Box display="flex" justifyContent="flex-end" p={2}>
           <Button

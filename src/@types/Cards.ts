@@ -1,11 +1,5 @@
 import { Maybe } from 'graphql/jsutils/Maybe';
-import {
-  Card,
-  CardSales,
-  History,
-  LaboratoryTest,
-  PrescriptionTest
-} from '../generated/graphql';
+import { Card, CardSales, History, LaboratoryTest } from '../generated/graphql';
 
 export type CardType = { __typename?: 'Card' } & Pick<
   Card,
@@ -109,21 +103,6 @@ export type TestsFromCardQuery = {
   | 'paid'
   | 'completed'
   | 'price'
-  | 'created_at'
-  | 'updated_at'
->;
-export type PrescriptionsFromCardQuery = {
-  __typename?: 'PrescriptionTest';
-} & Pick<
-  PrescriptionTest,
-  | 'id'
-  | 'cardId'
-  | 'result'
-  | 'paid'
-  | 'price'
-  | 'completed'
-  | 'new'
-  | 'rx'
   | 'created_at'
   | 'updated_at'
 >;

@@ -13,17 +13,16 @@ import {
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { PrescriptionsFromCardQuery } from '../../@types/Cards';
 import { useLocation } from 'react-router';
 import { format } from 'date-fns';
 import {
-  PrescriptionTestsDocument,
-  PrescriptionTestsQuery,
-  useDeletePrescriptionTestMutation
+  CardQuery,
+  PrescriptionsDocument,
+  PrescriptionsQuery,
+  useDeletePrescriptionMutation
 } from '../../generated/graphql';
 import AlertDialog from '../../components/AlertDialog';
 import { useHistory } from 'react-router-dom';
-import { PrescriptionSettingDataType } from '../../context/SettingContext';
 import clsx from 'clsx';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -48,7 +47,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const SingleDetailedPrescription: React.FC<{
-  prescription: PrescriptionsFromCardQuery;
+  prescription: NonNullable<CardQuery['card']['prescriptions']>[0];
 }> = ({ prescription }) => {
   const classes = useStyles();
   const itemDom = useRef<HTMLDivElement>(null);
@@ -61,24 +60,22 @@ const SingleDetailedPrescription: React.FC<{
   const query = new URLSearchParams(useLocation().search);
   const id = query.get('prescriptionId');
 
-  const [deletePrescription, { client }] = useDeletePrescriptionTestMutation({
+  const [deletePrescription, { client }] = useDeletePrescriptionMutation({
     onError: err => console.log(err),
     variables: {
       id: prescription.id
     },
     onCompleted() {
-      const prescriptionTestsCache: PrescriptionTestsQuery | null = client.readQuery(
-        {
-          query: PrescriptionTestsDocument
-        }
-      );
-      if (!prescriptionTestsCache) return;
-      const deletedItemRemoved = prescriptionTestsCache.prescriptionTests.filter(
+      const prescriptionCache: PrescriptionsQuery | null = client.readQuery({
+        query: PrescriptionsDocument
+      });
+      if (!prescriptionCache) return;
+      const deletedItemRemoved = prescriptionCache.prescriptions.filter(
         prescTest => prescTest.id !== prescription.id
       );
       client.writeQuery({
-        query: PrescriptionTestsDocument,
-        data: { prescriptionTests: [...deletedItemRemoved] }
+        query: PrescriptionsDocument,
+        data: { prescriptions: [...deletedItemRemoved] }
       });
     }
   });
@@ -120,26 +117,24 @@ const SingleDetailedPrescription: React.FC<{
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List className={classes.sticky} subheader={<li />}>
           <ul className={classes.ul}>
-            {(JSON.parse(
-              prescription.result
-            ) as PrescriptionSettingDataType[]).map((prescription, index) => {
+            {prescription.medications.map((medication, index) => {
               return (
                 <ListItem>
                   <ListItemText
-                    primary={`${prescription.name} `}
+                    primary={`${medication.medicine.name} `}
                     secondary={
                       <>
                         <Typography variant="body2">
-                          {prescription.strength}
+                          {medication.strength}
                         </Typography>
                         <Typography variant="body2">
-                          {prescription.perDay}
+                          {medication.perDay}
                         </Typography>
                         <Typography variant="body2">
-                          For {prescription.forDays} Days
+                          For {medication.forDays} Days
                         </Typography>
                         <Typography variant="body2">
-                          {prescription.other}
+                          {medication.other}
                         </Typography>
                       </>
                     }

@@ -1,0 +1,29 @@
+mutation CreatePrescription(
+  $cardId: ID!
+  $totalPrice: Float!
+  $medicationIds: [ID!]!
+  $rx: String!
+) {
+  createPrescription(
+    cardId: $cardId
+    medicationIds: $medicationIds
+    totalPrice: $totalPrice
+    rx: $rx
+  ) {
+    id
+    card {
+      name
+    }
+    price
+    medications {
+      id
+      medicine {
+        id
+        name
+      }
+      perDay
+      forDays
+    }
+    rx
+  }
+}

@@ -1,5 +1,5 @@
-query PrescriptionTestsForDashboard($skip: Float!, $take: Float!) {
-  prescriptionTests(skip: $skip, take: $take) {
+query prescriptionsForDashboard($skip: Float!, $take: Float!) {
+  prescriptions(skip: $skip, take: $take) {
     id
     paid
     price

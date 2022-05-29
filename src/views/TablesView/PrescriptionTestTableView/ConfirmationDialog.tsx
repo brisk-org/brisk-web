@@ -12,11 +12,12 @@ import {
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { AttachMoney, Close } from '@mui/icons-material';
-import { useMarkPrescriptionTestAsPaidMutation } from '../../../generated/graphql';
+// import { useMarkPrescriptionTestAsPaidMutation } from '../../../generated/graphql';
 import { PrescriptionTest } from '.';
 import PriceStepper from './PriceStepper';
 import { PrescriptionCheckIn } from '../../../context/SettingContext';
 import AlertDialog from '../../../components/AlertDialog';
+import { PrescriptionsQuery } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -47,7 +48,7 @@ export type PrescriptionCheckIns = {
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  prescription: PrescriptionTest;
+  prescription: PrescriptionsQuery['prescriptions'][0];
 }
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,
@@ -66,27 +67,25 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
   useEffect(() => {
     if (!open) return;
-    console.log(prescription.result);
-    setPrescriptionsCheckIn(
-      prescription.result.map(({ name, checkIn: checkInArray }) => ({
-        name,
-        remaining: checkInArray.reduce(
-          (prevValue, currentCheckIn) => prevValue + currentCheckIn.price,
-          0
-        ),
-        paid: 0,
-        paidToday: 0,
-        checkIn: checkInArray
-          .filter((checkIn, index) =>
-            checkIn.perDay === 'bid' ? index % 2 === 1 : true
-          )
-          .map(checkIn => ({
-            ...checkIn,
-            price: checkIn.perDay === 'bid' ? checkIn.price * 2 : checkIn.price
-          }))
-      }))
-    );
-  }, [open, prescription.result]);
+    // setPrescriptionsCheckIn(
+    // prescription.medications.map(medication => ({
+    //   name: medication.medicine.name,
+    //   remaining: medication.checkIn.reduce(
+    //     (prevValue, currentCheckIn) => prevValue + currentCheckIn.price,
+    //     0
+    //   ),
+    //   paid: 0,
+    //   paidToday: 0,
+    //   checkIn: checkInArray
+    //     .filter((checkIn, index) =>
+    //       checkIn.perDay === 'BID' ? index % 2 === 1 : true
+    //     )
+    //     .map(checkIn => ({
+    //       ...checkIn,
+    //       price: checkIn.perDay === 'BID' ? checkIn.price * 2 : checkIn.price
+    //     }))
+    // })))
+  }, [open, prescription.medications]);
 
   useEffect(() => {
     if (proceedToAction) {
@@ -94,60 +93,58 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     }
   }, [proceedToAction]);
 
-  const [
-    markPrescriptionTestAsPaid,
-    { loading }
-  ] = useMarkPrescriptionTestAsPaidMutation();
+  // const [
+  //   markPrescriptionTestAsPaid,
+  //   { loading }
+  // ] = useMarkPrescriptionTestAsPaidMutation();
 
   const handleClose = () => {
     setOpen(false);
   };
   const handleSuccess = async () => {
-    await markPrescriptionTestAsPaid({
-      variables: {
-        id: prescription.id,
-        result: prescription.result.map(result => {
-          const currentCheckIn = prescriptionsCheckIn!.find(
-            prescriptionsCheckIn => prescriptionsCheckIn.name === result.name
-          )!.checkIn;
-
-          const sortedCheckIn: PrescriptionCheckIn[] = [];
-          //           if (currentCheckIn[0].perDay === 'bid') {
-          //             for (let i = 0; i < currentCheckIn.length / 2; i++) {
-          //               sortedCheckIn.push({...currentCheckIn[i], price: currentCheckIn[i].price / 2});
-          //               sortedCheckIn.push(
-          // {...currentCheckIn[equivalent], price: currentCheckIn[i].price / 2}
-
-          //               );
-          //             }
-          //           }
-          if (currentCheckIn[0].perDay === 'bid') {
-            for (let i = 0; i < currentCheckIn.length; i++) {
-              sortedCheckIn.push({
-                ...currentCheckIn[i],
-                price: currentCheckIn[i].price / 2
-              });
-              sortedCheckIn.push({
-                ...currentCheckIn[i],
-                price: currentCheckIn[i].price / 2
-              });
-            }
-          }
-          return {
-            ...result,
-            checkIn: JSON.stringify(
-              currentCheckIn[0].perDay === 'bid'
-                ? sortedCheckIn
-                : currentCheckIn
-            )
-          };
-        }),
-        done: prescriptionsCheckIn!.every(
-          prescriptionCheckIn => prescriptionCheckIn.remaining === 0
-        )
-      }
-    });
-    setOpen(false);
+    // await markPrescriptionTestAsPaid({
+    //   variables: {
+    //     id: prescription.id,
+    //     result: prescription.result.map(result => {
+    //       const currentCheckIn = prescriptionsCheckIn!.find(
+    //         prescriptionsCheckIn => prescriptionsCheckIn.name === result.name
+    //       )!.checkIn;
+    //       const sortedCheckIn: PrescriptionCheckIn[] = [];
+    //       //           if (currentCheckIn[0].perDay === 'BID') {
+    //       //             for (let i = 0; i < currentCheckIn.length / 2; i++) {
+    //       //               sortedCheckIn.push({...currentCheckIn[i], price: currentCheckIn[i].price / 2});
+    //       //               sortedCheckIn.push(
+    //       // {...currentCheckIn[equivalent], price: currentCheckIn[i].price / 2}
+    //       //               );
+    //       //             }
+    //       //           }
+    //       if (currentCheckIn[0].perDay === 'BID') {
+    //         for (let i = 0; i < currentCheckIn.length; i++) {
+    //           sortedCheckIn.push({
+    //             ...currentCheckIn[i],
+    //             price: currentCheckIn[i].price / 2
+    //           });
+    //           sortedCheckIn.push({
+    //             ...currentCheckIn[i],
+    //             price: currentCheckIn[i].price / 2
+    //           });
+    //         }
+    //       }
+    //       return {
+    //         ...result,
+    //         checkIn: JSON.stringify(
+    //           currentCheckIn[0].perDay === 'BID'
+    //             ? sortedCheckIn
+    //             : currentCheckIn
+    //         )
+    //       };
+    //     }),
+    //     done: prescriptionsCheckIn!.every(
+    //       prescriptionCheckIn => prescriptionCheckIn.remaining === 0
+    //     )
+    //   }
+    // });
+    // setOpen(false);
   };
 
   return (
@@ -208,9 +205,10 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               <PriceStepper
                 prescriptionCheckIn={prescriptionCheckIn}
                 lastCheckIn={
-                  prescription.result.find(
-                    presc => presc.name === prescriptionCheckIn.name
-                  )?.checkIn
+                  (prescription.medications.find(
+                    medication =>
+                      medication.medicine.name === prescriptionCheckIn.name
+                  )?.checkIn as unknown) as PrescriptionCheckIn[]
                 }
                 setPrescriptionsCheckIn={setPrescriptionsCheckIn}
               />
@@ -218,12 +216,14 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         </DialogContent>
         <DialogActions>
           <Button
-            disabled={loading}
+            // disabled={loadinag}
+            disabled={false}
             autoFocus
             onClick={() => setAlertDialogToggle(true)}
             color="primary"
           >
-            {!loading ? 'Payment Successful' : 'Submitting...'}
+            {/* {!loading ? 'Payment Successful' : 'Submitting...'} */}
+            jj
           </Button>
         </DialogActions>
       </Dialog>

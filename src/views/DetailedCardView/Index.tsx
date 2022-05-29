@@ -55,13 +55,12 @@ const DetailedCardView = () => {
               {data.card.history && data.card.history[0] && (
                 <HistoryContainer history={data.card.history} />
               )}
-              {data.card.prescription_tests &&
-                data.card.prescription_tests[0] && (
-                  <PrescriptionContainer
-                    name={data.card.name}
-                    prescriptions={data.card.prescription_tests}
-                  />
-                )}
+              {data.card.prescriptions && data.card.prescriptions[0] && (
+                <PrescriptionContainer
+                  name={data.card.name}
+                  prescriptions={data.card.prescriptions}
+                />
+              )}
             </Grid>
           </Grid>
         )}

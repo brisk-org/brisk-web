@@ -1,6 +1,0 @@
-mutation MarkPrescriptionTestAsSeen($id: ID!) {
-  markPrescriptionTestAsSeen(id: $id) {
-    id
-    new
-  }
-}

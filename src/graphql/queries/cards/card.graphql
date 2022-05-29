@@ -14,11 +14,22 @@ query Card($id: ID!) {
       price
       created_at
     }
-    prescription_tests {
+    prescriptions {
       id
-      cardId
-      result
+      medications {
+        id
+        medicine {
+          id
+          name
+          price
+        }
+        strength
+        perDay
+        forDays
+        other
+      }
       paid
+      inrolled
       price
       completed
       new

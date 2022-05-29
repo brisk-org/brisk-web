@@ -1,0 +1,13 @@
+query Medicines {
+  medicines {
+    id
+    name
+    price
+    inStock
+    forDays
+    perDay
+    strength
+    created_at
+    updated_at
+  }
+}

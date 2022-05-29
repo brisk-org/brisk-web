@@ -1,5 +1,5 @@
-query Prescription($id: ID!) {
-  prescription(id: $id) {
+query Prescriptions($skip: Float!, $take: Float!) {
+  prescriptions(skip: $skip, take: $take) {
     id
     card {
       id
@@ -14,11 +14,14 @@ query Prescription($id: ID!) {
         id
         name
         price
+        inStock
       }
       strength
       perDay
       forDays
+      checkIn
       other
+      created_at
     }
     paid
     inrolled

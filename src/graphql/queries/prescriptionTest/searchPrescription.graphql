@@ -1,5 +1,5 @@
-query SearchPrescriptionTests($term: String!, $skip: Float!, $take: Float!) {
-  searchPrescriptionTests(term: $term, skip: $skip, take: $take) {
+query SearchPrescriptions($term: String!, $skip: Float!, $take: Float!) {
+  searchPrescriptions(term: $term, skip: $skip, take: $take) {
     id
     card {
       id
@@ -7,10 +7,25 @@ query SearchPrescriptionTests($term: String!, $skip: Float!, $take: Float!) {
       age
       gender
     }
-    result
+    # result
+    medications {
+      id
+      medicine {
+        id
+        name
+        price
+        inStock
+      }
+      strength
+      perDay
+      forDays
+      checkIn
+      other
+      created_at
+    }
     paid
-    price
     inrolled
+    price
     completed
     new
     rx

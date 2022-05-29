@@ -1,0 +1,32 @@
+mutation CreateMedication(
+  $medicineId: ID!
+  $strength: String
+  $perDay: PerDay!
+  $checkIn: [CheckIn!]!
+  $forDays: Float!
+  $other: String
+) {
+  createMedication(
+    medicineId: $medicineId
+    strength: $strength
+    perDay: $perDay
+    checkIn: $checkIn
+    forDays: $forDays
+    other: $other
+  ) {
+    id
+    medicine {
+      id
+      name
+      price
+      inStock
+    }
+    strength
+    forDays
+    checkIn
+    perDay
+    other
+    created_at
+    updated_at
+  }
+}

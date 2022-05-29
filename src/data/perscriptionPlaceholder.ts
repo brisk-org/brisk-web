@@ -6,7 +6,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '18m',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -14,7 +14,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'plasil',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -23,7 +23,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '18m',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -32,7 +32,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '400mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -41,7 +41,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '400mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -50,7 +50,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '400mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -58,7 +58,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'V.B complex #02',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -66,7 +66,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: '40% glucose #02',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -74,7 +74,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: '40% glucose #01',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -82,7 +82,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'BP',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -90,7 +90,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'Injection Service: IM',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -98,7 +98,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     name: 'Injection Service: IV',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -107,7 +107,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '75mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -116,7 +116,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '8mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -125,7 +125,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '8mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -134,7 +134,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '8mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -143,7 +143,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '8mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -152,7 +152,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '8mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -161,7 +161,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '8mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -170,7 +170,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '8mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   },
@@ -179,7 +179,7 @@ export const prescriptionPlaceholder: PrescriptionSettingDataType[] = [
     strength: '8mg',
     price: 50,
     checkIn: [],
-    perDay: 'stat',
+    perDay: 'STAT',
     inStock: 10,
     forDays: 1
   }

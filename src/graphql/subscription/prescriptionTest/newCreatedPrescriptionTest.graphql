@@ -1,5 +1,5 @@
-subscription NewCreatedPrescriptionTest {
-  newCreatedPrescriptionTest {
+subscription NewCreatedPrescription {
+  newCreatedPrescription {
     id
     card {
       id

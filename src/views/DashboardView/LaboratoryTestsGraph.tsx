@@ -1,6 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { Box, Button, Card, CardContent, CardHeader, Divider } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { CategoryOptions } from '../../data/testsPlaceHolder';
@@ -84,19 +91,19 @@ const LaboratoryTestsGraph: React.FC<Props> = ({
     const zoomSize = 6;
     chart.on('click', function(params) {
       console.log(
-        testStats.map(stat => stat.name)[
+        testStats.map(STAT => STAT.name)[
           Math.max(params.dataIndex - zoomSize / 2, 0)
         ]
       );
       chart.dispatchAction({
         type: 'dataZoom',
-        startValue: testStats.map(stat => stat.name)[
+        startValue: testStats.map(STAT => STAT.name)[
           Math.max(params.dataIndex - zoomSize / 2, 0)
         ],
-        endValue: testStats.map(stat => stat.name)[
+        endValue: testStats.map(STAT => STAT.name)[
           Math.min(
             params.dataIndex + zoomSize / 2,
-            testStats.map(stat => stat.value).length - 1
+            testStats.map(STAT => STAT.value).length - 1
           )
         ]
       });

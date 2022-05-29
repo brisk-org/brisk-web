@@ -6,10 +6,11 @@ import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../../components/Page';
 import Toolbar from '../../../components/Toolbar';
 import {
-  NewCreatedPrescriptionTestDocument,
-  usePrescriptionTestsCountQuery,
-  usePrescriptionTestsQuery,
-  useSearchPrescriptionTestsQuery
+  NewCreatedPrescriptionDocument,
+  PrescriptionsQuery,
+  usePrescriptionCountQuery,
+  usePrescriptionsQuery,
+  useSearchPrescriptionsQuery
 } from '../../../generated/graphql';
 import { SearchTermsType } from '../../../@types';
 import MainContainerTable from '../../../components/MainContainerTable';
@@ -53,17 +54,17 @@ const PrescriptionTestTableView = () => {
   const [take, setTake] = useState(10);
   const isBeingSearched = terms.name;
 
-  const { data: countData } = usePrescriptionTestsCountQuery();
+  const { data: countData } = usePrescriptionCountQuery();
 
-  const [allPrescriptions, setAllPrescriptions] = useState<
-    PrescriptionTest[]
+  const [prescriptions, setPrescriptions] = useState<
+    PrescriptionsQuery['prescriptions']
   >();
   const firstRender = useRef<HTMLDivElement>(null);
 
   const {
     data: searchedPrescriptionData,
     loading: searchedPrescriptionsLoading
-  } = useSearchPrescriptionTestsQuery({
+  } = useSearchPrescriptionsQuery({
     variables: { term: terms.name!, skip, take },
     skip: !isBeingSearched,
     onError: err => console.log(err)
@@ -73,7 +74,7 @@ const PrescriptionTestTableView = () => {
     data: allPrescriptionsData,
     loading: allPrescriptionsLoading,
     subscribeToMore
-  } = usePrescriptionTestsQuery({
+  } = usePrescriptionsQuery({
     variables: { skip, take },
     skip: !!isBeingSearched,
     fetchPolicy: firstRender.current ? 'cache-first' : 'network-only',
@@ -81,32 +82,32 @@ const PrescriptionTestTableView = () => {
   });
 
   subscribeToMore({
-    document: NewCreatedPrescriptionTestDocument,
+    document: NewCreatedPrescriptionDocument,
     updateQuery: (prev, { subscriptionData }) => {
       const newCreatedPrescriptionTest = subscriptionData.data;
       if (!newCreatedPrescriptionTest) return prev;
       return Object.assign({}, prev, {
-        prescriptionTests: prev.prescriptionTests
-          ? [newCreatedPrescriptionTest, ...prev.prescriptionTests]
+        prescriptions: prev.prescriptions
+          ? [newCreatedPrescriptionTest, ...prev.prescriptions]
           : [newCreatedPrescriptionTest]
       });
     },
     onError: err => console.log(err)
   });
   subscribeToMore({
-    document: NewCreatedPrescriptionTestDocument,
+    document: NewCreatedPrescriptionDocument,
     updateQuery: (prev, { subscriptionData }) => {
       const newPaidPrescriptionTest = subscriptionData.data;
       if (!newPaidPrescriptionTest) return prev;
       if (!prev && newPaidPrescriptionTest)
-        return { prescriptionTests: newPaidPrescriptionTest as any };
-      const filteredPrevWithoutPaidLaboratoryTest = prev.prescriptionTests.filter(
-        test =>
-          test.id !==
+        return { prescriptions: newPaidPrescriptionTest as any };
+      const filteredPrevWithoutPaidLaboratoryTest = prev.prescriptions.filter(
+        prescription =>
+          prescription.id !==
           (newPaidPrescriptionTest as any).newCreatedPrescriptionTest.id
       );
       return Object.assign({}, prev, {
-        prescriptionTests: [
+        prescriptions: [
           newPaidPrescriptionTest,
           ...filteredPrevWithoutPaidLaboratoryTest
         ]
@@ -117,37 +118,10 @@ const PrescriptionTestTableView = () => {
 
   useEffect(() => {
     if (isBeingSearched) {
-      setAllPrescriptions(
-        searchedPrescriptionData?.searchPrescriptionTests.map(prescription => ({
-          ...prescription,
-          result: (JSON.parse(
-            prescription.result
-          ) as PrescriptionSettingDataType[]).map(result => ({
-            ...result,
-            checkIn: JSON.parse(
-              (result.checkIn as unknown) as string
-            ) as PrescriptionCheckIn[]
-          }))
-        }))
-      );
+      setPrescriptions(searchedPrescriptionData?.searchPrescriptions);
       return;
     }
-    setAllPrescriptions(
-      allPrescriptionsData?.prescriptionTests.map(prescription => ({
-        ...prescription,
-        result: (JSON.parse(
-          prescription.result
-        ) as PrescriptionSettingDataType[]).map(
-          result =>
-            result && {
-              ...result,
-              checkIn: JSON.parse(
-                (result.checkIn as unknown) as string
-              ) as PrescriptionCheckIn[]
-            }
-        )
-      }))
-    );
+    setPrescriptions(allPrescriptionsData?.prescriptions);
   }, [allPrescriptionsData, searchedPrescriptionData, isBeingSearched]);
 
   return (
@@ -159,10 +133,10 @@ const PrescriptionTestTableView = () => {
           disablePhoneSearchField={true}
         />
         <Box mt={3}>
-          {allPrescriptions && !allPrescriptions[0] && 'No result'}
+          {prescriptions && !prescriptions[0] && 'No result'}
           {(allPrescriptionsLoading || searchedPrescriptionsLoading) &&
             'Loading...'}
-          {allPrescriptions && (
+          {prescriptions && (
             <MainContainerTable
               tableHead={[
                 'For',
@@ -171,13 +145,13 @@ const PrescriptionTestTableView = () => {
                 'Completed?',
                 'Requested At'
               ]}
-              count={countData?.prescriptionTestsCount}
+              count={countData?.prescriptionCount}
               skipState={{ skip, setSkip }}
               takeState={{ take, setTake }}
             >
-              {allPrescriptions.map((prescription, index) => {
+              {prescriptions.map((prescription, index) => {
                 return occupation === 'NURSE' ? (
-                  prescription.started && (
+                  prescription.inrolled && (
                     <SinglePrescriptionRow
                       key={index}
                       prescription={prescription}

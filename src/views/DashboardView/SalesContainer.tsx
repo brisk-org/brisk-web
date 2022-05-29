@@ -1,6 +1,14 @@
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import clsx from 'clsx';
-import { Typography, Button, Divider, Grid, CardHeader, Card, CardContent } from '@mui/material';
+import {
+  Typography,
+  Button,
+  Divider,
+  Grid,
+  CardHeader,
+  Card,
+  CardContent
+} from '@mui/material';
 
 import makeStyles from '@mui/styles/makeStyles';
 
@@ -81,10 +89,10 @@ type ActionType = {
 };
 interface Props {
   cardSales: { price: number; updated_at: string }[] | undefined;
-  prescriptionTestSales: SalesValue;
+  prescriptionSales: SalesValue;
   laboratoryTestSales: SalesValue;
   quickLaboratoryTestSales: SalesValue;
-  quickPrescriptionTestSales: SalesValue;
+  quickprescriptionales: SalesValue;
 }
 
 const salesReducer = function(
@@ -121,10 +129,10 @@ const salesReducer = function(
 
 const SalesContainer: React.FC<Props> = ({
   cardSales,
-  prescriptionTestSales,
+  prescriptionSales,
   laboratoryTestSales,
   quickLaboratoryTestSales,
-  quickPrescriptionTestSales
+  quickprescriptionales
 }) => {
   const classes = useStyles();
   const [totalAmount, setTotalAmount] = useState(0);
@@ -169,26 +177,26 @@ const SalesContainer: React.FC<Props> = ({
   }, [laboratoryTestSales, selectGeneralDuration]);
 
   useEffect(() => {
-    if (!prescriptionTestSales) return;
+    if (!prescriptionSales) return;
     dispatch({
       type: 'prescription',
       payload: {
-        data: prescriptionTestSales,
+        data: prescriptionSales,
         selectGeneralDuration: selectGeneralDuration
       }
     });
-  }, [prescriptionTestSales, selectGeneralDuration]);
+  }, [prescriptionSales, selectGeneralDuration]);
 
   useEffect(() => {
-    if (!quickPrescriptionTestSales) return;
+    if (!quickprescriptionales) return;
     dispatch({
       type: 'quickPrescription',
       payload: {
-        data: quickPrescriptionTestSales,
+        data: quickprescriptionales,
         selectGeneralDuration: selectGeneralDuration
       }
     });
-  }, [quickPrescriptionTestSales, selectGeneralDuration]);
+  }, [quickprescriptionales, selectGeneralDuration]);
 
   useEffect(() => {
     if (!quickLaboratoryTestSales) return;

@@ -22,7 +22,10 @@ import { useHistory } from 'react-router';
 import { cardQuery } from '../../../constants/queries';
 import ConfirmationDialog from './ConfirmationDialog';
 import CompletePrescDialog from './CompletePrescDialog';
-import { useMarkPrescriptionTestAsSeenMutation } from '../../../generated/graphql';
+import {
+  PrescriptionsQuery,
+  useMarkPrescriptionAsSeenMutation
+} from '../../../generated/graphql';
 import { PrescriptionTest } from '.';
 
 const useStyles = makeStyles(theme => ({
@@ -58,7 +61,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SinglePrescriptionRow: React.FC<{
-  prescription: PrescriptionTest;
+  prescription: PrescriptionsQuery['prescriptions'][0];
 }> = ({ prescription }) => {
   const classes = useStyles();
   const { containerProps, indicatorEl } = useLoading({
@@ -67,7 +70,7 @@ const SinglePrescriptionRow: React.FC<{
   });
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [completePrescDialogOpen, setCompletePrescDialogOpen] = useState(false);
-  const [markPrescriptionTestAsSeen] = useMarkPrescriptionTestAsSeenMutation();
+  const [markPrescriptionAsSeen] = useMarkPrescriptionAsSeenMutation();
 
   const history = useHistory();
   const { occupation } = useContext(AuthContext);
@@ -82,7 +85,7 @@ const SinglePrescriptionRow: React.FC<{
         break;
       case 'DOCTOR':
         prescription.new &&
-          (await markPrescriptionTestAsSeen({
+          (await markPrescriptionAsSeen({
             variables: { id: prescription.id }
           }));
         history.push(
@@ -130,7 +133,7 @@ const SinglePrescriptionRow: React.FC<{
         </TableCell>
         <TableCell>
           <Typography color="textPrimary" variant="body1" noWrap>
-            {prescription.started ? successIcon : pendingIcon}
+            {prescription.inrolled ? successIcon : pendingIcon}
           </Typography>
         </TableCell>
         <TableCell>

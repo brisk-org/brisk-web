@@ -19,8 +19,9 @@ import {
   LocalHospitalOutlined
 } from '@mui/icons-material';
 import {
-  useMarkPrescriptionTestAsCompletedMutation,
-  usePrescriptionTestQuery
+  PrescriptionsQuery,
+  // useMarkPrescriptionTestAsCompletedMutation,
+  usePrescriptionQuery
 } from '../../../generated/graphql';
 import { PrescriptionTest } from '.';
 import {
@@ -62,7 +63,7 @@ export type PrescriptionsCheckIn = {
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  prescription: PrescriptionTest;
+  prescription: PrescriptionsQuery['prescriptions'][0];
 }
 const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
   open,
@@ -78,60 +79,60 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
   useEffect(() => {
     if (!open) return;
     // setCheckInPrices(undefined);
-    setPrescriptionsCheckIn(
-      prescription.result.map(({ name, checkIn: checkInArray }) => {
-        // const sortedCheckIn: PrescriptionCheckIn[] = [];
-        // if (checkInArray[0].perDay === 'bid') {
-        //   for (let i = 0; i < checkInArray.length / 2; i++) {
-        //     sortedCheckIn.push(checkInArray[i]);
-        //     sortedCheckIn.push(
-        //       checkInArray[Math.floor(checkInArray.length / 2 + i)]
-        //     );
-        //   }
-        // }
-        return {
-          name,
-          completed: 0,
-          remaining: 0,
-          completedToday: 0,
-          checkIn: checkInArray
-          // checkInArray[0].perDay === 'bid' ? sortedCheckIn : checkInArray
-        };
-      })
-    );
-  }, [open, prescription.result]);
+    // setPrescriptionsCheckIn(
+    //   prescription.result.map(({ name, checkIn: checkInArray }) => {
+    // const sortedCheckIn: PrescriptionCheckIn[] = [];
+    // if (checkInArray[0].perDay === 'BID') {
+    //   for (let i = 0; i < checkInArray.length / 2; i++) {
+    //     sortedCheckIn.push(checkInArray[i]);
+    //     sortedCheckIn.push(
+    //       checkInArray[Math.floor(checkInArray.length / 2 + i)]
+    //     );
+    //   }
+    // }
+    // return {
+    //   name,
+    //   completed: 0,
+    //   remaining: 0,
+    //   completedToday: 0,
+    //   checkIn: checkInArray
+    // checkInArray[0].perDay === 'BID' ? sortedCheckIn : checkInArray
+    //     };
+    //   })
+    // );
+  }, [open, prescription.medications]);
 
-  // const { data, loading } = usePrescriptionTestQuery({
+  // const { data, loading } = usePrescriptionQuery({
   //   variables: { id: prescription.id }
   // });
-  const [
-    markPrescriptionTestAsCompleted
-  ] = useMarkPrescriptionTestAsCompletedMutation({
-    onError: err => console.error
-  });
+  // const [
+  //   markPrescriptionTestAsCompleted
+  // ] = useMarkPrescriptionTestAsCompletedMutation({
+  //   onError: err => console.error
+  // });
 
   const handleClose = () => {
     setOpen(false);
   };
   const handleSuccess = async () => {
-    markPrescriptionTestAsCompleted({
-      variables: {
-        id: prescription.id,
-        result: prescription.result.map(prescription => ({
-          ...prescription,
-          checkIn: JSON.stringify(
-            prescriptionsCheckIn!.find(
-              prescriptionsCheckIn =>
-                prescriptionsCheckIn.name === prescription.name
-            )!.checkIn
-          )
-        })),
-        done: prescriptionsCheckIn!.every(
-          prescriptionCheckIn => prescriptionCheckIn.remaining === 0
-        )
-      }
-    });
-    setOpen(false);
+    // markPrescriptionTestAsCompleted({
+    //   variables: {
+    //     id: prescription.id,
+    //     result: prescription.result.map(prescription => ({
+    //       ...prescription,
+    //       checkIn: JSON.stringify(
+    //         prescriptionsCheckIn!.find(
+    //           prescriptionsCheckIn =>
+    //             prescriptionsCheckIn.name === prescription.name
+    //         )!.checkIn
+    //       )
+    //     })),
+    //     done: prescriptionsCheckIn!.every(
+    //       prescriptionCheckIn => prescriptionCheckIn.remaining === 0
+    //     )
+    //   }
+    // });
+    // setOpen(false);
   };
 
   return (
@@ -172,9 +173,10 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
                 <MedicationStepper
                   prescriptionCheckIn={prescriptionCheckIn}
                   lastCheckIn={
-                    prescription.result.find(
-                      presc => presc.name === prescriptionCheckIn.name
-                    )?.checkIn
+                    (prescription.medications.find(
+                      medication =>
+                        medication.medicine.name === prescriptionCheckIn.name
+                    )?.checkIn as unknown) as PrescriptionCheckIn[]
                   }
                   setPrescriptionsCheckIn={setPrescriptionsCheckIn}
                 />

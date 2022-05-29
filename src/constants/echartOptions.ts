@@ -128,8 +128,8 @@ export const ageChartOption: ageChartOptionType = function(stats) {
 export const laboratoryTestCategoryChartOption: laboratoryTestCategoryChartOptionType = function({
   stats
 }) {
-  const name = stats.map(stat => stat.name);
-  const values = stats.map(stat => stat.value);
+  const name = stats.map(STAT => STAT.name);
+  const values = stats.map(STAT => STAT.value);
   return {
     xAxis: {
       type: 'category',
@@ -167,8 +167,8 @@ export const laboratoryTestCategoryChartOption: laboratoryTestCategoryChartOptio
 export const laboratoryTestChartOption: laboratoryTestCategoryChartOptionType = function({
   stats
 }) {
-  const name = stats.map(stat => stat.name);
-  const values = stats.map(stat => stat.value);
+  const name = stats.map(STAT => STAT.name);
+  const values = stats.map(STAT => STAT.value);
   return {
     title: {
       text: 'lab test',

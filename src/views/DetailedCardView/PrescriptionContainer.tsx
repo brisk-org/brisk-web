@@ -10,8 +10,8 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { WindowOutlined } from '@mui/icons-material';
 import { createStyles } from '@mui/styles';
-import { PrescriptionsFromCardQuery } from '../../@types/Cards';
 import SingleDetailedPrescription from './SingleDetailedPrescription';
+import { CardQuery } from '../../generated/graphql';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,14 +46,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface PrescriptionContainerProps {
+interface Props {
   name: string;
-  prescriptions: PrescriptionsFromCardQuery[];
+  prescriptions: CardQuery['card']['prescriptions'];
 }
-const PrescriptionContainer: React.FC<PrescriptionContainerProps> = ({
-  name,
-  prescriptions
-}) => {
+const PrescriptionContainer: React.FC<Props> = ({ name, prescriptions }) => {
   const classes = useStyles();
   return (
     <Card className={classes.root}>
@@ -65,14 +62,15 @@ const PrescriptionContainer: React.FC<PrescriptionContainerProps> = ({
       <Divider />
       <CardContent>
         <Grid container spacing={2}>
-          {prescriptions
-            .sort((a, b) => Number(b.id) - Number(a.id))
-            .map((prescription, index) => (
-              <SingleDetailedPrescription
-                key={index}
-                prescription={prescription}
-              />
-            ))}
+          {prescriptions &&
+            prescriptions
+              .sort((a, b) => Number(b.id) - Number(a.id))
+              .map((prescription, index) => (
+                <SingleDetailedPrescription
+                  key={index}
+                  prescription={prescription}
+                />
+              ))}
         </Grid>
       </CardContent>
     </Card>

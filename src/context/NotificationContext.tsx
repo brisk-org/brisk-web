@@ -54,7 +54,7 @@ const notificationReducer = function(
       const doctorNotif = notification.filter(
         ({ action }) =>
           (action as NotifAction) === 'COMPLETE_LABORATORY_TEST' ||
-          (action as NotifAction) === 'COMPLETE_PRESCRIPTION_TEST' ||
+          (action as NotifAction) === 'COMPLETE_PRESCRIPTION' ||
           (action as NotifAction) === 'MARK_CARD_AS_NEW' ||
           (action as NotifAction) === 'CREATE_CARD' ||
           (action as NotifAction) === 'PAY_FOR_QUICK_LABORATORY_TEST' ||
@@ -72,7 +72,7 @@ const notificationReducer = function(
     case 'RECEPTION':
       const receptionNotif = notification.filter(
         ({ action }) =>
-          (action as NotifAction) === 'CREATE_PRESCRIPTION_TEST' ||
+          (action as NotifAction) === 'CREATE_PRESCRIPTION' ||
           (action as NotifAction) === 'CREATE_LABORATORY_TEST' ||
           (action as NotifAction) === 'COMPLETE_QUICK_LABORATORY_TEST' ||
           (action as NotifAction) === 'COMPLETE_QUICK_PRESCRIPTION_TEST'
@@ -104,7 +104,7 @@ const notificationReducer = function(
     case 'NURSE':
       const prescriptionNotification = notification.filter(
         ({ action }) =>
-          (action as NotifAction) === 'PAY_FOR_PRESCRIPTION_TEST' ||
+          (action as NotifAction) === 'PAY_FOR_PRESCRIPTION' ||
           (action as NotifAction) === 'CREATE_QUICK_PRESCRIPTION_TEST'
       );
       enqueueSnackbar &&

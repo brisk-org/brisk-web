@@ -3,12 +3,26 @@ mutation UpdateMedicine(
   $name: String!
   $price: Float!
   $inStock: Float!
+  $strength: String
+  $perDay: PerDay
+  $forDays: Float
 ) {
-  updateMedicine(id: $id, name: $name, price: $price, inStock: $inStock) {
+  updateMedicine(
+    id: $id
+    name: $name
+    price: $price
+    inStock: $inStock
+    forDays: $forDays
+    perDay: $perDay
+    strength: $strength
+  ) {
     id
     name
     price
     inStock
+    forDays
+    perDay
+    strength
     created_at
     updated_at
   }

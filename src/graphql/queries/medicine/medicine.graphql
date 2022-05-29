@@ -1,0 +1,13 @@
+query Medicine($id: ID!) {
+  medicine(id: $id) {
+    id
+    name
+    price
+    inStock
+    forDays
+    perDay
+    strength
+    created_at
+    updated_at
+  }
+}

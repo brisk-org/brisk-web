@@ -21,12 +21,18 @@ import {
   SettingsContext
 } from '../../../context/SettingContext';
 import { AuthContext } from '../../../context/AuthContext';
-import { useCreatePrescriptionTestMutation } from '../../../generated/graphql';
+import {
+  CreateMedicationMutationVariables,
+  MedicationsQuery,
+  PerDay,
+  useCreatePrescriptionMutation,
+  useMedicinesQuery
+} from '../../../generated/graphql';
 import { cardQuery } from '../../../constants/queries';
 import { add, format } from 'date-fns';
 import { useReactToPrint } from 'react-to-print';
 import PrintHeader from '../../../components/PrintHeader';
-import SinglePresc from './SinglePresc';
+import PrescriptionBox from './PrescriptionBox';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -41,7 +47,14 @@ const useStyles = makeStyles(theme => ({
     padding: '20px 10px'
   }
 }));
-export interface SelectablePrescription extends PrescriptionSettingDataType {
+
+// type MedicineQuery = Omit<MedicinesQuery['medicines'][0], 'created_at' | 'updated_at'>
+
+type MedicineQuery = Omit<
+  MedicationsQuery['medications'][0],
+  '__typename' | 'id' | 'created_at' | 'updated_at'
+>;
+export interface SelectablePrescription extends MedicineQuery {
   selected: boolean;
 }
 
@@ -56,11 +69,9 @@ export type PrescriptionInfo = {
 
 const PrescriptionTestFormView = () => {
   const classes = useStyles();
-  const query = new URLSearchParams(useLocation().search);
+  const query = new window.URLSearchParams(useLocation().search);
   const history = useHistory();
 
-  const [isQueried, setIsQueried] = useState(false);
-  const { prescriptionTestSettingData } = useContext(SettingsContext);
   const { username } = useContext(AuthContext);
 
   const [prescriptionInfo, setPrescriptionInfo] = useState<PrescriptionInfo>({
@@ -71,7 +82,9 @@ const PrescriptionTestFormView = () => {
     rx: 'Rx',
     drName: username
   });
-  const [createPrescriptionTest] = useCreatePrescriptionTestMutation({
+  const [medications, setMedications] = useState<SelectablePrescription[]>();
+  const { data, loading } = useMedicinesQuery();
+  const [createPrescriptionTest] = useCreatePrescriptionMutation({
     onError: err => console.log(err)
   });
 
@@ -83,40 +96,42 @@ const PrescriptionTestFormView = () => {
     documentTitle: `Prescription for ${prescriptionInfo.name}`,
     onAfterPrint: () => setPrintReady(false)
   });
+
   useEffect(() => {
-    if (printReady) {
-      handlePrint && handlePrint();
-    }
-  }, [printReady]);
-  const [prescriptions, setPrescriptions] = useState<SelectablePrescription[]>(
-    prescriptionTestSettingData!.map(prescription => ({
-      ...prescription,
-      selected: false
-    }))
-  );
-  useEffect(() => {
-    if (query.get('id')) {
-      setIsQueried(true);
-    }
-  }, [query]);
+    if (!data) return;
+    setMedications(
+      data.medicines.map(medicine => ({
+        medicine: {
+          ...medicine
+        },
+        checkIn: '',
+        forDays: medicine.forDays || 0,
+        perDay: medicine.perDay || PerDay.Stat,
+        strength: medicine.strength || undefined,
+        selected: false
+      }))
+    );
+  }, [data, loading]);
+
   const handleSubmit = async () => {
-    const selectedPrescriptions = prescriptions
-      .filter(presc => presc.selected)
-      .map(prescription => {
+    if (!medications) return;
+    const selectedMedicines: SelectablePrescription[] = medications
+      .filter(medication => medication.selected)
+      .map(medication => {
         const checkIn: PrescriptionCheckIn[] = [];
-        for (let i = 0; i < prescription.forDays; i++) {
+        for (let i = 0; i < medication.forDays; i++) {
           checkIn.push({
             date: add(new Date(), { days: i }).toISOString(),
-            perDay: prescription.perDay,
-            price: prescription.price,
+            perDay: medication.perDay,
+            price: medication.medicine.price,
             isPaid: false,
             completed: false
           });
-          if (prescription.perDay === 'bid') {
+          if (medication.perDay === 'BID') {
             checkIn.push({
               date: add(new Date(), { days: i }).toISOString(),
-              perDay: prescription.perDay,
-              price: prescription.price,
+              perDay: medication.perDay,
+              price: medication.medicine.price,
               isPaid: false,
               completed: false
             });
@@ -124,7 +139,7 @@ const PrescriptionTestFormView = () => {
         }
 
         // const sortedCheckIn: PrescriptionCheckIn[] = [];
-        // if (prescription.perDay === 'bid') {
+        // if (prescription.perDay === 'BID') {
         //   for (let i = 0; i < Math.floor(checkIn.length / 2); i++) {
         //     sortedCheckIn.push(checkIn[i]);
         //     sortedCheckIn.push(checkIn[Math.floor(checkIn.length / 2 + i)]);
@@ -133,42 +148,36 @@ const PrescriptionTestFormView = () => {
         // console.log(sortedCheckIn, checkIn);
 
         return {
-          name: prescription.name,
-          perDay: prescription.perDay,
-          price: prescription.price,
-          forDays: prescription.forDays,
-          inStock: prescription.inStock,
-          other: prescription.other,
-          strength: prescription.strength,
+          ...medication,
           checkIn: JSON.stringify(
             checkIn
-            // prescription.perDay === 'bid' ? sortedCheckIn : prescription.checkIn
+            // prescription.perDay === 'BID' ? sortedCheckIn : prescription.checkIn
           )
         };
       });
 
-    if (!selectedPrescriptions) {
+    if (!selectedMedicines) {
     }
     let price = 0;
-    selectedPrescriptions.forEach(prescription => {
-      const perDay = prescription.perDay === 'stat' ? 1 : 2;
-      price += prescription.price * prescription.forDays * perDay;
+    selectedMedicines.forEach(medication => {
+      const perDay = medication.perDay === 'STAT' ? 1 : 2;
+      price += medication.medicine.price * medication.forDays * perDay;
     });
     if (!prescriptionInfo.cardId) return;
-    const createdPresc = await createPrescriptionTest({
-      variables: {
-        cardId: prescriptionInfo.cardId,
-        result: selectedPrescriptions,
-        rx: prescriptionInfo.rx,
-        price
-      }
-    });
-    history.push(
-      cardQuery({
-        id: prescriptionInfo.cardId,
-        prescriptionId: createdPresc.data?.createPrescriptionTest.id
-      })
-    );
+    // const createdPresc = await createPrescriptionTest({
+    //   variables: {
+    //     cardId: prescriptionInfo.cardId,
+    //     result: selectedMedicines,
+    //     rx: prescriptionInfo.rx,
+    //     price
+    //   }
+    // });
+    // history.push(
+    //   cardQuery({
+    //     id: prescriptionInfo.cardId,
+    //     prescriptionId: createdPresc.data?.createPrescriptionTest.id
+    //   })
+    // );
     setPrescriptionInfo({
       name: '',
       age: '',
@@ -181,7 +190,7 @@ const PrescriptionTestFormView = () => {
   const handlePrescriptionInfoChange:
     | React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>
     | undefined = event => {
-    setPrescriptions(prevPresc => ({
+    setPrescriptionInfo(prevPresc => ({
       ...prevPresc,
       [event.target.name]: event.target.value
     }));
@@ -217,16 +226,7 @@ const PrescriptionTestFormView = () => {
                   Sex: {prescriptionInfo.gender}
                 </Typography>
               </Grid>
-              <List sx={{ width: '100%' }}>
-                {!printReady &&
-                  prescriptions.map((prescription, index) => (
-                    <SinglePresc
-                      prescription={{ ...prescription }}
-                      setPrescriptions={setPrescriptions}
-                    />
-                  ))}
-              </List>
-              {!printReady && (
+              {printReady ? (
                 <Grid item md={6}>
                   <TextField
                     fullWidth
@@ -238,6 +238,18 @@ const PrescriptionTestFormView = () => {
                     variant="standard"
                   />
                 </Grid>
+              ) : (
+                medications && (
+                  <List sx={{ width: '100%' }}>
+                    {medications.map((medication, index) => (
+                      <PrescriptionBox
+                        key={index}
+                        medication={medication}
+                        setMedications={setMedications}
+                      />
+                    ))}
+                  </List>
+                )
               )}
               <Grid item md={12} xs={12}>
                 <TextareaAutosize
@@ -268,7 +280,7 @@ const PrescriptionTestFormView = () => {
         <Box display="flex" justifyContent="flex-end" p={2}>
           <Button
             onClick={handleSubmit}
-            disabled={!isQueried}
+            disabled={!prescriptionInfo.cardId}
             color="primary"
             variant="contained"
             style={{ marginRight: 10 }}
@@ -276,8 +288,12 @@ const PrescriptionTestFormView = () => {
             Send Prescription
           </Button>
           <Button
-            onClick={() => setPrintReady(true)}
-            disabled={!isQueried}
+            // onClick={() => setPrintReady(true)}
+            onClick={() => {
+              setPrintReady(true);
+              handlePrint && handlePrint();
+            }}
+            disabled={!prescriptionInfo.cardId}
             color="secondary"
             variant="contained"
           >

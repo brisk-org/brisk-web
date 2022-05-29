@@ -13,8 +13,8 @@ import DailyCalander from './DailyCalander';
 import {
   useCardsForDashboardQuery,
   NewCreatedCardDocument,
-  NewCreatedPrescriptionTestDocument,
-  usePrescriptionTestsForDashboardQuery,
+  NewCreatedPrescriptionDocument,
+  usePrescriptionsForDashboardQuery,
   useQuickPrescriptionTestsForDashboardQuery,
   useQuickLaboratoryTestsForDashboardQuery,
   NewCreatedQuickLaboratoryTestDocument,
@@ -34,14 +34,14 @@ const DashboardView = () => {
     subscribeToMore: subscribeToMoreLaboratoryTests
   } = useLaboratoryTestsForDashboardQuery({ variables: { skip: 0, take: 0 } });
   const {
-    data: prescriptionTestsData,
-    subscribeToMore: subscribeToMorePrescriptionTests
-  } = usePrescriptionTestsForDashboardQuery({
+    data: prescriptionData,
+    subscribeToMore: subscribeToMoreprescription
+  } = usePrescriptionsForDashboardQuery({
     variables: { skip: 0, take: 0 }
   });
   const {
     data: quickPrescriptionData,
-    subscribeToMore: subscribeToMoreQuickPrescriptionTests
+    subscribeToMore: subscribeToMoreQuickprescription
   } = useQuickPrescriptionTestsForDashboardQuery({
     variables: { skip: 0, take: 0 }
   });
@@ -76,13 +76,13 @@ const DashboardView = () => {
       },
       onError: err => console.log(err)
     });
-    subscribeToMorePrescriptionTests({
-      document: NewCreatedPrescriptionTestDocument,
+    subscribeToMoreprescription({
+      document: NewCreatedPrescriptionDocument,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const newCreatedCard = subscriptionData.data;
         return Object.assign({}, prev, {
-          prescriptionTests: [newCreatedCard, ...prev.prescriptionTests]
+          prescription: [newCreatedCard, ...prev.prescriptions]
         });
       },
       onError: err => console.log(err)
@@ -99,13 +99,13 @@ const DashboardView = () => {
       onError: err => console.log(err)
     });
 
-    subscribeToMoreQuickPrescriptionTests({
+    subscribeToMoreQuickprescription({
       document: NewCreatedQuickPrescriptionTestDocument,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const newCreatedPrescriptionTest = subscriptionData.data;
         return Object.assign({}, prev, {
-          quickPrescriptionTests: [
+          quickprescription: [
             newCreatedPrescriptionTest,
             ...prev.quickPrescriptionTests
           ]
@@ -132,11 +132,11 @@ const DashboardView = () => {
             <SalesContainer
               cardSales={cardSales}
               laboratoryTestSales={laboratoryTestsData?.laboratoryTests}
-              prescriptionTestSales={prescriptionTestsData?.prescriptionTests}
+              prescriptionSales={prescriptionData?.prescriptions}
               quickLaboratoryTestSales={
                 quickLaboratoryTestData?.quickLaboratoryTests
               }
-              quickPrescriptionTestSales={
+              quickprescriptionales={
                 quickPrescriptionData?.quickPrescriptionTests
               }
             />
