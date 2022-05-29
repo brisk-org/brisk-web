@@ -8,6 +8,7 @@ import ChangeRates from './ChangeRates';
 import { AuthContext } from '../../context/AuthContext';
 import AttendanceDialog from './AttendanceDialog';
 import RegisteredUsers from './RegisteredUsers';
+import { Occupation } from '../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -26,11 +27,11 @@ const SettingsView = () => {
   return (
     <Page className={classes.root} title="Settings">
       <Container maxWidth="lg" sx={{ mb: 10 }}>
-        <Box mt={3}>{occupation === 'ADMIN' && <ChangeRates />}</Box>
+        <Box mt={3}>{occupation === Occupation.Admin && <ChangeRates />}</Box>
         <Box my={3}>
           <ChangePassword />
         </Box>
-        {occupation === 'ADMIN' && <RegisteredUsers />}
+        {occupation === Occupation.Admin && <RegisteredUsers />}
         <AttendanceDialog open={open} setOpen={setOpen} />
       </Container>
     </Page>

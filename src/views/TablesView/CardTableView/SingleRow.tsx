@@ -1,12 +1,24 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { TableRow, TableCell, IconButton, Typography, colors, Chip, Menu, MenuItem } from '@mui/material';
+import {
+  TableRow,
+  TableCell,
+  IconButton,
+  Typography,
+  colors,
+  Chip,
+  Menu,
+  MenuItem
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { UnfoldMore } from '@mui/icons-material';
 import clsx from 'clsx';
 import { format, isBefore, sub } from 'date-fns';
 import FieldShortner from '../../../components/helpers/TextShortner';
 import { CardType } from '../../../@types/Cards';
-import { useInvalidateCardMutation } from '../../../generated/graphql';
+import {
+  Occupation,
+  useInvalidateCardMutation
+} from '../../../generated/graphql';
 import { useHistory } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
 import { SettingsContext } from '../../../context/SettingContext';
@@ -67,12 +79,12 @@ const SingleRow: React.FC<{ card: CardType }> = ({ card }) => {
   const handleMoreClick = async (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
-    if (occupation === 'RECEPTION') {
+    if (occupation === Occupation.Reception) {
       setOpen(true);
       return;
     }
 
-    if (occupation === 'DOCTOR') {
+    if (occupation === Occupation.Doctor) {
       setMenuAnchorEl(event.currentTarget);
       return;
     }

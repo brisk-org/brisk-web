@@ -5,6 +5,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../../components/Page';
 import {
   NewCreatedQuickPrescriptionTestDocument,
+  Occupation,
   QuickPrescriptionTestsQuery,
   useQuickPrescriptionTestsCountQuery,
   useQuickPrescriptionTestsQuery
@@ -77,7 +78,7 @@ const QuickPrescriptionTestTableView = () => {
             >
               {quickPrescriptions.quickPrescriptionTests.map(
                 (quickPrescriptionTest, index) => {
-                  return occupation === 'RECEPTION' ? (
+                  return occupation === Occupation.Reception ? (
                     !quickPrescriptionTest.paid && (
                       <SingleQuickPrescriptionTestRow
                         key={index}

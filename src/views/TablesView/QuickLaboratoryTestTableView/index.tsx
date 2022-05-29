@@ -6,6 +6,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../../components/Page';
 import {
   NewCreatedQuickLaboratoryTestDocument,
+  Occupation,
   QuickLaboratoryTestsQuery,
   useQuickLaboratoryTestsCountQuery,
   useQuickLaboratoryTestsQuery
@@ -77,7 +78,7 @@ const QuickLaboratoryTestTableView = () => {
             >
               {quickLabTests.quickLaboratoryTests.map(
                 (quickLaboratoryTest, index) => {
-                  return occupation === 'RECEPTION' ? (
+                  return occupation === Occupation.Reception ? (
                     !quickLaboratoryTest.paid && (
                       <SingleQuickLaboratoryTestRow
                         key={index}

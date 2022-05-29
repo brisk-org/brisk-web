@@ -210,7 +210,7 @@ export type Mutation = {
 export type MutationRegisterArgs = {
   username: Scalars['String'];
   password: Scalars['String'];
-  occupation: Scalars['String'];
+  occupation: Occupation;
 };
 
 
@@ -435,6 +435,14 @@ export type Notification = {
   created_at: Scalars['String'];
 };
 
+export enum Occupation {
+  Admin = 'ADMIN',
+  Reception = 'RECEPTION',
+  Doctor = 'DOCTOR',
+  Nurse = 'NURSE',
+  Laboratory = 'LABORATORY'
+}
+
 export enum PerDay {
   Bid = 'BID',
   Stat = 'STAT'
@@ -651,7 +659,7 @@ export type User = {
   __typename?: 'User';
   id: Scalars['ID'];
   username: Scalars['String'];
-  occupation: Scalars['String'];
+  occupation: Occupation;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
@@ -1178,6 +1186,16 @@ export type ChangeUserDetailMutation = (
   ) }
 );
 
+export type DeleteUserMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DeleteUserMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteUser'>
+);
+
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
@@ -1202,7 +1220,7 @@ export type LoginMutation = (
 export type RegisterMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
-  occupation: Scalars['String'];
+  occupation: Occupation;
 }>;
 
 
@@ -3144,6 +3162,37 @@ export function useChangeUserDetailMutation(baseOptions?: Apollo.MutationHookOpt
 export type ChangeUserDetailMutationHookResult = ReturnType<typeof useChangeUserDetailMutation>;
 export type ChangeUserDetailMutationResult = Apollo.MutationResult<ChangeUserDetailMutation>;
 export type ChangeUserDetailMutationOptions = Apollo.BaseMutationOptions<ChangeUserDetailMutation, ChangeUserDetailMutationVariables>;
+export const DeleteUserDocument = gql`
+    mutation DeleteUser($id: ID!) {
+  deleteUser(id: $id)
+}
+    `;
+export type DeleteUserMutationFn = Apollo.MutationFunction<DeleteUserMutation, DeleteUserMutationVariables>;
+
+/**
+ * __useDeleteUserMutation__
+ *
+ * To run a mutation, you first call `useDeleteUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUserMutation, { data, loading, error }] = useDeleteUserMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserMutation, DeleteUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, options);
+      }
+export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
+export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
+export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password) {
@@ -3188,7 +3237,7 @@ export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const RegisterDocument = gql`
-    mutation Register($username: String!, $password: String!, $occupation: String!) {
+    mutation Register($username: String!, $password: String!, $occupation: Occupation!) {
   register(username: $username, password: $password, occupation: $occupation) {
     errors {
       field

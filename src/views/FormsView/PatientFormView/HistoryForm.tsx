@@ -41,7 +41,8 @@ import {
   useCreateHistoryMutation,
   useHistoryQuery,
   useUpdateHistoryMutation,
-  useMarkCardAsSeenMutation
+  useMarkCardAsSeenMutation,
+  Occupation
 } from '../../../generated/graphql';
 import { AuthContext } from '../../../context/AuthContext';
 import {
@@ -269,12 +270,12 @@ const HistoryForm = () => {
             <Button onClick={handleClick} name="none" type="submit">
               {isNewHistory ? 'Create History' : 'Update History'}
             </Button>
-            {occupation === 'DOCTOR' && (
+            {occupation === Occupation.Doctor && (
               <Button onClick={handleClick} name="request" type="submit">
                 Request Test
               </Button>
             )}
-            {occupation === 'DOCTOR' && (
+            {occupation === Occupation.Doctor && (
               <Button onClick={handleClick} name="prescribe" type="submit">
                 Prescribe
               </Button>

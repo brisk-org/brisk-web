@@ -1,6 +1,13 @@
 import React, { useContext, useState } from 'react';
 
-import { TableRow, TableCell, IconButton, Typography, Box, colors } from '@mui/material';
+import {
+  TableRow,
+  TableCell,
+  IconButton,
+  Typography,
+  Box,
+  colors
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import {
   CancelPresentationRounded,
@@ -15,7 +22,10 @@ import clsx from 'clsx';
 import { useHistory } from 'react-router';
 import { cardQuery, completeTestQuery } from '../../../constants/queries';
 import ConfirmationDialog from './ConfirmationDialog';
-import { useMarkLaboratoryTestAsSeenMutation } from '../../../generated/graphql';
+import {
+  Occupation,
+  useMarkLaboratoryTestAsSeenMutation
+} from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -66,13 +76,13 @@ const SingleTestRow: React.FC<{ test: LaboratoryTestType }> = ({ test }) => {
     | undefined = event => {
     setOpen(!open);
     switch (occupation) {
-      case 'RECEPTION':
+      case Occupation.Reception:
         setOpen(true);
         break;
-      case 'LABORATORIAN':
+      case Occupation.Laboratory:
         history.push(completeTestQuery(test.id));
         break;
-      case 'DOCTOR':
+      case Occupation.Doctor:
         test.completed &&
           markLaboratoryTestAsSeen({
             variables: {

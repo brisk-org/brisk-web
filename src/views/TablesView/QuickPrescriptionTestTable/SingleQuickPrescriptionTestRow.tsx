@@ -1,6 +1,13 @@
 import React, { useContext, useState } from 'react';
 
-import { TableRow, TableCell, IconButton, Typography, Box, colors } from '@mui/material';
+import {
+  TableRow,
+  TableCell,
+  IconButton,
+  Typography,
+  Box,
+  colors
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { DoneAllRounded, UnfoldMore } from '@mui/icons-material';
 import { format } from 'date-fns';
@@ -12,7 +19,10 @@ import { quickPrescribeQuery } from '../../../constants/queries';
 import ConfirmationDialog from './ConfirmationDialog';
 import { QuickPrescriptionType } from '../../../@types/QuickLaboratoryTests';
 import CompletedQuickPrescriptionTestListDialog from './CompletedQuickPrescriptionTestListDialog';
-import { useMarkQuickPrescriptionTestAsSeenMutation } from '../../../generated/graphql';
+import {
+  Occupation,
+  useMarkQuickPrescriptionTestAsSeenMutation
+} from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -68,17 +78,17 @@ const SingleQuickPrescriptionTestRow: React.FC<{
       prescription.result
     ) as any;
     switch (occupation) {
-      case 'RECEPTION':
+      case Occupation.Reception:
         !prescription.paid && setPaymentDialogOpen(true);
         break;
-      case 'DOCTOR':
+      case Occupation.Doctor:
         // prescription.new &&
         //   (await markQuickPerscriptionAsSeen({
         //     variables: { id: prescription.id }
         //   }));
         setCompletedListDialogOpen(true);
         break;
-      case 'NURSE':
+      case Occupation.Nurse:
         prescription.completed
           ? setCompletedListDialogOpen(true)
           : history.push(

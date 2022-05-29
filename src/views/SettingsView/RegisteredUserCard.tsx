@@ -11,15 +11,25 @@ import {
   Typography,
   colors
 } from '@mui/material';
-import { User } from '../../generated/graphql';
+import {
+  AllUsersDocument,
+  useDeleteUserMutation,
+  AllUsersQuery
+} from '../../generated/graphql';
 
-export interface RegisteredUsersProps {
-  user: {
-    __typename?: 'User' | undefined;
-  } & Pick<User, 'id' | 'username' | 'occupation' | 'created_at'>;
-}
+const RegisteredUsersCard: React.FC<{ user: AllUsersQuery['allUsers'][0] }> = ({
+  user
+}) => {
+  const [deleteUser] = useDeleteUserMutation({
+    refetchQueries: [{ query: AllUsersDocument }]
+  });
 
-const RegisteredUsersCard: React.FC<RegisteredUsersProps> = ({ user }) => {
+  const handleDeleteUser = async () => {
+    await deleteUser({
+      variables: { id: user.id }
+    });
+  };
+
   return (
     <Grid item md={4} sm={6} style={{}}>
       <Card>
@@ -46,9 +56,9 @@ const RegisteredUsersCard: React.FC<RegisteredUsersProps> = ({ user }) => {
             variant="contained"
             value={user.id}
             size="small"
-            // onClick={handleDeleteUser}
+            onClick={handleDeleteUser}
           >
-            Delete
+            Remove
           </Button>
         </CardActions>
       </Card>

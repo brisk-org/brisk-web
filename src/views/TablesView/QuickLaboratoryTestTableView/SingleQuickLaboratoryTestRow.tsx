@@ -1,6 +1,13 @@
 import React, { useContext, useState } from 'react';
 
-import { TableRow, TableCell, IconButton, Typography, Box, colors } from '@mui/material';
+import {
+  TableRow,
+  TableCell,
+  IconButton,
+  Typography,
+  Box,
+  colors
+} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { DoneAllRounded, UnfoldMore } from '@mui/icons-material';
 import { format } from 'date-fns';
@@ -12,6 +19,7 @@ import ConfirmationDialog from './ConfirmationDialog';
 import { QuickLabTestType } from '../../../@types/QuickLaboratoryTests';
 import { useHistory } from 'react-router';
 import CompletedQuickLaboratoryTestListDialog from './CompletedQuickLaboratoryTestListDialog';
+import { Occupation } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -62,10 +70,10 @@ const SingleQuickLaboratoryTestRow: React.FC<{
   const handleClick = () => {
     const { fbs, hcg, rbs } = JSON.parse(laboratoryTest.result) as any;
     switch (occupation) {
-      case 'RECEPTION':
+      case Occupation.Reception:
         setPaymentDialogOpen(true);
         break;
-      case 'LABORATORIAN':
+      case Occupation.Laboratory:
         laboratoryTest.completed
           ? setCompletedListDialogOpen(true)
           : history.push(
@@ -78,7 +86,7 @@ const SingleQuickLaboratoryTestRow: React.FC<{
               })
             );
         break;
-      case 'DOCTOR':
+      case Occupation.Doctor:
         setCompletedListDialogOpen(true);
         break;
     }

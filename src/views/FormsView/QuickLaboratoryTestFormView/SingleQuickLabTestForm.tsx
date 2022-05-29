@@ -2,6 +2,7 @@ import { Checkbox, FormControlLabel, Typography } from '@mui/material';
 import React, { useContext } from 'react';
 import NumberTextField from '../../../components/helpers/NumberTextField';
 import { AuthContext } from '../../../context/AuthContext';
+import { Occupation } from '../../../generated/graphql';
 
 interface SingleLabTestProps {
   singleDetail: { name: string; price: number; selected: boolean };
@@ -20,7 +21,7 @@ const SingleQuickLabTestForm: React.FC<SingleLabTestProps> = ({
   const { occupation } = useContext(AuthContext);
   return (
     <>
-      {occupation === 'LABORATORIAN' ? (
+      {occupation === Occupation.Laboratory ? (
         <>
           <Typography>{name}:</Typography>
           <NumberTextField

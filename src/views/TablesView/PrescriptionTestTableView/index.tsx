@@ -7,6 +7,7 @@ import Page from '../../../components/Page';
 import Toolbar from '../../../components/Toolbar';
 import {
   NewCreatedPrescriptionDocument,
+  Occupation,
   PrescriptionsQuery,
   usePrescriptionCountQuery,
   usePrescriptionsQuery,
@@ -151,14 +152,14 @@ const PrescriptionTestTableView = () => {
               takeState={{ take, setTake }}
             >
               {prescriptions.map((prescription, index) => {
-                return occupation === 'NURSE' ? (
+                return occupation === Occupation.Nurse ? (
                   prescription.inrolled && (
                     <SinglePrescriptionRow
                       key={index}
                       prescription={prescription}
                     />
                   )
-                ) : occupation === 'RECEPTION' ? (
+                ) : occupation === Occupation.Reception ? (
                   !prescription.paid && (
                     <SinglePrescriptionRow
                       key={index}

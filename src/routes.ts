@@ -14,7 +14,6 @@ import {
   OfflineBoltOutlined
 } from '@mui/icons-material';
 
-import { Occupation } from './context/AuthContext';
 import DashboardView from './views/DashboardView';
 import CardFormView from './views/FormsView/PatientFormView';
 import QuickLaboratoryTestFormView from './views/FormsView/QuickLaboratoryTestFormView';
@@ -32,6 +31,7 @@ import PrescriptionTestTableView from './views/TablesView/PrescriptionTestTableV
 import DetailedCardView from './views/DetailedCardView/Index';
 import LaboratoryTestTableView from './views/TablesView/LaboratoryTestTableView';
 import PrescriptionTestFormView from './views/FormsView/PrescriptionTestFormView';
+import { Occupation } from './generated/graphql';
 
 type Routes = {
   path: string;
@@ -47,44 +47,44 @@ export const useRoutes = function(): Routes[] {
       path: '/app/dashboard',
       icon: DashboardOutlined,
       label: 'Dashboard',
-      routeOccupation: ['ADMIN'],
+      routeOccupation: [Occupation.Admin],
       component: DashboardView
     },
     {
       path: '/app/data/card',
       icon: PermIdentity,
       label: 'Cards',
-      routeOccupation: ['DOCTOR', 'RECEPTION'],
+      routeOccupation: [Occupation.Doctor, Occupation.Reception],
       component: CardTableView
     },
     {
       path: '/app/data/card/history',
-      routeOccupation: ['DOCTOR'],
+      routeOccupation: [Occupation.Doctor],
       component: DetailedCardView
     },
     {
       path: '/app/form/card',
       icon: PersonAddOutlined,
       label: 'Add a Card',
-      routeOccupation: ['RECEPTION', 'DOCTOR'],
-      linkOccupation: ['RECEPTION'],
+      routeOccupation: [Occupation.Reception, Occupation.Doctor],
+      linkOccupation: [Occupation.Reception],
       component: CardFormView
     },
     {
       path: '/app/form/quick-laboratory-test',
       icon: PostAddOutlined,
       label: 'Add Quick Laboratory Test',
-      routeOccupation: ['RECEPTION', 'LABORATORIAN'],
+      routeOccupation: [Occupation.Reception, Occupation.Laboratory],
       component: QuickLaboratoryTestFormView,
-      linkOccupation: ['RECEPTION']
+      linkOccupation: [Occupation.Reception]
     },
     {
       path: '/app/form/quick-prescription-test',
       icon: PostAddOutlined,
       label: 'Add Quick Prescription Test',
-      routeOccupation: ['RECEPTION', 'NURSE'],
+      routeOccupation: [Occupation.Reception, Occupation.Nurse],
       component: QuickPrescriptionFormView,
-      linkOccupation: ['RECEPTION']
+      linkOccupation: [Occupation.Reception]
     },
 
     {
@@ -92,43 +92,59 @@ export const useRoutes = function(): Routes[] {
       icon: GroupWorkOutlined,
       label: 'Laboratory Test',
       component: LaboratoryTestTableView,
-      routeOccupation: ['DOCTOR', 'RECEPTION', 'LABORATORIAN']
+      routeOccupation: [
+        Occupation.Doctor,
+        Occupation.Reception,
+        Occupation.Laboratory
+      ]
     },
     {
       path: '/app/data/prescription-test',
       icon: AcUnitOutlined,
       label: 'Prescription Test',
       component: PrescriptionTestTableView,
-      routeOccupation: ['DOCTOR', 'RECEPTION', 'NURSE']
+      routeOccupation: [
+        Occupation.Doctor,
+        Occupation.Reception,
+        Occupation.Nurse
+      ]
     },
     {
       path: '/app/data/quick-laboratory-test',
       icon: OfflineBoltOutlined,
       label: 'Quick Laboratory Test',
-      routeOccupation: ['RECEPTION', 'LABORATORIAN', 'DOCTOR'],
+      routeOccupation: [
+        Occupation.Reception,
+        Occupation.Laboratory,
+        Occupation.Doctor
+      ],
       component: QuickLaboratoryTestTableView
     },
     {
       path: '/app/data/quick-prescription-test',
       icon: FlashOffOutlined,
       label: 'Quick Prescription Tests',
-      routeOccupation: ['RECEPTION', 'NURSE', 'DOCTOR'],
+      routeOccupation: [
+        Occupation.Reception,
+        Occupation.Nurse,
+        Occupation.Doctor
+      ],
       component: QuickPrescriptionTestTableView
     },
 
     {
       path: '/app/form/laboratory-test/request',
-      routeOccupation: ['DOCTOR'],
+      routeOccupation: [Occupation.Doctor],
       component: RequestLaboratoryTestFormView
     },
     {
       path: '/app/form/laboratory-test/complete',
-      routeOccupation: ['DOCTOR', 'LABORATORIAN'],
+      routeOccupation: [Occupation.Doctor, Occupation.Laboratory],
       component: CompleteLaboratoryTestFormView
     },
     {
       path: '/app/form/prescription-test',
-      routeOccupation: ['DOCTOR', 'NURSE'],
+      routeOccupation: [Occupation.Doctor, Occupation.Nurse],
       component: PrescriptionTestFormView
     },
     {
@@ -136,31 +152,37 @@ export const useRoutes = function(): Routes[] {
       icon: WindowOutlined,
       label: 'Request Form',
       component: MedicalRequestFormView,
-      routeOccupation: ['DOCTOR']
+      routeOccupation: [Occupation.Doctor]
     },
     {
       path: '/app/data/cards/history/asst',
       icon: ReceiptOutlined,
       label: 'Weekly Asst',
       component: AsstTableView,
-      routeOccupation: ['ADMIN']
+      routeOccupation: [Occupation.Admin]
     },
     {
       path: '/app/settings',
       icon: SettingsOutlined,
       label: 'Settings',
       component: SettingsView,
-      routeOccupation: ['ADMIN', 'DOCTOR', 'LABORATORIAN', 'NURSE', 'RECEPTION']
+      routeOccupation: [
+        Occupation.Admin,
+        Occupation.Doctor,
+        Occupation.Laboratory,
+        Occupation.Nurse,
+        Occupation.Reception
+      ]
     },
     {
       path: '/app/form/medical/certificate',
       component: MedicalCertificateFormView,
-      routeOccupation: ['DOCTOR']
+      routeOccupation: [Occupation.Doctor]
     },
     {
       path: '/app/form/medical/certificate',
       component: MedicalCertificateFormView,
-      routeOccupation: ['ADMIN']
+      routeOccupation: [Occupation.Admin]
     }
   ];
 };

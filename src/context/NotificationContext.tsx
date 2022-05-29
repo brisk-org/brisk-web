@@ -12,9 +12,10 @@ import {
   NewNotificationSubscriptionDocument,
   useClearNotificationMutation,
   useDeleteNotificationMutation,
-  DeleteNotificationSubscriptionDocument
+  DeleteNotificationSubscriptionDocument,
+  Occupation
 } from '../generated/graphql';
-import { AuthContext, Occupation } from './AuthContext';
+import { AuthContext } from './AuthContext';
 
 type ContextType = {
   count: number;
@@ -50,7 +51,7 @@ const notificationReducer = function(
   { type, payload: { notification, enqueueSnackbar, newNotification } }: Action
 ) {
   switch (type) {
-    case 'DOCTOR':
+    case Occupation.Admin:
       const doctorNotif = notification.filter(
         ({ action }) =>
           (action as NotifAction) === 'COMPLETE_LABORATORY_TEST' ||
@@ -69,7 +70,7 @@ const notificationReducer = function(
         notifications: doctorNotif,
         count: doctorNotif.length
       };
-    case 'RECEPTION':
+    case Occupation.Reception:
       const receptionNotif = notification.filter(
         ({ action }) =>
           (action as NotifAction) === 'CREATE_PRESCRIPTION' ||
@@ -86,7 +87,7 @@ const notificationReducer = function(
         notifications: receptionNotif,
         count: receptionNotif.length
       };
-    case 'LABORATORIAN':
+    case Occupation.Laboratory:
       const laboratoryNotification = notification.filter(
         ({ action }) =>
           (action as NotifAction) === 'PAY_FOR_LABORATORY_TEST' ||
@@ -101,7 +102,7 @@ const notificationReducer = function(
         notifications: laboratoryNotification,
         count: laboratoryNotification.length
       };
-    case 'NURSE':
+    case Occupation.Nurse:
       const prescriptionNotification = notification.filter(
         ({ action }) =>
           (action as NotifAction) === 'PAY_FOR_PRESCRIPTION' ||
@@ -150,7 +151,7 @@ const NotificationProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     console.log('start');
-    if (occupation === 'ADMIN') return;
+    if (occupation === Occupation.Admin) return;
     subscribeToMore({
       document: NewNotificationSubscriptionDocument,
       updateQuery: (prev, { subscriptionData }) => {

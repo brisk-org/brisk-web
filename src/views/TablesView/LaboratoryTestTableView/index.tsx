@@ -12,7 +12,8 @@ import {
   useSearchLaboratoryTestsQuery,
   useLaboratoryTestsQuery,
   NewCreatedLaboratoryTestDocument,
-  useLaboratoryTestsCountQuery
+  useLaboratoryTestsCountQuery,
+  Occupation
 } from '../../../generated/graphql';
 import MainContainerTable from '../../../components/MainContainerTable';
 import SingleTestRow from './SingleTestRow';
@@ -139,14 +140,14 @@ const LaboratoryTestTableView = () => {
               count={countData?.laboratoryTestsCount}
             >
               {allTests.laboratoryTests.map((test, index) => {
-                return occupation === 'DOCTOR' ? (
+                return occupation === Occupation.Doctor ? (
                   <SingleTestRow key={index} test={test} />
                 ) : test.paid && !test.completed ? (
-                  occupation === 'LABORATORIAN' && (
+                  occupation === Occupation.Laboratory && (
                     <SingleTestRow key={index} test={test} />
                   )
                 ) : (
-                  occupation === 'RECEPTION' &&
+                  occupation === Occupation.Reception &&
                   !test.paid && <SingleTestRow key={index} test={test} />
                 );
               })}
@@ -159,14 +160,14 @@ const LaboratoryTestTableView = () => {
               count={countData?.laboratoryTestsCount}
             >
               {searchedTests?.searchLaboratoryTests.map((test, index) => {
-                return occupation === 'DOCTOR' ? (
+                return occupation === Occupation.Doctor ? (
                   <SingleTestRow key={index} test={test} />
                 ) : test.paid && !test.completed ? (
-                  occupation === 'LABORATORIAN' && (
+                  occupation === Occupation.Laboratory && (
                     <SingleTestRow key={index} test={test} />
                   )
                 ) : (
-                  occupation === 'RECEPTION' &&
+                  occupation === Occupation.Reception &&
                   !test.paid && <SingleTestRow key={index} test={test} />
                 );
               })}

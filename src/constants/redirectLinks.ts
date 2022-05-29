@@ -1,15 +1,18 @@
-import { Occupation } from '../context/AuthContext';
+import { Occupation } from '../generated/graphql';
 
 export const redirectLink = function(occupation: Occupation) {
-  return occupation === 'ADMIN'
-    ? '/app/dashboard'
-    : occupation === 'DOCTOR'
-    ? '/app/data/card'
-    : occupation === 'RECEPTION'
-    ? '/app/form/card'
-    : occupation === 'LABORATORIAN'
-    ? '/app/data/laboratory-test'
-    : occupation === 'NURSE'
-    ? '/app/data/prescription-test'
-    : '/login';
+  switch (occupation) {
+    case Occupation.Admin:
+      return '/app/dashboard';
+    case Occupation.Doctor:
+      return '/app/data/card';
+    case Occupation.Reception:
+      return '/app/form/card';
+    case Occupation.Laboratory:
+      return 'app/data/laboratory-test';
+    case Occupation.Nurse:
+      return 'app/data/prescription-test';
+    default:
+      return '/login';
+  }
 };

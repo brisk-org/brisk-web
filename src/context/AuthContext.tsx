@@ -3,14 +3,18 @@ import jwtDecode from 'jwt-decode';
 import React, { createContext, useEffect, useReducer } from 'react';
 import { useHistory } from 'react-router-dom';
 import { redirectLink } from '../constants/redirectLinks';
-import { LoginMutation, RegisterMutation } from '../generated/graphql';
+import {
+  LoginMutation,
+  Occupation,
+  RegisterMutation
+} from '../generated/graphql';
 
-export type Occupation =
-  | 'ADMIN'
-  | 'DOCTOR'
-  | 'RECEPTION'
-  | 'LABORATORIAN'
-  | 'NURSE';
+// export type Occupation =
+//   | 'ADMIN'
+//   | Occupation.Doctor
+//   | 'RECEPTION'
+//   | 'LABORATORIAN'
+//   | 'NURSE';
 interface State {
   username: string;
   password: string;
@@ -40,7 +44,7 @@ type ContextT = {
 const initialState: State = {
   username: '',
   password: '',
-  occupation: 'ADMIN'
+  occupation: Occupation.Admin
 };
 
 const authReducer = (state: State, action: Action) => {
@@ -67,7 +71,7 @@ const authReducer = (state: State, action: Action) => {
 const AuthContext = createContext<ContextT>({
   username: '',
   password: '',
-  occupation: 'ADMIN',
+  occupation: Occupation.Admin,
   formField: () => {},
   login: (data: any) => {},
   register: (data: any) => {},

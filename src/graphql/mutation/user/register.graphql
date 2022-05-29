@@ -1,7 +1,7 @@
 mutation Register(
   $username: String!
   $password: String!
-  $occupation: String!
+  $occupation: Occupation!
 ) {
   register(username: $username, password: $password, occupation: $occupation) {
     errors {

@@ -23,6 +23,7 @@ import { cardQuery } from '../../../constants/queries';
 import ConfirmationDialog from './ConfirmationDialog';
 import CompletePrescDialog from './CompletePrescDialog';
 import {
+  Occupation,
   PrescriptionsQuery,
   useMarkPrescriptionAsSeenMutation
 } from '../../../generated/graphql';
@@ -77,13 +78,13 @@ const SinglePrescriptionRow: React.FC<{
 
   const handleClick = async () => {
     switch (occupation) {
-      case 'RECEPTION':
+      case Occupation.Reception:
         !prescription.paid && setPaymentDialogOpen(true);
         break;
-      case 'NURSE':
+      case Occupation.Nurse:
         setCompletePrescDialogOpen(true);
         break;
-      case 'DOCTOR':
+      case Occupation.Doctor:
         prescription.new &&
           (await markPrescriptionAsSeen({
             variables: { id: prescription.id }

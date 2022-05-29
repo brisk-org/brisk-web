@@ -14,29 +14,32 @@ import {
   FormControl,
   InputLabel
 } from '@mui/material';
-import { useRegisterMutation } from '../../generated/graphql';
-import { Occupation } from '../../context/AuthContext';
+import {
+  AllUsersDocument,
+  Occupation,
+  useRegisterMutation
+} from '../../generated/graphql';
 
 const occupationOptions: { value: Occupation; label: string }[] = [
   {
     label: 'Admin',
-    value: 'ADMIN'
+    value: Occupation.Admin
   },
   {
     label: 'Doctor',
-    value: 'DOCTOR'
+    value: Occupation.Doctor
   },
   {
     label: 'Reception',
-    value: 'RECEPTION'
+    value: Occupation.Reception
   },
   {
-    label: 'Laboratorian',
-    value: 'LABORATORIAN'
+    label: 'Laboratory',
+    value: Occupation.Laboratory
   },
   {
     label: 'Nurse',
-    value: 'NURSE'
+    value: Occupation.Nurse
   }
 ];
 
@@ -47,7 +50,7 @@ const CreateUserDialog: React.FC<{
   const [error, setError] = useState('');
   const [user, setUser] = useState({
     username: '',
-    occupation: 'RECEPTION',
+    occupation: Occupation.Admin,
     password: ''
   });
   const [register] = useRegisterMutation({
@@ -60,6 +63,7 @@ const CreateUserDialog: React.FC<{
         return;
       }
     },
+    refetchQueries: [{ query: AllUsersDocument }],
     onError(error) {
       console.log(error);
     },

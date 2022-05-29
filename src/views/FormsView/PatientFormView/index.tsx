@@ -6,6 +6,7 @@ import { AuthContext } from '../../../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import CardForm from './CardForm';
 import HistoryForm from './HistoryForm';
+import { Occupation } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -25,13 +26,17 @@ const CardFormView = () => {
   return (
     <Page
       title={
-        occupation === 'DOCTOR' && history
+        occupation === Occupation.Doctor && history
           ? 'Register Patient History'
           : 'Register Patient Card'
       }
     >
       <Container className={classes.root} maxWidth="lg">
-        {!history ? <CardForm /> : occupation === 'DOCTOR' && <HistoryForm />}
+        {!history ? (
+          <CardForm />
+        ) : (
+          occupation === Occupation.Doctor && <HistoryForm />
+        )}
         <Divider />
       </Container>
     </Page>
