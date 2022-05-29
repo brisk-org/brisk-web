@@ -1,5 +1,6 @@
 mutation CreateMedication(
   $medicineId: ID!
+  $prescriptionId: ID!
   $strength: String
   $perDay: PerDay!
   $checkIn: [CheckIn!]!
@@ -8,6 +9,7 @@ mutation CreateMedication(
 ) {
   createMedication(
     medicineId: $medicineId
+    prescriptionId: $prescriptionId
     strength: $strength
     perDay: $perDay
     checkIn: $checkIn
@@ -23,7 +25,11 @@ mutation CreateMedication(
     }
     strength
     forDays
-    checkIn
+    checkIn {
+      date
+      isPaid
+      isCompleted
+    }
     perDay
     other
     created_at

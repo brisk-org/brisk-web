@@ -205,7 +205,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               <PriceStepper
                 prescriptionCheckIn={prescriptionCheckIn}
                 lastCheckIn={
-                  (prescription.medications.find(
+                  (prescription.medications?.find(
                     medication =>
                       medication.medicine.name === prescriptionCheckIn.name
                   )?.checkIn as unknown) as PrescriptionCheckIn[]

@@ -22,17 +22,19 @@ import {
 } from '../../../context/SettingContext';
 import { AuthContext } from '../../../context/AuthContext';
 import {
-  CreateMedicationMutationVariables,
   MedicationsQuery,
   PerDay,
+  useCreateMedicationMutation,
   useCreatePrescriptionMutation,
-  useMedicinesQuery
+  useMedicinesQuery,
+  CheckIn
 } from '../../../generated/graphql';
 import { cardQuery } from '../../../constants/queries';
 import { add, format } from 'date-fns';
 import { useReactToPrint } from 'react-to-print';
 import PrintHeader from '../../../components/PrintHeader';
 import PrescriptionBox from './PrescriptionBox';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -52,7 +54,7 @@ const useStyles = makeStyles(theme => ({
 
 type MedicineQuery = Omit<
   MedicationsQuery['medications'][0],
-  '__typename' | 'id' | 'created_at' | 'updated_at'
+  '__typename' | 'id' | 'created_at' | 'checkIn' | 'updated_at'
 >;
 export interface SelectablePrescription extends MedicineQuery {
   selected: boolean;
@@ -73,6 +75,7 @@ const PrescriptionTestFormView = () => {
   const history = useHistory();
 
   const { username } = useContext(AuthContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   const [prescriptionInfo, setPrescriptionInfo] = useState<PrescriptionInfo>({
     cardId: query.get('id') || undefined,
@@ -84,7 +87,14 @@ const PrescriptionTestFormView = () => {
   });
   const [medications, setMedications] = useState<SelectablePrescription[]>();
   const { data, loading } = useMedicinesQuery();
-  const [createPrescriptionTest] = useCreatePrescriptionMutation({
+  const [
+    createMedication,
+    { loading: createMedicationLoading }
+  ] = useCreateMedicationMutation();
+  const [
+    createPrescriptionTest,
+    { loading: createPrescriptionTestLoading }
+  ] = useCreatePrescriptionMutation({
     onError: err => console.log(err)
   });
 
@@ -104,7 +114,6 @@ const PrescriptionTestFormView = () => {
         medicine: {
           ...medicine
         },
-        checkIn: '',
         forDays: medicine.forDays || 0,
         perDay: medicine.perDay || PerDay.Stat,
         strength: medicine.strength || undefined,
@@ -115,69 +124,80 @@ const PrescriptionTestFormView = () => {
 
   const handleSubmit = async () => {
     if (!medications) return;
-    const selectedMedicines: SelectablePrescription[] = medications
-      .filter(medication => medication.selected)
-      .map(medication => {
-        const checkIn: PrescriptionCheckIn[] = [];
-        for (let i = 0; i < medication.forDays; i++) {
+    const createdMedicationId: string[] = [];
+    const selectedMedicines: SelectablePrescription[] = medications.filter(
+      medication => medication.selected
+    );
+
+    if (!prescriptionInfo.cardId) return;
+    if (!selectedMedicines[0]) {
+      enqueueSnackbar('Select atleast One medicine', { variant: 'warning' });
+      return;
+    }
+    const totalPrice = selectedMedicines.reduce(
+      (prevPrice, currentMedicine) =>
+        prevPrice +
+        (currentMedicine.medicine.price * currentMedicine.forDays +
+          currentMedicine.perDay ===
+        PerDay.Bid
+          ? 2
+          : 1),
+      0
+    );
+    const prescription = await createPrescriptionTest({
+      variables: {
+        cardId: prescriptionInfo.cardId,
+        rx: prescriptionInfo.rx,
+        totalPrice
+      }
+    });
+    if (!prescription.data) {
+      enqueueSnackbar('Error creating Prescription', { variant: 'error' });
+      return;
+    }
+    if (!selectedMedicines[0]) {
+      enqueueSnackbar('Select atleast One medicine', { variant: 'error' });
+      return;
+    }
+    for (let k = 0; k < selectedMedicines.length; k++) {
+      const checkIn: CheckIn[] = [];
+
+      for (let i = 0; i < selectedMedicines[k].forDays; i++) {
+        checkIn.push({
+          date: add(new Date(), { days: i }).toISOString(),
+          isPaid: false,
+          isCompleted: false
+        });
+        if (selectedMedicines[k].perDay === PerDay['Bid']) {
           checkIn.push({
             date: add(new Date(), { days: i }).toISOString(),
-            perDay: medication.perDay,
-            price: medication.medicine.price,
             isPaid: false,
-            completed: false
+            isCompleted: false
           });
-          if (medication.perDay === 'BID') {
-            checkIn.push({
-              date: add(new Date(), { days: i }).toISOString(),
-              perDay: medication.perDay,
-              price: medication.medicine.price,
-              isPaid: false,
-              completed: false
-            });
-          }
         }
+      }
 
-        // const sortedCheckIn: PrescriptionCheckIn[] = [];
-        // if (prescription.perDay === 'BID') {
-        //   for (let i = 0; i < Math.floor(checkIn.length / 2); i++) {
-        //     sortedCheckIn.push(checkIn[i]);
-        //     sortedCheckIn.push(checkIn[Math.floor(checkIn.length / 2 + i)]);
-        //   }
-        // }
-        // console.log(sortedCheckIn, checkIn);
-
-        return {
-          ...medication,
-          checkIn: JSON.stringify(
-            checkIn
-            // prescription.perDay === 'BID' ? sortedCheckIn : prescription.checkIn
-          )
-        };
+      const medication = await createMedication({
+        variables: {
+          ...selectedMedicines[k],
+          prescriptionId: prescription.data.createPrescription.id,
+          medicineId: selectedMedicines[k].medicine.id,
+          checkIn
+        }
       });
-
-    if (!selectedMedicines) {
+      if (!medication.data) {
+        enqueueSnackbar('Internal Server Error', { variant: 'error' });
+        return;
+      }
+      createdMedicationId.push(medication.data.createMedication.id);
     }
-    let price = 0;
-    selectedMedicines.forEach(medication => {
-      const perDay = medication.perDay === 'STAT' ? 1 : 2;
-      price += medication.medicine.price * medication.forDays * perDay;
-    });
-    if (!prescriptionInfo.cardId) return;
-    // const createdPresc = await createPrescriptionTest({
-    //   variables: {
-    //     cardId: prescriptionInfo.cardId,
-    //     result: selectedMedicines,
-    //     rx: prescriptionInfo.rx,
-    //     price
-    //   }
-    // });
-    // history.push(
-    //   cardQuery({
-    //     id: prescriptionInfo.cardId,
-    //     prescriptionId: createdPresc.data?.createPrescriptionTest.id
-    //   })
-    // );
+
+    history.push(
+      cardQuery({
+        id: prescriptionInfo.cardId,
+        prescriptionId: prescription.data?.createPrescription.id
+      })
+    );
     setPrescriptionInfo({
       name: '',
       age: '',
@@ -285,10 +305,11 @@ const PrescriptionTestFormView = () => {
             variant="contained"
             style={{ marginRight: 10 }}
           >
-            Send Prescription
+            {createMedicationLoading || createPrescriptionTestLoading
+              ? '...Loading'
+              : 'Send Prescription'}
           </Button>
           <Button
-            // onClick={() => setPrintReady(true)}
             onClick={() => {
               setPrintReady(true);
               handlePrint && handlePrint();

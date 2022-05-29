@@ -1,5 +1,5 @@
+import React, { useState } from 'react';
 import {
-  Button,
   Checkbox,
   ListItem,
   ListItemButton,
@@ -7,7 +7,6 @@ import {
   ListItemText,
   Typography
 } from '@mui/material';
-import React, { useState } from 'react';
 import { SelectablePrescription } from '.';
 import { AddMedicineMutationVariables } from '../../../generated/graphql';
 import PrescriptionSettingDialog from '../../SettingsView/MedicineAccordion/MedicineSettingDialog';
@@ -62,7 +61,6 @@ const PrescriptionBox: React.FC<Props> = ({
             forDays: medicationEdit.forDays!,
             strength: medicationEdit.strength!,
             perDay: medicationEdit.perDay!,
-            checkIn: '',
             selected: true
           };
         }

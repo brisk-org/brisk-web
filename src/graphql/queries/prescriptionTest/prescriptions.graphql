@@ -19,7 +19,11 @@ query Prescriptions($skip: Float!, $take: Float!) {
       strength
       perDay
       forDays
-      checkIn
+      checkIn {
+        date
+        isPaid
+        isCompleted
+      }
       other
       created_at
     }

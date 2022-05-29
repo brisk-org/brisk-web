@@ -63,9 +63,16 @@ export type ChangeSettingsInput = {
 };
 
 export type CheckIn = {
-  data: Scalars['String'];
-  isPaid: Scalars['String'];
-  isCompleted: Scalars['String'];
+  date: Scalars['String'];
+  isPaid: Scalars['Boolean'];
+  isCompleted: Scalars['Boolean'];
+};
+
+export type CheckInObjectType = {
+  __typename?: 'CheckInObjectType';
+  date: Scalars['String'];
+  isPaid: Scalars['Boolean'];
+  isCompleted: Scalars['Boolean'];
 };
 
 export type CompleteQuickLabTestInput = {
@@ -136,7 +143,7 @@ export type Medication = {
   prescription: Medication;
   strength?: Maybe<Scalars['String']>;
   perDay: PerDay;
-  checkIn: Scalars['String'];
+  checkIn: Array<CheckInObjectType>;
   forDays: Scalars['Float'];
   other?: Maybe<Scalars['String']>;
   created_at: Scalars['String'];
@@ -343,7 +350,6 @@ export type MutationDeleteHistoryArgs = {
 
 export type MutationCreatePrescriptionArgs = {
   cardId: Scalars['ID'];
-  medicationIds: Array<Scalars['ID']>;
   totalPrice: Scalars['Float'];
   rx: Scalars['String'];
 };
@@ -361,6 +367,7 @@ export type MutationMarkPrescriptionAsSeenArgs = {
 
 export type MutationCreateMedicationArgs = {
   medicineId: Scalars['ID'];
+  prescriptionId: Scalars['ID'];
   strength?: Maybe<Scalars['String']>;
   perDay: PerDay;
   checkIn: Array<CheckIn>;
@@ -438,8 +445,7 @@ export type Prescription = {
   id: Scalars['ID'];
   cardId: Scalars['Float'];
   card: Card;
-  result: Scalars['String'];
-  medications: Array<Medication>;
+  medications?: Maybe<Array<Medication>>;
   rx: Scalars['String'];
   paid: Scalars['Boolean'];
   inrolled: Scalars['Boolean'];
@@ -882,6 +888,7 @@ export type PayForLaboratoryTestMutation = (
 
 export type CreateMedicationMutationVariables = Exact<{
   medicineId: Scalars['ID'];
+  prescriptionId: Scalars['ID'];
   strength?: Maybe<Scalars['String']>;
   perDay: PerDay;
   checkIn: Array<CheckIn> | CheckIn;
@@ -894,11 +901,14 @@ export type CreateMedicationMutation = (
   { __typename?: 'Mutation' }
   & { createMedication: (
     { __typename?: 'Medication' }
-    & Pick<Medication, 'id' | 'strength' | 'forDays' | 'checkIn' | 'perDay' | 'other' | 'created_at' | 'updated_at'>
+    & Pick<Medication, 'id' | 'strength' | 'forDays' | 'perDay' | 'other' | 'created_at' | 'updated_at'>
     & { medicine: (
       { __typename?: 'Medicine' }
       & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
-    ) }
+    ), checkIn: Array<(
+      { __typename?: 'CheckInObjectType' }
+      & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+    )> }
   ) }
 );
 
@@ -970,7 +980,6 @@ export type DeleteNotificationMutation = (
 export type CreatePrescriptionMutationVariables = Exact<{
   cardId: Scalars['ID'];
   totalPrice: Scalars['Float'];
-  medicationIds: Array<Scalars['ID']> | Scalars['ID'];
   rx: Scalars['String'];
 }>;
 
@@ -983,14 +992,14 @@ export type CreatePrescriptionMutation = (
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'name'>
-    ), medications: Array<(
+    ), medications?: Maybe<Array<(
       { __typename?: 'Medication' }
       & Pick<Medication, 'id' | 'perDay' | 'forDays'>
       & { medicine: (
         { __typename?: 'Medicine' }
         & Pick<Medicine, 'id' | 'name'>
       ) }
-    )> }
+    )>> }
   ) }
 );
 
@@ -1228,14 +1237,14 @@ export type CardQuery = (
     )>>, prescriptions?: Maybe<Array<(
       { __typename?: 'Prescription' }
       & Pick<Prescription, 'id' | 'paid' | 'inrolled' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
-      & { medications: Array<(
+      & { medications?: Maybe<Array<(
         { __typename?: 'Medication' }
         & Pick<Medication, 'id' | 'strength' | 'perDay' | 'forDays' | 'other'>
         & { medicine: (
           { __typename?: 'Medicine' }
           & Pick<Medicine, 'id' | 'name' | 'price'>
         ) }
-      )> }
+      )>> }
     )>>, laboratory_tests?: Maybe<Array<(
       { __typename?: 'LaboratoryTest' }
       & Pick<LaboratoryTest, 'id' | 'cardId' | 'result' | 'paid' | 'new' | 'completed' | 'price' | 'created_at' | 'updated_at'>
@@ -1430,11 +1439,14 @@ export type MedicationQuery = (
   { __typename?: 'Query' }
   & { medication: (
     { __typename?: 'Medication' }
-    & Pick<Medication, 'id' | 'strength' | 'forDays' | 'checkIn' | 'perDay' | 'other' | 'created_at' | 'updated_at'>
+    & Pick<Medication, 'id' | 'strength' | 'forDays' | 'perDay' | 'other' | 'created_at' | 'updated_at'>
     & { medicine: (
       { __typename?: 'Medicine' }
       & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
-    ) }
+    ), checkIn: Array<(
+      { __typename?: 'CheckInObjectType' }
+      & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+    )> }
   ) }
 );
 
@@ -1445,11 +1457,14 @@ export type MedicationsQuery = (
   { __typename?: 'Query' }
   & { medications: Array<(
     { __typename?: 'Medication' }
-    & Pick<Medication, 'id' | 'strength' | 'forDays' | 'checkIn' | 'perDay' | 'other' | 'created_at' | 'updated_at'>
+    & Pick<Medication, 'id' | 'strength' | 'forDays' | 'perDay' | 'other' | 'created_at' | 'updated_at'>
     & { medicine: (
       { __typename?: 'Medicine' }
       & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
-    ) }
+    ), checkIn: Array<(
+      { __typename?: 'CheckInObjectType' }
+      & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+    )> }
   )> }
 );
 
@@ -1501,14 +1516,14 @@ export type PrescriptionQuery = (
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
-    ), medications: Array<(
+    ), medications?: Maybe<Array<(
       { __typename?: 'Medication' }
       & Pick<Medication, 'id' | 'strength' | 'perDay' | 'forDays' | 'other'>
       & { medicine: (
         { __typename?: 'Medicine' }
         & Pick<Medicine, 'id' | 'name' | 'price'>
       ) }
-    )> }
+    )>> }
   ) }
 );
 
@@ -1548,14 +1563,17 @@ export type PrescriptionsQuery = (
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
-    ), medications: Array<(
+    ), medications?: Maybe<Array<(
       { __typename?: 'Medication' }
-      & Pick<Medication, 'id' | 'strength' | 'perDay' | 'forDays' | 'checkIn' | 'other' | 'created_at'>
+      & Pick<Medication, 'id' | 'strength' | 'perDay' | 'forDays' | 'other' | 'created_at'>
       & { medicine: (
         { __typename?: 'Medicine' }
         & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
-      ) }
-    )> }
+      ), checkIn: Array<(
+        { __typename?: 'CheckInObjectType' }
+        & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+      )> }
+    )>> }
   )> }
 );
 
@@ -1574,14 +1592,17 @@ export type SearchPrescriptionsQuery = (
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
-    ), medications: Array<(
+    ), medications?: Maybe<Array<(
       { __typename?: 'Medication' }
-      & Pick<Medication, 'id' | 'strength' | 'perDay' | 'forDays' | 'checkIn' | 'other' | 'created_at'>
+      & Pick<Medication, 'id' | 'strength' | 'perDay' | 'forDays' | 'other' | 'created_at'>
       & { medicine: (
         { __typename?: 'Medicine' }
         & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
-      ) }
-    )> }
+      ), checkIn: Array<(
+        { __typename?: 'CheckInObjectType' }
+        & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+      )> }
+    )>> }
   )> }
 );
 
@@ -2352,9 +2373,10 @@ export type PayForLaboratoryTestMutationHookResult = ReturnType<typeof usePayFor
 export type PayForLaboratoryTestMutationResult = Apollo.MutationResult<PayForLaboratoryTestMutation>;
 export type PayForLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<PayForLaboratoryTestMutation, PayForLaboratoryTestMutationVariables>;
 export const CreateMedicationDocument = gql`
-    mutation CreateMedication($medicineId: ID!, $strength: String, $perDay: PerDay!, $checkIn: [CheckIn!]!, $forDays: Float!, $other: String) {
+    mutation CreateMedication($medicineId: ID!, $prescriptionId: ID!, $strength: String, $perDay: PerDay!, $checkIn: [CheckIn!]!, $forDays: Float!, $other: String) {
   createMedication(
     medicineId: $medicineId
+    prescriptionId: $prescriptionId
     strength: $strength
     perDay: $perDay
     checkIn: $checkIn
@@ -2370,7 +2392,11 @@ export const CreateMedicationDocument = gql`
     }
     strength
     forDays
-    checkIn
+    checkIn {
+      date
+      isPaid
+      isCompleted
+    }
     perDay
     other
     created_at
@@ -2394,6 +2420,7 @@ export type CreateMedicationMutationFn = Apollo.MutationFunction<CreateMedicatio
  * const [createMedicationMutation, { data, loading, error }] = useCreateMedicationMutation({
  *   variables: {
  *      medicineId: // value for 'medicineId'
+ *      prescriptionId: // value for 'prescriptionId'
  *      strength: // value for 'strength'
  *      perDay: // value for 'perDay'
  *      checkIn: // value for 'checkIn'
@@ -2610,13 +2637,8 @@ export type DeleteNotificationMutationHookResult = ReturnType<typeof useDeleteNo
 export type DeleteNotificationMutationResult = Apollo.MutationResult<DeleteNotificationMutation>;
 export type DeleteNotificationMutationOptions = Apollo.BaseMutationOptions<DeleteNotificationMutation, DeleteNotificationMutationVariables>;
 export const CreatePrescriptionDocument = gql`
-    mutation CreatePrescription($cardId: ID!, $totalPrice: Float!, $medicationIds: [ID!]!, $rx: String!) {
-  createPrescription(
-    cardId: $cardId
-    medicationIds: $medicationIds
-    totalPrice: $totalPrice
-    rx: $rx
-  ) {
+    mutation CreatePrescription($cardId: ID!, $totalPrice: Float!, $rx: String!) {
+  createPrescription(cardId: $cardId, totalPrice: $totalPrice, rx: $rx) {
     id
     card {
       name
@@ -2652,7 +2674,6 @@ export type CreatePrescriptionMutationFn = Apollo.MutationFunction<CreatePrescri
  *   variables: {
  *      cardId: // value for 'cardId'
  *      totalPrice: // value for 'totalPrice'
- *      medicationIds: // value for 'medicationIds'
  *      rx: // value for 'rx'
  *   },
  * });
@@ -3791,7 +3812,11 @@ export const MedicationDocument = gql`
     }
     strength
     forDays
-    checkIn
+    checkIn {
+      date
+      isPaid
+      isCompleted
+    }
     perDay
     other
     created_at
@@ -3839,7 +3864,11 @@ export const MedicationsDocument = gql`
     }
     strength
     forDays
-    checkIn
+    checkIn {
+      date
+      isPaid
+      isCompleted
+    }
     perDay
     other
     created_at
@@ -4154,7 +4183,11 @@ export const PrescriptionsDocument = gql`
       strength
       perDay
       forDays
-      checkIn
+      checkIn {
+        date
+        isPaid
+        isCompleted
+      }
       other
       created_at
     }
@@ -4219,7 +4252,11 @@ export const SearchPrescriptionsDocument = gql`
       strength
       perDay
       forDays
-      checkIn
+      checkIn {
+        date
+        isPaid
+        isCompleted
+      }
       other
       created_at
     }

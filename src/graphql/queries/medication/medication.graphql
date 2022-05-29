@@ -9,7 +9,11 @@ query Medication($id: ID!) {
     }
     strength
     forDays
-    checkIn
+    checkIn {
+      date
+      isPaid
+      isCompleted
+    }
     perDay
     other
     created_at

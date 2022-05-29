@@ -117,7 +117,7 @@ const SingleDetailedPrescription: React.FC<{
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List className={classes.sticky} subheader={<li />}>
           <ul className={classes.ul}>
-            {prescription.medications.map((medication, index) => {
+            {prescription.medications?.map((medication, index) => {
               return (
                 <ListItem>
                   <ListItemText
