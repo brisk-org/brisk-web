@@ -1,13 +1,7 @@
-# mutation MarkPrescriptionTestAsCompleted(
-#   $id: ID!
-#   $result: [PrescriptionInput!]!
-#   $done: Boolean!
-# ) {
-#   markPrescriptionTestAsCompleted(
-#     main: { id: $id, result: $result, done: $done }
-#   ) {
-#     id
-#     new
-#     inrolled
-#   }
-# }
+mutation MarkPrescriptionAsCompleted($id: ID!, $completed: Boolean!) {
+  markPrescriptionAsCompleted(id: $id, completed: $completed) {
+    id
+    new
+    inrolled
+  }
+}

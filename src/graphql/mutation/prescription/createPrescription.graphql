@@ -1,5 +1,5 @@
-mutation CreatePrescription($cardId: ID!, $totalPrice: Float!, $rx: String!) {
-  createPrescription(cardId: $cardId, totalPrice: $totalPrice, rx: $rx) {
+mutation CreatePrescription($cardId: ID!, $price: Float!, $rx: String!) {
+  createPrescription(cardId: $cardId, price: $price, rx: $rx) {
     id
     card {
       name

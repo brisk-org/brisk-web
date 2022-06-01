@@ -63,14 +63,25 @@ export type ChangeSettingsInput = {
 };
 
 export type CheckIn = {
+  __typename?: 'CheckIn';
   date: Scalars['String'];
+  price: Scalars['Float'];
+  status: Array<CheckInStatus>;
+};
+
+export type CheckInInput = {
+  date: Scalars['String'];
+  price: Scalars['Float'];
+  status: Array<CheckInStatusInput>;
+};
+
+export type CheckInStatus = {
+  __typename?: 'CheckInStatus';
   isPaid: Scalars['Boolean'];
   isCompleted: Scalars['Boolean'];
 };
 
-export type CheckInObjectType = {
-  __typename?: 'CheckInObjectType';
-  date: Scalars['String'];
+export type CheckInStatusInput = {
   isPaid: Scalars['Boolean'];
   isCompleted: Scalars['Boolean'];
 };
@@ -140,10 +151,10 @@ export type Medication = {
   __typename?: 'Medication';
   id: Scalars['ID'];
   medicine: Medicine;
-  prescription: Medication;
+  prescription: Prescription;
   strength?: Maybe<Scalars['String']>;
   perDay: PerDay;
-  checkIn: Array<CheckInObjectType>;
+  checkIn: Array<CheckIn>;
   forDays: Scalars['Float'];
   other?: Maybe<Scalars['String']>;
   created_at: Scalars['String'];
@@ -154,7 +165,7 @@ export type Medicine = {
   __typename?: 'Medicine';
   id: Scalars['ID'];
   name: Scalars['String'];
-  prescription: Medication;
+  medications: Medication;
   price: Scalars['Float'];
   inStock: Scalars['Float'];
   strength?: Maybe<Scalars['String']>;
@@ -191,9 +202,13 @@ export type Mutation = {
   updateHistory: History;
   deleteHistory: Scalars['Boolean'];
   createPrescription: Prescription;
+  markPrescriptionAsCompleted: Prescription;
+  updatePrescriptionCheckIn: Prescription;
+  markPrescriptionAsPaid: Prescription;
   deletePrescription: Scalars['Boolean'];
   markPrescriptionAsSeen: Prescription;
   createMedication: Medication;
+  deleteMedication: Scalars['Boolean'];
   createQuickPrescriptionTest: QuickPrescriptionTest;
   completeQuickPrescriptionTest: QuickPrescriptionTest;
   markQuickPrescriptionTestAsPaid: QuickPrescriptionTest;
@@ -350,8 +365,26 @@ export type MutationDeleteHistoryArgs = {
 
 export type MutationCreatePrescriptionArgs = {
   cardId: Scalars['ID'];
-  totalPrice: Scalars['Float'];
+  price: Scalars['Float'];
   rx: Scalars['String'];
+};
+
+
+export type MutationMarkPrescriptionAsCompletedArgs = {
+  completed: Scalars['Boolean'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationUpdatePrescriptionCheckInArgs = {
+  checkIn: Array<Array<CheckInInput>>;
+  id: Scalars['ID'];
+};
+
+
+export type MutationMarkPrescriptionAsPaidArgs = {
+  paid: Scalars['Boolean'];
+  id: Scalars['ID'];
 };
 
 
@@ -370,9 +403,14 @@ export type MutationCreateMedicationArgs = {
   prescriptionId: Scalars['ID'];
   strength?: Maybe<Scalars['String']>;
   perDay: PerDay;
-  checkIn: Array<CheckIn>;
+  checkIn: Array<CheckInInput>;
   forDays: Scalars['Float'];
   other?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationDeleteMedicationArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -899,7 +937,7 @@ export type CreateMedicationMutationVariables = Exact<{
   prescriptionId: Scalars['ID'];
   strength?: Maybe<Scalars['String']>;
   perDay: PerDay;
-  checkIn: Array<CheckIn> | CheckIn;
+  checkIn: Array<CheckInInput> | CheckInInput;
   forDays: Scalars['Float'];
   other?: Maybe<Scalars['String']>;
 }>;
@@ -914,8 +952,12 @@ export type CreateMedicationMutation = (
       { __typename?: 'Medicine' }
       & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
     ), checkIn: Array<(
-      { __typename?: 'CheckInObjectType' }
-      & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+      { __typename?: 'CheckIn' }
+      & Pick<CheckIn, 'date' | 'price'>
+      & { status: Array<(
+        { __typename?: 'CheckInStatus' }
+        & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+      )> }
     )> }
   ) }
 );
@@ -987,7 +1029,7 @@ export type DeleteNotificationMutation = (
 
 export type CreatePrescriptionMutationVariables = Exact<{
   cardId: Scalars['ID'];
-  totalPrice: Scalars['Float'];
+  price: Scalars['Float'];
   rx: Scalars['String'];
 }>;
 
@@ -1021,6 +1063,34 @@ export type DeletePrescriptionMutation = (
   & Pick<Mutation, 'deletePrescription'>
 );
 
+export type MarkPrescriptionAsCompletedMutationVariables = Exact<{
+  id: Scalars['ID'];
+  completed: Scalars['Boolean'];
+}>;
+
+
+export type MarkPrescriptionAsCompletedMutation = (
+  { __typename?: 'Mutation' }
+  & { markPrescriptionAsCompleted: (
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'new' | 'inrolled'>
+  ) }
+);
+
+export type MarkPrescriptionAsPaidMutationVariables = Exact<{
+  id: Scalars['ID'];
+  paid: Scalars['Boolean'];
+}>;
+
+
+export type MarkPrescriptionAsPaidMutation = (
+  { __typename?: 'Mutation' }
+  & { markPrescriptionAsPaid: (
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'paid' | 'inrolled'>
+  ) }
+);
+
 export type MarkPrescriptionAsSeenMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -1031,6 +1101,31 @@ export type MarkPrescriptionAsSeenMutation = (
   & { markPrescriptionAsSeen: (
     { __typename?: 'Prescription' }
     & Pick<Prescription, 'id' | 'new'>
+  ) }
+);
+
+export type UpdatePrescriptionCheckInMutationVariables = Exact<{
+  id: Scalars['ID'];
+  checkIn: Array<Array<CheckInInput> | CheckInInput> | Array<CheckInInput> | CheckInInput;
+}>;
+
+
+export type UpdatePrescriptionCheckInMutation = (
+  { __typename?: 'Mutation' }
+  & { updatePrescriptionCheckIn: (
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id'>
+    & { medications?: Maybe<Array<(
+      { __typename?: 'Medication' }
+      & { checkIn: Array<(
+        { __typename?: 'CheckIn' }
+        & Pick<CheckIn, 'date' | 'price'>
+        & { status: Array<(
+          { __typename?: 'CheckInStatus' }
+          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+        )> }
+      )> }
+    )>> }
   ) }
 );
 
@@ -1462,8 +1557,12 @@ export type MedicationQuery = (
       { __typename?: 'Medicine' }
       & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
     ), checkIn: Array<(
-      { __typename?: 'CheckInObjectType' }
-      & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+      { __typename?: 'CheckIn' }
+      & Pick<CheckIn, 'date' | 'price'>
+      & { status: Array<(
+        { __typename?: 'CheckInStatus' }
+        & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+      )> }
     )> }
   ) }
 );
@@ -1480,8 +1579,12 @@ export type MedicationsQuery = (
       { __typename?: 'Medicine' }
       & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
     ), checkIn: Array<(
-      { __typename?: 'CheckInObjectType' }
-      & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+      { __typename?: 'CheckIn' }
+      & Pick<CheckIn, 'date' | 'price'>
+      & { status: Array<(
+        { __typename?: 'CheckInStatus' }
+        & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+      )> }
     )> }
   )> }
 );
@@ -1588,8 +1691,12 @@ export type PrescriptionsQuery = (
         { __typename?: 'Medicine' }
         & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
       ), checkIn: Array<(
-        { __typename?: 'CheckInObjectType' }
-        & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+        { __typename?: 'CheckIn' }
+        & Pick<CheckIn, 'date' | 'price'>
+        & { status: Array<(
+          { __typename?: 'CheckInStatus' }
+          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+        )> }
       )> }
     )>> }
   )> }
@@ -1617,8 +1724,12 @@ export type SearchPrescriptionsQuery = (
         { __typename?: 'Medicine' }
         & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
       ), checkIn: Array<(
-        { __typename?: 'CheckInObjectType' }
-        & Pick<CheckInObjectType, 'date' | 'isPaid' | 'isCompleted'>
+        { __typename?: 'CheckIn' }
+        & Pick<CheckIn, 'date' | 'price'>
+        & { status: Array<(
+          { __typename?: 'CheckInStatus' }
+          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+        )> }
       )> }
     )>> }
   )> }
@@ -2391,7 +2502,7 @@ export type PayForLaboratoryTestMutationHookResult = ReturnType<typeof usePayFor
 export type PayForLaboratoryTestMutationResult = Apollo.MutationResult<PayForLaboratoryTestMutation>;
 export type PayForLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<PayForLaboratoryTestMutation, PayForLaboratoryTestMutationVariables>;
 export const CreateMedicationDocument = gql`
-    mutation CreateMedication($medicineId: ID!, $prescriptionId: ID!, $strength: String, $perDay: PerDay!, $checkIn: [CheckIn!]!, $forDays: Float!, $other: String) {
+    mutation CreateMedication($medicineId: ID!, $prescriptionId: ID!, $strength: String, $perDay: PerDay!, $checkIn: [CheckInInput!]!, $forDays: Float!, $other: String) {
   createMedication(
     medicineId: $medicineId
     prescriptionId: $prescriptionId
@@ -2412,8 +2523,11 @@ export const CreateMedicationDocument = gql`
     forDays
     checkIn {
       date
-      isPaid
-      isCompleted
+      price
+      status {
+        isPaid
+        isCompleted
+      }
     }
     perDay
     other
@@ -2655,8 +2769,8 @@ export type DeleteNotificationMutationHookResult = ReturnType<typeof useDeleteNo
 export type DeleteNotificationMutationResult = Apollo.MutationResult<DeleteNotificationMutation>;
 export type DeleteNotificationMutationOptions = Apollo.BaseMutationOptions<DeleteNotificationMutation, DeleteNotificationMutationVariables>;
 export const CreatePrescriptionDocument = gql`
-    mutation CreatePrescription($cardId: ID!, $totalPrice: Float!, $rx: String!) {
-  createPrescription(cardId: $cardId, totalPrice: $totalPrice, rx: $rx) {
+    mutation CreatePrescription($cardId: ID!, $price: Float!, $rx: String!) {
+  createPrescription(cardId: $cardId, price: $price, rx: $rx) {
     id
     card {
       name
@@ -2691,7 +2805,7 @@ export type CreatePrescriptionMutationFn = Apollo.MutationFunction<CreatePrescri
  * const [createPrescriptionMutation, { data, loading, error }] = useCreatePrescriptionMutation({
  *   variables: {
  *      cardId: // value for 'cardId'
- *      totalPrice: // value for 'totalPrice'
+ *      price: // value for 'price'
  *      rx: // value for 'rx'
  *   },
  * });
@@ -2734,6 +2848,78 @@ export function useDeletePrescriptionMutation(baseOptions?: Apollo.MutationHookO
 export type DeletePrescriptionMutationHookResult = ReturnType<typeof useDeletePrescriptionMutation>;
 export type DeletePrescriptionMutationResult = Apollo.MutationResult<DeletePrescriptionMutation>;
 export type DeletePrescriptionMutationOptions = Apollo.BaseMutationOptions<DeletePrescriptionMutation, DeletePrescriptionMutationVariables>;
+export const MarkPrescriptionAsCompletedDocument = gql`
+    mutation MarkPrescriptionAsCompleted($id: ID!, $completed: Boolean!) {
+  markPrescriptionAsCompleted(id: $id, completed: $completed) {
+    id
+    new
+    inrolled
+  }
+}
+    `;
+export type MarkPrescriptionAsCompletedMutationFn = Apollo.MutationFunction<MarkPrescriptionAsCompletedMutation, MarkPrescriptionAsCompletedMutationVariables>;
+
+/**
+ * __useMarkPrescriptionAsCompletedMutation__
+ *
+ * To run a mutation, you first call `useMarkPrescriptionAsCompletedMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkPrescriptionAsCompletedMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markPrescriptionAsCompletedMutation, { data, loading, error }] = useMarkPrescriptionAsCompletedMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      completed: // value for 'completed'
+ *   },
+ * });
+ */
+export function useMarkPrescriptionAsCompletedMutation(baseOptions?: Apollo.MutationHookOptions<MarkPrescriptionAsCompletedMutation, MarkPrescriptionAsCompletedMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkPrescriptionAsCompletedMutation, MarkPrescriptionAsCompletedMutationVariables>(MarkPrescriptionAsCompletedDocument, options);
+      }
+export type MarkPrescriptionAsCompletedMutationHookResult = ReturnType<typeof useMarkPrescriptionAsCompletedMutation>;
+export type MarkPrescriptionAsCompletedMutationResult = Apollo.MutationResult<MarkPrescriptionAsCompletedMutation>;
+export type MarkPrescriptionAsCompletedMutationOptions = Apollo.BaseMutationOptions<MarkPrescriptionAsCompletedMutation, MarkPrescriptionAsCompletedMutationVariables>;
+export const MarkPrescriptionAsPaidDocument = gql`
+    mutation MarkPrescriptionAsPaid($id: ID!, $paid: Boolean!) {
+  markPrescriptionAsPaid(id: $id, paid: $paid) {
+    id
+    paid
+    inrolled
+  }
+}
+    `;
+export type MarkPrescriptionAsPaidMutationFn = Apollo.MutationFunction<MarkPrescriptionAsPaidMutation, MarkPrescriptionAsPaidMutationVariables>;
+
+/**
+ * __useMarkPrescriptionAsPaidMutation__
+ *
+ * To run a mutation, you first call `useMarkPrescriptionAsPaidMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkPrescriptionAsPaidMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markPrescriptionAsPaidMutation, { data, loading, error }] = useMarkPrescriptionAsPaidMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      paid: // value for 'paid'
+ *   },
+ * });
+ */
+export function useMarkPrescriptionAsPaidMutation(baseOptions?: Apollo.MutationHookOptions<MarkPrescriptionAsPaidMutation, MarkPrescriptionAsPaidMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkPrescriptionAsPaidMutation, MarkPrescriptionAsPaidMutationVariables>(MarkPrescriptionAsPaidDocument, options);
+      }
+export type MarkPrescriptionAsPaidMutationHookResult = ReturnType<typeof useMarkPrescriptionAsPaidMutation>;
+export type MarkPrescriptionAsPaidMutationResult = Apollo.MutationResult<MarkPrescriptionAsPaidMutation>;
+export type MarkPrescriptionAsPaidMutationOptions = Apollo.BaseMutationOptions<MarkPrescriptionAsPaidMutation, MarkPrescriptionAsPaidMutationVariables>;
 export const MarkPrescriptionAsSeenDocument = gql`
     mutation MarkPrescriptionAsSeen($id: ID!) {
   markPrescriptionAsSeen(id: $id) {
@@ -2768,6 +2954,50 @@ export function useMarkPrescriptionAsSeenMutation(baseOptions?: Apollo.MutationH
 export type MarkPrescriptionAsSeenMutationHookResult = ReturnType<typeof useMarkPrescriptionAsSeenMutation>;
 export type MarkPrescriptionAsSeenMutationResult = Apollo.MutationResult<MarkPrescriptionAsSeenMutation>;
 export type MarkPrescriptionAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkPrescriptionAsSeenMutation, MarkPrescriptionAsSeenMutationVariables>;
+export const UpdatePrescriptionCheckInDocument = gql`
+    mutation UpdatePrescriptionCheckIn($id: ID!, $checkIn: [[CheckInInput!]!]!) {
+  updatePrescriptionCheckIn(id: $id, checkIn: $checkIn) {
+    id
+    medications {
+      checkIn {
+        date
+        price
+        status {
+          isPaid
+          isCompleted
+        }
+      }
+    }
+  }
+}
+    `;
+export type UpdatePrescriptionCheckInMutationFn = Apollo.MutationFunction<UpdatePrescriptionCheckInMutation, UpdatePrescriptionCheckInMutationVariables>;
+
+/**
+ * __useUpdatePrescriptionCheckInMutation__
+ *
+ * To run a mutation, you first call `useUpdatePrescriptionCheckInMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdatePrescriptionCheckInMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updatePrescriptionCheckInMutation, { data, loading, error }] = useUpdatePrescriptionCheckInMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      checkIn: // value for 'checkIn'
+ *   },
+ * });
+ */
+export function useUpdatePrescriptionCheckInMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePrescriptionCheckInMutation, UpdatePrescriptionCheckInMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdatePrescriptionCheckInMutation, UpdatePrescriptionCheckInMutationVariables>(UpdatePrescriptionCheckInDocument, options);
+      }
+export type UpdatePrescriptionCheckInMutationHookResult = ReturnType<typeof useUpdatePrescriptionCheckInMutation>;
+export type UpdatePrescriptionCheckInMutationResult = Apollo.MutationResult<UpdatePrescriptionCheckInMutation>;
+export type UpdatePrescriptionCheckInMutationOptions = Apollo.BaseMutationOptions<UpdatePrescriptionCheckInMutation, UpdatePrescriptionCheckInMutationVariables>;
 export const CompleteQuickLaboratoryTestDocument = gql`
     mutation CompleteQuickLaboratoryTest($id: String!, $price: Float, $other: String) {
   completeQuickLaboratoryTest(id: $id, input: {price: $price, other: $other}) {
@@ -3863,8 +4093,11 @@ export const MedicationDocument = gql`
     forDays
     checkIn {
       date
-      isPaid
-      isCompleted
+      price
+      status {
+        isPaid
+        isCompleted
+      }
     }
     perDay
     other
@@ -3915,8 +4148,11 @@ export const MedicationsDocument = gql`
     forDays
     checkIn {
       date
-      isPaid
-      isCompleted
+      price
+      status {
+        isPaid
+        isCompleted
+      }
     }
     perDay
     other
@@ -4234,8 +4470,11 @@ export const PrescriptionsDocument = gql`
       forDays
       checkIn {
         date
-        isPaid
-        isCompleted
+        price
+        status {
+          isPaid
+          isCompleted
+        }
       }
       other
       created_at
@@ -4303,8 +4542,11 @@ export const SearchPrescriptionsDocument = gql`
       forDays
       checkIn {
         date
-        isPaid
-        isCompleted
+        price
+        status {
+          isPaid
+          isCompleted
+        }
       }
       other
       created_at

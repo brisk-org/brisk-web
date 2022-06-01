@@ -21,8 +21,11 @@ query SearchPrescriptions($term: String!, $skip: Float!, $take: Float!) {
       forDays
       checkIn {
         date
-        isPaid
-        isCompleted
+        price
+        status {
+          isPaid
+          isCompleted
+        }
       }
       other
       created_at

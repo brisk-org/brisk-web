@@ -134,21 +134,20 @@ const PrescriptionTestFormView = () => {
       enqueueSnackbar('Select atleast One medicine', { variant: 'warning' });
       return;
     }
-    const totalPrice = selectedMedicines.reduce(
+    const price = selectedMedicines.reduce(
       (prevPrice, currentMedicine) =>
         prevPrice +
-        (currentMedicine.medicine.price * currentMedicine.forDays +
-          currentMedicine.perDay ===
-        PerDay.Bid
-          ? 2
-          : 1),
+        currentMedicine.medicine.price *
+          currentMedicine.forDays *
+          (currentMedicine.perDay === PerDay.Bid ? 2 : 1),
       0
     );
+    console.log('price', price, selectedMedicines);
     const prescription = await createPrescriptionTest({
       variables: {
         cardId: prescriptionInfo.cardId,
         rx: prescriptionInfo.rx,
-        totalPrice
+        price
       }
     });
     if (!prescription.data) {
@@ -159,29 +158,35 @@ const PrescriptionTestFormView = () => {
       enqueueSnackbar('Select atleast One medicine', { variant: 'error' });
       return;
     }
-    for (let k = 0; k < selectedMedicines.length; k++) {
+    for (let i = 0; i < selectedMedicines.length; i++) {
       const checkIn: CheckIn[] = [];
 
-      for (let i = 0; i < selectedMedicines[k].forDays; i++) {
-        checkIn.push({
-          date: add(new Date(), { days: i }).toISOString(),
-          isPaid: false,
-          isCompleted: false
-        });
-        if (selectedMedicines[k].perDay === PerDay['Bid']) {
-          checkIn.push({
-            date: add(new Date(), { days: i }).toISOString(),
+      for (let j = 0; j < selectedMedicines[i].forDays; j++) {
+        const checkInStatus = [
+          {
             isPaid: false,
             isCompleted: false
-          });
-        }
+          },
+          {
+            isPaid: false,
+            isCompleted: false
+          }
+        ];
+        checkIn.push({
+          date: add(new Date(), { days: j }).toISOString(),
+          price: selectedMedicines[i].medicine.price,
+          status: checkInStatus.splice(
+            0,
+            selectedMedicines[i].perDay === PerDay['Bid'] ? 2 : 1
+          )
+        });
       }
 
       const medication = await createMedication({
         variables: {
-          ...selectedMedicines[k],
-          prescriptionId: prescription.data.createPrescription.id,
-          medicineId: selectedMedicines[k].medicine.id,
+          ...selectedMedicines[i],
+          prescriptionId: prescription.data!.createPrescription.id,
+          medicineId: selectedMedicines[i].medicine.id,
           checkIn
         }
       });

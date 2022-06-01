@@ -11,8 +11,11 @@ query Medications {
     forDays
     checkIn {
       date
-      isPaid
-      isCompleted
+      price
+      status {
+        isPaid
+        isCompleted
+      }
     }
     perDay
     other

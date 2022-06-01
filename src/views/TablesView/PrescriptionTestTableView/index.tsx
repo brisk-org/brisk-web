@@ -86,6 +86,7 @@ const PrescriptionTestTableView = () => {
     document: NewCreatedPrescriptionDocument,
     updateQuery: (prev, { subscriptionData }) => {
       const newCreatedPrescriptionTest = subscriptionData.data;
+      console.log(subscriptionData, newCreatedPrescriptionTest);
       if (!newCreatedPrescriptionTest) return prev;
       return Object.assign({}, prev, {
         prescriptions: prev.prescriptions
@@ -116,7 +117,27 @@ const PrescriptionTestTableView = () => {
     },
     onError: err => console.log(err)
   });
-
+  subscribeToMore({
+    document: NewCreatedPrescriptionDocument,
+    updateQuery: (prev, { subscriptionData }) => {
+      const newPaidPrescriptionTest = subscriptionData.data;
+      if (!newPaidPrescriptionTest) return prev;
+      if (!prev && newPaidPrescriptionTest)
+        return { prescriptions: newPaidPrescriptionTest as any };
+      const filteredPrevWithoutPaidLaboratoryTest = prev.prescriptions.filter(
+        prescription =>
+          prescription.id !==
+          (newPaidPrescriptionTest as any).newCreatedPrescriptionTest.id
+      );
+      return Object.assign({}, prev, {
+        prescriptions: [
+          newPaidPrescriptionTest,
+          ...filteredPrevWithoutPaidLaboratoryTest
+        ]
+      });
+    },
+    onError: err => console.log(err)
+  });
   useEffect(() => {
     if (isBeingSearched) {
       setPrescriptions(searchedPrescriptionData?.searchPrescriptions);

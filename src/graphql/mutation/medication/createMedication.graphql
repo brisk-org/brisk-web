@@ -3,7 +3,7 @@ mutation CreateMedication(
   $prescriptionId: ID!
   $strength: String
   $perDay: PerDay!
-  $checkIn: [CheckIn!]!
+  $checkIn: [CheckInInput!]!
   $forDays: Float!
   $other: String
 ) {
@@ -27,8 +27,11 @@ mutation CreateMedication(
     forDays
     checkIn {
       date
-      isPaid
-      isCompleted
+      price
+      status {
+        isPaid
+        isCompleted
+      }
     }
     perDay
     other

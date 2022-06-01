@@ -79,12 +79,6 @@ const SingleDetailedPrescription: React.FC<{
       });
     }
   });
-  const handleClick = () => {
-    setOpen(!open);
-  };
-  const handleDialogOpen = () => {
-    setDialogToggle(true);
-  };
   useEffect(() => {
     if (id === prescription.id) {
       setOpen(true);
@@ -93,8 +87,10 @@ const SingleDetailedPrescription: React.FC<{
   }, [id]);
   useEffect(() => {
     if (!proceedToAction) return;
-    deletePrescription();
-    history.push('/app/data/prescription-test');
+    (async function() {
+      await deletePrescription();
+    })();
+    setDialogToggle(false);
   }, [proceedToAction]);
 
   return (
@@ -102,7 +98,7 @@ const SingleDetailedPrescription: React.FC<{
       <ListItem
         className={clsx({ [classes.queried]: prescription.id === id })}
         button
-        onClick={handleClick}
+        onClick={() => setOpen(!open)}
       >
         <ListItemText
           primary={
@@ -148,7 +144,7 @@ const SingleDetailedPrescription: React.FC<{
             state={{ dialogToggle, setDialogToggle, setProceedToAction }}
           />
           <Button
-            onClick={handleDialogOpen}
+            onClick={() => setDialogToggle(true)}
             fullWidth
             variant="contained"
             color="secondary"

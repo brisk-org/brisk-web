@@ -11,8 +11,11 @@ query Medication($id: ID!) {
     forDays
     checkIn {
       date
-      isPaid
-      isCompleted
+      price
+      status {
+        isPaid
+        isCompleted
+      }
     }
     perDay
     other

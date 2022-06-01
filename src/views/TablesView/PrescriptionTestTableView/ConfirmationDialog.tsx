@@ -17,7 +17,13 @@ import { PrescriptionTest } from '.';
 import PriceStepper from './PriceStepper';
 import { PrescriptionCheckIn } from '../../../context/SettingContext';
 import AlertDialog from '../../../components/AlertDialog';
-import { PrescriptionsQuery } from '../../../generated/graphql';
+import {
+  CheckIn,
+  PerDay,
+  PrescriptionsQuery,
+  useMarkPrescriptionAsPaidMutation,
+  useUpdatePrescriptionCheckInMutation
+} from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -40,10 +46,11 @@ const useStyles = makeStyles(theme => ({
 // export type CheckInPrice = { name: string; };
 export type PrescriptionCheckIns = {
   name: string;
+  perDay: PerDay;
   paid: number;
   remaining: number;
   paidToday: number;
-  checkIn: PrescriptionCheckIn[];
+  checkIn: CheckIn[];
 };
 interface ConfirmationDialogProps {
   open: boolean;
@@ -61,30 +68,23 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   const [proceedToAction, setProceedToAction] = useState(false);
 
   // const [checkInPrices, setCheckInPrices] = useState<CheckInPrice[]>();
-  const [prescriptionsCheckIn, setPrescriptionsCheckIn] = useState<
+  const [medicationsCheckIn, setMedicationsCheckIn] = useState<
     PrescriptionCheckIns[]
   >();
 
   useEffect(() => {
     if (!open) return;
-    // setPrescriptionsCheckIn(
-    // prescription.medications.map(medication => ({
-    //   name: medication.medicine.name,
-    //   remaining: medication.checkIn.reduce(
-    //     (prevValue, currentCheckIn) => prevValue + currentCheckIn.price,
-    //     0
-    //   ),
-    //   paid: 0,
-    //   paidToday: 0,
-    //   checkIn: checkInArray
-    //     .filter((checkIn, index) =>
-    //       checkIn.perDay === 'BID' ? index % 2 === 1 : true
-    //     )
-    //     .map(checkIn => ({
-    //       ...checkIn,
-    //       price: checkIn.perDay === 'BID' ? checkIn.price * 2 : checkIn.price
-    //     }))
-    // })))
+    setMedicationsCheckIn(
+      prescription.medications?.map(medication => ({
+        name: medication.medicine.name,
+        remaining: medication.medicine.price,
+        perDay: medication.perDay,
+        paid: 0,
+        paidToday: 0,
+        checkIn: medication.checkIn
+      }))
+    );
+    console.log(medicationsCheckIn, prescription.medications);
   }, [open, prescription.medications]);
 
   useEffect(() => {
@@ -93,58 +93,26 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     }
   }, [proceedToAction]);
 
+  const [
+    updatePrescriptionCheckIn,
+    { loading }
+  ] = useUpdatePrescriptionCheckInMutation();
   // const [
-  //   markPrescriptionTestAsPaid,
+  //   markPrescriptionAsPaid,
   //   { loading }
-  // ] = useMarkPrescriptionTestAsPaidMutation();
+  // ] = useMarkPrescriptionAsPaidMutation();
 
   const handleClose = () => {
     setOpen(false);
   };
   const handleSuccess = async () => {
-    // await markPrescriptionTestAsPaid({
-    //   variables: {
-    //     id: prescription.id,
-    //     result: prescription.result.map(result => {
-    //       const currentCheckIn = prescriptionsCheckIn!.find(
-    //         prescriptionsCheckIn => prescriptionsCheckIn.name === result.name
-    //       )!.checkIn;
-    //       const sortedCheckIn: PrescriptionCheckIn[] = [];
-    //       //           if (currentCheckIn[0].perDay === 'BID') {
-    //       //             for (let i = 0; i < currentCheckIn.length / 2; i++) {
-    //       //               sortedCheckIn.push({...currentCheckIn[i], price: currentCheckIn[i].price / 2});
-    //       //               sortedCheckIn.push(
-    //       // {...currentCheckIn[equivalent], price: currentCheckIn[i].price / 2}
-    //       //               );
-    //       //             }
-    //       //           }
-    //       if (currentCheckIn[0].perDay === 'BID') {
-    //         for (let i = 0; i < currentCheckIn.length; i++) {
-    //           sortedCheckIn.push({
-    //             ...currentCheckIn[i],
-    //             price: currentCheckIn[i].price / 2
-    //           });
-    //           sortedCheckIn.push({
-    //             ...currentCheckIn[i],
-    //             price: currentCheckIn[i].price / 2
-    //           });
-    //         }
-    //       }
-    //       return {
-    //         ...result,
-    //         checkIn: JSON.stringify(
-    //           currentCheckIn[0].perDay === 'BID'
-    //             ? sortedCheckIn
-    //             : currentCheckIn
-    //         )
-    //       };
-    //     }),
-    //     done: prescriptionsCheckIn!.every(
-    //       prescriptionCheckIn => prescriptionCheckIn.remaining === 0
-    //     )
-    //   }
-    // });
-    // setOpen(false);
+    await updatePrescriptionCheckIn({
+      variables: {
+        id: prescription.id,
+        checkIn: medicationsCheckIn!.map(({ checkIn }) => checkIn)
+      }
+    });
+    setOpen(false);
   };
 
   return (
@@ -178,13 +146,13 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           </Typography>
           <Typography variant="body1" gutterBottom>
             Paid(
-            {prescriptionsCheckIn?.reduce(
+            {medicationsCheckIn?.reduce(
               (prevPrice, currentCheckInPrices) =>
                 prevPrice + currentCheckInPrices.paid,
               0
             )}
             etb) Remaining: (
-            {prescriptionsCheckIn?.reduce(
+            {medicationsCheckIn?.reduce(
               (prevPrice, currentCheckInPrices) =>
                 prevPrice + currentCheckInPrices.remaining,
               0
@@ -193,24 +161,24 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           </Typography>
           <Typography variant="body2" gutterBottom>
             Paid Today: (
-            {prescriptionsCheckIn?.reduce(
+            {medicationsCheckIn?.reduce(
               (prevPrice, currentCheckInPrices) =>
                 prevPrice + currentCheckInPrices.paidToday,
               0
             )}
             etb)
           </Typography>
-          {prescriptionsCheckIn &&
-            prescriptionsCheckIn.map(prescriptionCheckIn => (
+          {medicationsCheckIn &&
+            medicationsCheckIn.map(medicationCheckIn => (
               <PriceStepper
-                prescriptionCheckIn={prescriptionCheckIn}
+                prescriptionCheckIn={medicationCheckIn}
                 lastCheckIn={
-                  (prescription.medications?.find(
+                  prescription.medications?.find(
                     medication =>
-                      medication.medicine.name === prescriptionCheckIn.name
-                  )?.checkIn as unknown) as PrescriptionCheckIn[]
+                      medication.medicine.name === medicationCheckIn.name
+                  )?.checkIn
                 }
-                setPrescriptionsCheckIn={setPrescriptionsCheckIn}
+                setPrescriptionsCheckIn={setMedicationsCheckIn}
               />
             ))}
         </DialogContent>
@@ -222,8 +190,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             onClick={() => setAlertDialogToggle(true)}
             color="primary"
           >
-            {/* {!loading ? 'Payment Successful' : 'Submitting...'} */}
-            jj
+            {!loading ? 'Payment Successful' : 'Submitting...'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -25,7 +25,6 @@ import { useSnackbar } from 'notistack';
 
 const inititalMedicine: AddMedicineMutationVariables = {
   name: '',
-  forDays: 1,
   perDay: PerDay.Stat,
   price: 0,
   inStock: 0,

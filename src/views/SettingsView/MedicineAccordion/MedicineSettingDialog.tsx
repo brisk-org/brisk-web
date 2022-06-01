@@ -45,13 +45,13 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
       | SelectChangeEvent<string>
   ) => {
     const eventName = event.target.name;
-    let value: number | string = event.target.value;
+    let value: number | string | undefined = event.target.value;
     if (
       eventName === 'price' ||
       eventName === 'forDays' ||
       eventName === 'inStock'
     ) {
-      value = parseInt(event.target.value) || '';
+      value = parseInt(event.target.value) || undefined;
     }
     setMedicine(prevPrescription => ({
       ...prevPrescription,
@@ -81,7 +81,8 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
                   <TextField
                     required
                     name="price"
-                    value={medicine.price}
+                    type="number"
+                    value={medicine.price || ''}
                     label="Price"
                     onChange={handleChange}
                     variant="standard"
@@ -90,7 +91,8 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
                   <TextField
                     required
                     name="inStock"
-                    value={medicine.inStock}
+                    type="number"
+                    value={medicine.inStock || ''}
                     label="In Stock"
                     onChange={handleChange}
                     variant="standard"
@@ -101,7 +103,8 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
               <TextField
                 required={type === 'request'}
                 name="forDays"
-                value={medicine.forDays}
+                type="number"
+                value={medicine.forDays || ''}
                 label="For: "
                 onChange={handleChange}
                 margin="dense"

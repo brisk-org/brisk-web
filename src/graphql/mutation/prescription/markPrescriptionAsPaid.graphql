@@ -1,11 +1,7 @@
-# mutation MarkPrescriptionTestAsPaid(
-#   $id: ID!
-#   $result: [PrescriptionInput!]!
-#   $done: Boolean!
-# ) {
-#   markPrescriptionTestAsPaid(main: { id: $id, result: $result, done: $done }) {
-#     id
-#     paid
-#     inrolled
-#   }
-# }
+mutation MarkPrescriptionAsPaid($id: ID!, $paid: Boolean!) {
+  markPrescriptionAsPaid(id: $id, paid: $paid) {
+    id
+    paid
+    inrolled
+  }
+}
