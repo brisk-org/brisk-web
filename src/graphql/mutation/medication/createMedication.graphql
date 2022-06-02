@@ -1,41 +1,41 @@
-mutation CreateMedication(
-  $medicineId: ID!
-  $prescriptionId: ID!
-  $strength: String
-  $perDay: PerDay!
-  $checkIn: [CheckInInput!]!
-  $forDays: Float!
-  $other: String
-) {
-  createMedication(
-    medicineId: $medicineId
-    prescriptionId: $prescriptionId
-    strength: $strength
-    perDay: $perDay
-    checkIn: $checkIn
-    forDays: $forDays
-    other: $other
-  ) {
-    id
-    medicine {
-      id
-      name
-      price
-      inStock
-    }
-    strength
-    forDays
-    checkIn {
-      date
-      price
-      status {
-        isPaid
-        isCompleted
-      }
-    }
-    perDay
-    other
-    created_at
-    updated_at
-  }
-}
+# mutation CreateMedication(
+#   $medicineId: ID!
+#   $prescriptionId: ID!
+#   $strength: String
+#   $perDay: PerDay!
+#   $checkIn: [CheckInInput!]!
+#   $forDays: Float!
+#   $other: String
+# ) {
+#   createMedication(
+#     medicineId: $medicineId
+#     prescriptionId: $prescriptionId
+#     strength: $strength
+#     perDay: $perDay
+#     checkIn: $checkIn
+#     forDays: $forDays
+#     other: $other
+#   ) {
+#     id
+#     medicine {
+#       id
+#       name
+#       price
+#       inStock
+#     }
+#     strength
+#     forDays
+#     checkIn {
+#       date
+#       price
+#       status {
+#         isPaid
+#         isCompleted
+#       }
+#     }
+#     perDay
+#     other
+#     created_at
+#     updated_at
+#   }
+# }

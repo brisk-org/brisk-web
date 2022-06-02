@@ -5,6 +5,7 @@ import Page from '../../../components/Page';
 import QuickLabTestForm from './QuickLabTestForm';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
+  NotificationAction,
   useCompleteQuickLaboratoryTestMutation,
   useCreateQuickLaboratoryTestMutation
 } from '../../../generated/graphql';
@@ -66,10 +67,10 @@ const QuickLaboratoryTestFormView = () => {
   const [completeQuickLabTest] = useCompleteQuickLaboratoryTestMutation({
     onError: err => console.log(err),
     onCompleted() {
-      const viewedNotif = notifications.find(
+      const viewedNotif = notifications?.find(
         notif =>
-          notif.quick_laboratory_test_id === Number(qLabTest.id) &&
-          (notif.action as NotifAction) === 'CREATE_QUICK_LABORATORY_TEST'
+          notif.quick_laboratory_test?.id === qLabTest.id &&
+          notif.action === NotificationAction['Complete']
       );
       viewedNotif && handleDeleteNotification(viewedNotif.id);
     }

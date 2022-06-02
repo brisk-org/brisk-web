@@ -1,5 +1,15 @@
-mutation CreatePrescription($cardId: ID!, $price: Float!, $rx: String!) {
-  createPrescription(cardId: $cardId, price: $price, rx: $rx) {
+mutation CreatePrescription(
+  $cardId: ID!
+  $price: Float!
+  $rx: String!
+  $medications: [CreateMedicationsInput!]!
+) {
+  createPrescription(
+    cardId: $cardId
+    price: $price
+    rx: $rx
+    medications: $medications
+  ) {
     id
     card {
       name

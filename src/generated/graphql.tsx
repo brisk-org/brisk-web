@@ -19,6 +19,7 @@ export type Card = {
   id: Scalars['ID'];
   laboratory_tests?: Maybe<Array<LaboratoryTest>>;
   prescriptions?: Maybe<Array<Prescription>>;
+  notifications?: Maybe<Array<Notification>>;
   name: Scalars['String'];
   phone: Scalars['String'];
   age: Scalars['String'];
@@ -102,6 +103,16 @@ export type CreateLaboratoryTestInput = {
   result: Scalars['String'];
 };
 
+export type CreateMedicationsInput = {
+  medicineId: Scalars['ID'];
+  strength?: Maybe<Scalars['String']>;
+  perDay: PerDay;
+  /** getting this array from the client and stringify it  */
+  checkIn: Array<CheckInInput>;
+  forDays: Scalars['Float'];
+  other?: Maybe<Scalars['String']>;
+};
+
 export type CreateQuickLabTestInput = {
   name: Scalars['String'];
   price?: Maybe<Scalars['Float']>;
@@ -138,6 +149,7 @@ export type LaboratoryTest = {
   id: Scalars['ID'];
   cardId: Scalars['Float'];
   card: Card;
+  notifications?: Maybe<Array<Notification>>;
   result: Scalars['String'];
   paid: Scalars['Boolean'];
   price: Scalars['Float'];
@@ -151,6 +163,7 @@ export type Medication = {
   __typename?: 'Medication';
   id: Scalars['ID'];
   medicine: Medicine;
+  medicineId: Scalars['String'];
   prescription: Prescription;
   strength?: Maybe<Scalars['String']>;
   perDay: PerDay;
@@ -365,6 +378,7 @@ export type MutationDeleteHistoryArgs = {
 
 export type MutationCreatePrescriptionArgs = {
   cardId: Scalars['ID'];
+  medications: Array<CreateMedicationsInput>;
   price: Scalars['Float'];
   rx: Scalars['String'];
 };
@@ -395,17 +409,6 @@ export type MutationDeletePrescriptionArgs = {
 
 export type MutationMarkPrescriptionAsSeenArgs = {
   id: Scalars['ID'];
-};
-
-
-export type MutationCreateMedicationArgs = {
-  medicineId: Scalars['ID'];
-  prescriptionId: Scalars['ID'];
-  strength?: Maybe<Scalars['String']>;
-  perDay: PerDay;
-  checkIn: Array<CheckInInput>;
-  forDays: Scalars['Float'];
-  other?: Maybe<Scalars['String']>;
 };
 
 
@@ -463,15 +466,24 @@ export type MutationDeleteNotificationArgs = {
 export type Notification = {
   __typename?: 'Notification';
   id: Scalars['ID'];
-  desc: Scalars['String'];
-  card_id?: Maybe<Scalars['Float']>;
-  laboratory_test_id?: Maybe<Scalars['Float']>;
-  prescription_id?: Maybe<Scalars['Float']>;
-  quick_prescription_test_id?: Maybe<Scalars['Float']>;
-  quick_laboratory_test_id?: Maybe<Scalars['Float']>;
-  action: Scalars['String'];
+  for: Array<Occupation>;
+  message: Scalars['String'];
+  action: NotificationAction;
+  card?: Maybe<Card>;
+  laboratory_test?: Maybe<LaboratoryTest>;
+  prescription?: Maybe<Prescription>;
+  quick_prescription_test?: Maybe<QuickPrescriptionTest>;
+  quick_laboratory_test?: Maybe<QuickLaboratoryTest>;
   created_at: Scalars['String'];
 };
+
+export enum NotificationAction {
+  Payment = 'PAYMENT',
+  Create = 'CREATE',
+  MarkAsNew = 'MARK_AS_NEW',
+  Complete = 'COMPLETE',
+  CheckIn = 'CHECK_IN'
+}
 
 export enum Occupation {
   Admin = 'ADMIN',
@@ -492,6 +504,7 @@ export type Prescription = {
   cardId: Scalars['Float'];
   card: Card;
   medications?: Maybe<Array<Medication>>;
+  notifications?: Maybe<Array<Notification>>;
   rx: Scalars['String'];
   paid: Scalars['Boolean'];
   inrolled: Scalars['Boolean'];
@@ -638,6 +651,7 @@ export type QuickLaboratoryTest = {
   __typename?: 'QuickLaboratoryTest';
   id: Scalars['ID'];
   name: Scalars['String'];
+  notifications?: Maybe<Array<Notification>>;
   price: Scalars['Float'];
   completed: Scalars['Boolean'];
   new: Scalars['Boolean'];
@@ -652,6 +666,7 @@ export type QuickPrescriptionTest = {
   __typename?: 'QuickPrescriptionTest';
   id: Scalars['ID'];
   name: Scalars['String'];
+  notifications?: Maybe<Array<Notification>>;
   price: Scalars['Float'];
   completed: Scalars['Boolean'];
   new: Scalars['Boolean'];
@@ -932,36 +947,6 @@ export type PayForLaboratoryTestMutation = (
   ) }
 );
 
-export type CreateMedicationMutationVariables = Exact<{
-  medicineId: Scalars['ID'];
-  prescriptionId: Scalars['ID'];
-  strength?: Maybe<Scalars['String']>;
-  perDay: PerDay;
-  checkIn: Array<CheckInInput> | CheckInInput;
-  forDays: Scalars['Float'];
-  other?: Maybe<Scalars['String']>;
-}>;
-
-
-export type CreateMedicationMutation = (
-  { __typename?: 'Mutation' }
-  & { createMedication: (
-    { __typename?: 'Medication' }
-    & Pick<Medication, 'id' | 'strength' | 'forDays' | 'perDay' | 'other' | 'created_at' | 'updated_at'>
-    & { medicine: (
-      { __typename?: 'Medicine' }
-      & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
-    ), checkIn: Array<(
-      { __typename?: 'CheckIn' }
-      & Pick<CheckIn, 'date' | 'price'>
-      & { status: Array<(
-        { __typename?: 'CheckInStatus' }
-        & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
-      )> }
-    )> }
-  ) }
-);
-
 export type AddMedicineMutationVariables = Exact<{
   name: Scalars['String'];
   price: Scalars['Float'];
@@ -1031,6 +1016,7 @@ export type CreatePrescriptionMutationVariables = Exact<{
   cardId: Scalars['ID'];
   price: Scalars['Float'];
   rx: Scalars['String'];
+  medications: Array<CreateMedicationsInput> | CreateMedicationsInput;
 }>;
 
 
@@ -1620,7 +1606,31 @@ export type NotificationsQuery = (
   { __typename?: 'Query' }
   & { notifications: Array<(
     { __typename?: 'Notification' }
-    & Pick<Notification, 'id' | 'desc' | 'card_id' | 'laboratory_test_id' | 'prescription_id' | 'quick_laboratory_test_id' | 'quick_prescription_test_id' | 'action' | 'created_at'>
+    & Pick<Notification, 'id' | 'message' | 'for' | 'action' | 'created_at'>
+    & { card?: Maybe<(
+      { __typename?: 'Card' }
+      & Pick<Card, 'id' | 'name'>
+    )>, laboratory_test?: Maybe<(
+      { __typename?: 'LaboratoryTest' }
+      & Pick<LaboratoryTest, 'id' | 'created_at'>
+      & { card: (
+        { __typename?: 'Card' }
+        & Pick<Card, 'id' | 'name'>
+      ) }
+    )>, prescription?: Maybe<(
+      { __typename?: 'Prescription' }
+      & Pick<Prescription, 'id' | 'created_at'>
+      & { card: (
+        { __typename?: 'Card' }
+        & Pick<Card, 'id' | 'name'>
+      ) }
+    )>, quick_laboratory_test?: Maybe<(
+      { __typename?: 'QuickLaboratoryTest' }
+      & Pick<QuickLaboratoryTest, 'id' | 'name'>
+    )>, quick_prescription_test?: Maybe<(
+      { __typename?: 'QuickPrescriptionTest' }
+      & Pick<QuickPrescriptionTest, 'id' | 'name'>
+    )> }
   )> }
 );
 
@@ -1880,7 +1890,31 @@ export type NewNotificationSubscriptionSubscription = (
   { __typename?: 'Subscription' }
   & { newNotificationSubscription: (
     { __typename?: 'Notification' }
-    & Pick<Notification, 'id' | 'desc' | 'card_id' | 'laboratory_test_id' | 'prescription_id' | 'quick_laboratory_test_id' | 'quick_prescription_test_id' | 'action' | 'created_at'>
+    & Pick<Notification, 'id' | 'message' | 'for' | 'action' | 'created_at'>
+    & { card?: Maybe<(
+      { __typename?: 'Card' }
+      & Pick<Card, 'id' | 'name'>
+    )>, laboratory_test?: Maybe<(
+      { __typename?: 'LaboratoryTest' }
+      & Pick<LaboratoryTest, 'id' | 'created_at'>
+      & { card: (
+        { __typename?: 'Card' }
+        & Pick<Card, 'id' | 'name'>
+      ) }
+    )>, prescription?: Maybe<(
+      { __typename?: 'Prescription' }
+      & Pick<Prescription, 'id' | 'created_at'>
+      & { card: (
+        { __typename?: 'Card' }
+        & Pick<Card, 'id' | 'name'>
+      ) }
+    )>, quick_laboratory_test?: Maybe<(
+      { __typename?: 'QuickLaboratoryTest' }
+      & Pick<QuickLaboratoryTest, 'id' | 'name'>
+    )>, quick_prescription_test?: Maybe<(
+      { __typename?: 'QuickPrescriptionTest' }
+      & Pick<QuickPrescriptionTest, 'id' | 'name'>
+    )> }
   ) }
 );
 
@@ -2501,73 +2535,6 @@ export function usePayForLaboratoryTestMutation(baseOptions?: Apollo.MutationHoo
 export type PayForLaboratoryTestMutationHookResult = ReturnType<typeof usePayForLaboratoryTestMutation>;
 export type PayForLaboratoryTestMutationResult = Apollo.MutationResult<PayForLaboratoryTestMutation>;
 export type PayForLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<PayForLaboratoryTestMutation, PayForLaboratoryTestMutationVariables>;
-export const CreateMedicationDocument = gql`
-    mutation CreateMedication($medicineId: ID!, $prescriptionId: ID!, $strength: String, $perDay: PerDay!, $checkIn: [CheckInInput!]!, $forDays: Float!, $other: String) {
-  createMedication(
-    medicineId: $medicineId
-    prescriptionId: $prescriptionId
-    strength: $strength
-    perDay: $perDay
-    checkIn: $checkIn
-    forDays: $forDays
-    other: $other
-  ) {
-    id
-    medicine {
-      id
-      name
-      price
-      inStock
-    }
-    strength
-    forDays
-    checkIn {
-      date
-      price
-      status {
-        isPaid
-        isCompleted
-      }
-    }
-    perDay
-    other
-    created_at
-    updated_at
-  }
-}
-    `;
-export type CreateMedicationMutationFn = Apollo.MutationFunction<CreateMedicationMutation, CreateMedicationMutationVariables>;
-
-/**
- * __useCreateMedicationMutation__
- *
- * To run a mutation, you first call `useCreateMedicationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateMedicationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createMedicationMutation, { data, loading, error }] = useCreateMedicationMutation({
- *   variables: {
- *      medicineId: // value for 'medicineId'
- *      prescriptionId: // value for 'prescriptionId'
- *      strength: // value for 'strength'
- *      perDay: // value for 'perDay'
- *      checkIn: // value for 'checkIn'
- *      forDays: // value for 'forDays'
- *      other: // value for 'other'
- *   },
- * });
- */
-export function useCreateMedicationMutation(baseOptions?: Apollo.MutationHookOptions<CreateMedicationMutation, CreateMedicationMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateMedicationMutation, CreateMedicationMutationVariables>(CreateMedicationDocument, options);
-      }
-export type CreateMedicationMutationHookResult = ReturnType<typeof useCreateMedicationMutation>;
-export type CreateMedicationMutationResult = Apollo.MutationResult<CreateMedicationMutation>;
-export type CreateMedicationMutationOptions = Apollo.BaseMutationOptions<CreateMedicationMutation, CreateMedicationMutationVariables>;
 export const AddMedicineDocument = gql`
     mutation AddMedicine($name: String!, $price: Float!, $inStock: Float!, $strength: String, $perDay: PerDay, $forDays: Float) {
   addMedicine(
@@ -2769,8 +2736,13 @@ export type DeleteNotificationMutationHookResult = ReturnType<typeof useDeleteNo
 export type DeleteNotificationMutationResult = Apollo.MutationResult<DeleteNotificationMutation>;
 export type DeleteNotificationMutationOptions = Apollo.BaseMutationOptions<DeleteNotificationMutation, DeleteNotificationMutationVariables>;
 export const CreatePrescriptionDocument = gql`
-    mutation CreatePrescription($cardId: ID!, $price: Float!, $rx: String!) {
-  createPrescription(cardId: $cardId, price: $price, rx: $rx) {
+    mutation CreatePrescription($cardId: ID!, $price: Float!, $rx: String!, $medications: [CreateMedicationsInput!]!) {
+  createPrescription(
+    cardId: $cardId
+    price: $price
+    rx: $rx
+    medications: $medications
+  ) {
     id
     card {
       name
@@ -2807,6 +2779,7 @@ export type CreatePrescriptionMutationFn = Apollo.MutationFunction<CreatePrescri
  *      cardId: // value for 'cardId'
  *      price: // value for 'price'
  *      rx: // value for 'rx'
+ *      medications: // value for 'medications'
  *   },
  * });
  */
@@ -4277,12 +4250,36 @@ export const NotificationsDocument = gql`
     query Notifications {
   notifications {
     id
-    desc
-    card_id
-    laboratory_test_id
-    prescription_id
-    quick_laboratory_test_id
-    quick_prescription_test_id
+    message
+    card {
+      id
+      name
+    }
+    laboratory_test {
+      id
+      card {
+        id
+        name
+      }
+      created_at
+    }
+    prescription {
+      id
+      card {
+        id
+        name
+      }
+      created_at
+    }
+    quick_laboratory_test {
+      id
+      name
+    }
+    quick_prescription_test {
+      id
+      name
+    }
+    for
     action
     created_at
   }
@@ -5022,12 +5019,36 @@ export const NewNotificationSubscriptionDocument = gql`
     subscription NewNotificationSubscription {
   newNotificationSubscription {
     id
-    desc
-    card_id
-    laboratory_test_id
-    prescription_id
-    quick_laboratory_test_id
-    quick_prescription_test_id
+    message
+    card {
+      id
+      name
+    }
+    laboratory_test {
+      id
+      card {
+        id
+        name
+      }
+      created_at
+    }
+    prescription {
+      id
+      card {
+        id
+        name
+      }
+      created_at
+    }
+    quick_laboratory_test {
+      id
+      name
+    }
+    quick_prescription_test {
+      id
+      name
+    }
+    for
     action
     created_at
   }

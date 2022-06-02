@@ -1,12 +1,36 @@
 subscription NewNotificationSubscription {
   newNotificationSubscription {
     id
-    desc
-    card_id
-    laboratory_test_id
-    prescription_id
-    quick_laboratory_test_id
-    quick_prescription_test_id
+    message
+    card {
+      id
+      name
+    }
+    laboratory_test {
+      id
+      card {
+        id
+        name
+      }
+      created_at
+    }
+    prescription {
+      id
+      card {
+        id
+        name
+      }
+      created_at
+    }
+    quick_laboratory_test {
+      id
+      name
+    }
+    quick_prescription_test {
+      id
+      name
+    }
+    for
     action
     created_at
   }

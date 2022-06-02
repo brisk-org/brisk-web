@@ -120,14 +120,14 @@ const TopBar: React.FC<{ onMobileNavOpen: () => void }> = ({
             </Typography>
           ) : (
             <List className={classes.list}>
-              {notifications.map(({ id, desc, action }, index) => {
+              {notifications?.map(({ id, message, action }, index) => {
                 return (
                   <ListItem
                     style={{ borderTop: index !== 0 ? '1px solid gray' : '' }}
                     key={index}
                   >
                     <ListItemText
-                      primary={desc}
+                      primary={message}
                       secondary={action}
                       style={{
                         minWidth: 300,

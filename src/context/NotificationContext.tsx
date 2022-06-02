@@ -4,10 +4,17 @@ import {
   SnackbarMessage,
   useSnackbar
 } from 'notistack';
-import React, { createContext, useContext, useEffect, useReducer } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useState
+} from 'react';
 import { NotifAction } from '../@types/Notification';
 import {
   Notification,
+  NotificationsQuery,
   useNotificationsQuery,
   NewNotificationSubscriptionDocument,
   useClearNotificationMutation,
@@ -19,7 +26,7 @@ import { AuthContext } from './AuthContext';
 
 type ContextType = {
   count: number;
-  notifications: Notification[];
+  notifications?: NotificationsQuery['notifications'];
   handleClearNotifications: () => Promise<boolean | undefined>;
   handleDeleteNotification: (id: string) => Promise<boolean | undefined>;
 };
@@ -46,94 +53,97 @@ type Action = {
     ) => SnackbarKey;
   };
 };
-const notificationReducer = function(
-  state: State,
-  { type, payload: { notification, enqueueSnackbar, newNotification } }: Action
-) {
-  switch (type) {
-    case Occupation.Admin:
-      const doctorNotif = notification.filter(
-        ({ action }) =>
-          (action as NotifAction) === 'COMPLETE_LABORATORY_TEST' ||
-          (action as NotifAction) === 'COMPLETE_PRESCRIPTION' ||
-          (action as NotifAction) === 'MARK_CARD_AS_NEW' ||
-          (action as NotifAction) === 'CREATE_CARD' ||
-          (action as NotifAction) === 'PAY_FOR_QUICK_LABORATORY_TEST' ||
-          (action as NotifAction) === 'PAY_FOR_QUICK_PRESCRIPTION_TEST'
-      );
-      enqueueSnackbar &&
-        doctorNotif[0] === newNotification &&
-        enqueueSnackbar(newNotification.desc, {
-          variant: 'success'
-        });
-      return {
-        notifications: doctorNotif,
-        count: doctorNotif.length
-      };
-    case Occupation.Reception:
-      const receptionNotif = notification.filter(
-        ({ action }) =>
-          (action as NotifAction) === 'CREATE_PRESCRIPTION' ||
-          (action as NotifAction) === 'CREATE_LABORATORY_TEST' ||
-          (action as NotifAction) === 'COMPLETE_QUICK_LABORATORY_TEST' ||
-          (action as NotifAction) === 'COMPLETE_QUICK_PRESCRIPTION_TEST'
-      );
-      enqueueSnackbar &&
-        receptionNotif[0] === newNotification &&
-        enqueueSnackbar(newNotification.desc, {
-          variant: 'success'
-        });
-      return {
-        notifications: receptionNotif,
-        count: receptionNotif.length
-      };
-    case Occupation.Laboratory:
-      const laboratoryNotification = notification.filter(
-        ({ action }) =>
-          (action as NotifAction) === 'PAY_FOR_LABORATORY_TEST' ||
-          (action as NotifAction) === 'CREATE_QUICK_LABORATORY_TEST'
-      );
-      enqueueSnackbar &&
-        laboratoryNotification[0] === newNotification &&
-        enqueueSnackbar(newNotification.desc, {
-          variant: 'success'
-        });
-      return {
-        notifications: laboratoryNotification,
-        count: laboratoryNotification.length
-      };
-    case Occupation.Nurse:
-      const prescriptionNotification = notification.filter(
-        ({ action }) =>
-          (action as NotifAction) === 'PAY_FOR_PRESCRIPTION' ||
-          (action as NotifAction) === 'CREATE_QUICK_PRESCRIPTION_TEST'
-      );
-      enqueueSnackbar &&
-        prescriptionNotification[0] === newNotification &&
-        enqueueSnackbar(newNotification.desc, {
-          variant: 'success'
-        });
-      return {
-        notifications: prescriptionNotification,
-        count: prescriptionNotification.length
-      };
+// const notificationReducer = function(
+//   state: State,
+//   { type, payload: { notification, enqueueSnackbar, newNotification } }: Action
+// ) {
+//   switch (type) {
+//     case Occupation.Admin:
+//       const doctorNotif = notification.filter(
+//         ({ action }) =>
+//           (action as NotifAction) === 'COMPLETE_LABORATORY_TEST' ||
+//           (action as NotifAction) === 'COMPLETE_PRESCRIPTION' ||
+//           (action as NotifAction) === 'MARK_CARD_AS_NEW' ||
+//           (action as NotifAction) === 'CREATE_CARD' ||
+//           (action as NotifAction) === 'PAY_FOR_QUICK_LABORATORY_TEST' ||
+//           (action as NotifAction) === 'PAY_FOR_QUICK_PRESCRIPTION_TEST'
+//       );
+//       enqueueSnackbar &&
+//         doctorNotif[0] === newNotification &&
+//         enqueueSnackbar(newNotification.desc, {
+//           variant: 'success'
+//         });
+//       return {
+//         notifications: doctorNotif,
+//         count: doctorNotif.length
+//       };
+//     case Occupation.Reception:
+//       const receptionNotif = notification.filter(
+//         ({ action }) =>
+//           (action as NotifAction) === 'CREATE_PRESCRIPTION' ||
+//           (action as NotifAction) === 'CREATE_LABORATORY_TEST' ||
+//           (action as NotifAction) === 'COMPLETE_QUICK_LABORATORY_TEST' ||
+//           (action as NotifAction) === 'COMPLETE_QUICK_PRESCRIPTION_TEST'
+//       );
+//       enqueueSnackbar &&
+//         receptionNotif[0] === newNotification &&
+//         enqueueSnackbar(newNotification.desc, {
+//           variant: 'success'
+//         });
+//       return {
+//         notifications: receptionNotif,
+//         count: receptionNotif.length
+//       };
+//     case Occupation.Laboratory:
+//       const laboratoryNotification = notification.filter(
+//         ({ action }) =>
+//           (action as NotifAction) === 'PAY_FOR_LABORATORY_TEST' ||
+//           (action as NotifAction) === 'CREATE_QUICK_LABORATORY_TEST'
+//       );
+//       enqueueSnackbar &&
+//         laboratoryNotification[0] === newNotification &&
+//         enqueueSnackbar(newNotification.desc, {
+//           variant: 'success'
+//         });
+//       return {
+//         notifications: laboratoryNotification,
+//         count: laboratoryNotification.length
+//       };
+//     case Occupation.Nurse:
+//       const prescriptionNotification = notification.filter(
+//         ({ action }) =>
+//           (action as NotifAction) === 'PAY_FOR_PRESCRIPTION' ||
+//           (action as NotifAction) === 'CREATE_QUICK_PRESCRIPTION_TEST'
+//       );
+//       enqueueSnackbar &&
+//         prescriptionNotification[0] === newNotification &&
+//         enqueueSnackbar(newNotification.desc, {
+//           variant: 'success'
+//         });
+//       return {
+//         notifications: prescriptionNotification,
+//         count: prescriptionNotification.length
+//       };
 
-    default:
-      return {
-        notifications: [],
-        count: 0
-      };
-  }
-};
+//     default:
+//       return {
+//         notifications: [],
+//         count: 0
+//       };
+//   }
+// };
 const initialNotification: State = {
   count: 0,
   notifications: []
 };
 const NotificationProvider: React.FC = ({ children }) => {
-  const [notification, dispatch] = useReducer(
-    notificationReducer,
-    initialNotification
-  );
+  // const [notification, dispatch] = useReducer(
+  //   notificationReducer,
+  //   initialNotification
+  // );
+  const [notifications, setNotifications] = useState<
+    NotificationsQuery['notifications']
+  >();
   const { occupation } = useContext(AuthContext);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -143,14 +153,18 @@ const NotificationProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     if (!data) return;
-    dispatch({
-      type: occupation,
-      payload: { notification: data.notifications }
-    });
-  }, [data]);
+    // dispatch({
+    //   type: occupation,
+    //   payload: { notification: data.notifications }
+    // });
+    setNotifications(
+      data.notifications.filter(notification =>
+        notification.for.find(notificationFor => notificationFor === occupation)
+      )
+    );
+  }, [data, occupation]);
 
   useEffect(() => {
-    console.log('start');
     if (occupation === Occupation.Admin) return;
     subscribeToMore({
       document: NewNotificationSubscriptionDocument,
@@ -159,17 +173,16 @@ const NotificationProvider: React.FC = ({ children }) => {
           .newNotificationSubscription;
         console.log(prev, 'sdfh');
         // if (!newNotification) return prev;
-        dispatch({
-          type: occupation,
-          payload: {
-            notification: prev.notifications
-              ? [newNotification, ...prev.notifications]
-              : [newNotification],
-            newNotification,
-            enqueueSnackbar
-          }
+        setNotifications(prevNotifications =>
+          prevNotifications
+            ? [newNotification, ...prevNotifications]
+            : [newNotification]
+        );
+        enqueueSnackbar(newNotification.message, {
+          variant: 'success'
         });
-        console.log(notification);
+
+        console.log(notifications);
         return Object.assign({}, prev, {
           notifications: prev.notifications
             ? [newNotification, ...prev.notifications]
@@ -180,20 +193,12 @@ const NotificationProvider: React.FC = ({ children }) => {
     subscribeToMore({
       document: DeleteNotificationSubscriptionDocument,
       updateQuery: (prev, { subscriptionData }) => {
-        const deleteNotif: Notification = (subscriptionData.data as any)
+        const deletedNotification: Notification = (subscriptionData.data as any)
           .deleteNotificationSubscription;
-        console.log(deleteNotif, 'deleted ntoif');
-        // if (!deleteNotif) return prev;
-        const withoutDeletedNotification = prev.notifications.filter(
-          notif => notif.id !== deleteNotif.id
+        const withoutDeletedNotification = notifications?.filter(
+          notification => notification.id !== deletedNotification.id
         );
-        console.log(withoutDeletedNotification, prev);
-        dispatch({
-          type: occupation,
-          payload: {
-            notification: withoutDeletedNotification
-          }
-        });
+        setNotifications(withoutDeletedNotification);
         return Object.assign({}, prev, {
           notifications: withoutDeletedNotification
         });
@@ -212,8 +217,8 @@ const NotificationProvider: React.FC = ({ children }) => {
   return (
     <NotificationContext.Provider
       value={{
-        count: notification.count,
-        notifications: notification.notifications,
+        count: notifications?.length || 0,
+        notifications,
         handleClearNotifications,
         handleDeleteNotification
       }}

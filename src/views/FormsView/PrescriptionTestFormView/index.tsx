@@ -15,19 +15,20 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../../components/Page';
 import { useHistory, useLocation } from 'react-router-dom';
-import {
-  PrescriptionCheckIn,
-  PrescriptionSettingDataType,
-  SettingsContext
-} from '../../../context/SettingContext';
+// import {
+//   PrescriptionCheckIn,
+//   PrescriptionSettingDataType,
+//   SettingsContext
+// } from '../../../context/SettingContext';
 import { AuthContext } from '../../../context/AuthContext';
 import {
   MedicationsQuery,
   PerDay,
-  useCreateMedicationMutation,
+  // useCreateMedicationMutation,
   useCreatePrescriptionMutation,
   useMedicinesQuery,
-  CheckIn
+  CheckIn,
+  CreateMedicationsInput
 } from '../../../generated/graphql';
 import { cardQuery } from '../../../constants/queries';
 import { add, format } from 'date-fns';
@@ -87,10 +88,10 @@ const PrescriptionTestFormView = () => {
   });
   const [medications, setMedications] = useState<SelectablePrescription[]>();
   const { data, loading } = useMedicinesQuery();
-  const [
-    createMedication,
-    { loading: createMedicationLoading }
-  ] = useCreateMedicationMutation();
+  // const [
+  //   createMedication,
+  //   { loading: createMedicationLoading }
+  // ] = useCreateMedicationMutation();
   const [
     createPrescriptionTest,
     { loading: createPrescriptionTestLoading }
@@ -124,7 +125,7 @@ const PrescriptionTestFormView = () => {
 
   const handleSubmit = async () => {
     if (!medications) return;
-    const createdMedicationId: string[] = [];
+    const createdMedications: CreateMedicationsInput[] = [];
     const selectedMedicines: SelectablePrescription[] = medications.filter(
       medication => medication.selected
     );
@@ -134,30 +135,7 @@ const PrescriptionTestFormView = () => {
       enqueueSnackbar('Select atleast One medicine', { variant: 'warning' });
       return;
     }
-    const price = selectedMedicines.reduce(
-      (prevPrice, currentMedicine) =>
-        prevPrice +
-        currentMedicine.medicine.price *
-          currentMedicine.forDays *
-          (currentMedicine.perDay === PerDay.Bid ? 2 : 1),
-      0
-    );
-    console.log('price', price, selectedMedicines);
-    const prescription = await createPrescriptionTest({
-      variables: {
-        cardId: prescriptionInfo.cardId,
-        rx: prescriptionInfo.rx,
-        price
-      }
-    });
-    if (!prescription.data) {
-      enqueueSnackbar('Error creating Prescription', { variant: 'error' });
-      return;
-    }
-    if (!selectedMedicines[0]) {
-      enqueueSnackbar('Select atleast One medicine', { variant: 'error' });
-      return;
-    }
+
     for (let i = 0; i < selectedMedicines.length; i++) {
       const checkIn: CheckIn[] = [];
 
@@ -181,22 +159,30 @@ const PrescriptionTestFormView = () => {
           )
         });
       }
-
-      const medication = await createMedication({
-        variables: {
-          ...selectedMedicines[i],
-          prescriptionId: prescription.data!.createPrescription.id,
-          medicineId: selectedMedicines[i].medicine.id,
-          checkIn
-        }
+      createdMedications.push({
+        ...selectedMedicines[i],
+        medicineId: selectedMedicines[i].medicine.id,
+        checkIn
       });
-      if (!medication.data) {
-        enqueueSnackbar('Internal Server Error', { variant: 'error' });
-        return;
-      }
-      createdMedicationId.push(medication.data.createMedication.id);
     }
 
+    const price = selectedMedicines.reduce(
+      (prevPrice, currentMedicine) =>
+        prevPrice +
+        currentMedicine.medicine.price *
+          currentMedicine.forDays *
+          (currentMedicine.perDay === PerDay.Bid ? 2 : 1),
+      0
+    );
+    console.log('price', price, selectedMedicines);
+    const prescription = await createPrescriptionTest({
+      variables: {
+        cardId: prescriptionInfo.cardId,
+        medications: createdMedications,
+        rx: prescriptionInfo.rx,
+        price
+      }
+    });
     history.push(
       cardQuery({
         id: prescriptionInfo.cardId,
@@ -310,9 +296,7 @@ const PrescriptionTestFormView = () => {
             variant="contained"
             style={{ marginRight: 10 }}
           >
-            {createMedicationLoading || createPrescriptionTestLoading
-              ? '...Loading'
-              : 'Send Prescription'}
+            {createPrescriptionTestLoading ? '...Loading' : 'Send Prescription'}
           </Button>
           <Button
             onClick={() => {
