@@ -55,9 +55,10 @@ const SettingsProvider: React.FC = ({ children }) => {
     if (!data) return;
     setCardPrice(data.setting.card_price);
     setCardExpirationDate(data.setting.card_expiration_date);
-    const testRateData = JSON.parse(
-      data.setting.laboratory_tests_data
-    ) as LaboratoryTestCatagories[];
+    // const testRateData = JSON.parse(
+    //   data.setting.laboratory_tests_data
+    // ) as LaboratoryTestCatagories[];
+    const testRateData = defaultLaboratoryTestSeed;
     console.log(data.setting, testRateData[0].name, 'Hi');
     const prescriptionRateData = JSON.parse(
       data.setting.prescription_data

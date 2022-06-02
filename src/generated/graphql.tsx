@@ -1031,10 +1031,14 @@ export type CreatePrescriptionMutation = (
     ), medications?: Maybe<Array<(
       { __typename?: 'Medication' }
       & Pick<Medication, 'id' | 'perDay' | 'forDays'>
-      & { medicine: (
-        { __typename?: 'Medicine' }
-        & Pick<Medicine, 'id' | 'name'>
-      ) }
+      & { checkIn: Array<(
+        { __typename?: 'CheckIn' }
+        & Pick<CheckIn, 'date' | 'price'>
+        & { status: Array<(
+          { __typename?: 'CheckInStatus' }
+          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+        )> }
+      )> }
     )>> }
   ) }
 );
@@ -2750,12 +2754,16 @@ export const CreatePrescriptionDocument = gql`
     price
     medications {
       id
-      medicine {
-        id
-        name
-      }
       perDay
       forDays
+      checkIn {
+        date
+        price
+        status {
+          isPaid
+          isCompleted
+        }
+      }
     }
     rx
   }

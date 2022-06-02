@@ -19,6 +19,7 @@ import { PrescriptionCheckIn } from '../../../context/SettingContext';
 import AlertDialog from '../../../components/AlertDialog';
 import {
   CheckIn,
+  CheckInInput,
   PerDay,
   PrescriptionsQuery,
   useMarkPrescriptionAsPaidMutation,
@@ -50,7 +51,7 @@ export type PrescriptionCheckIns = {
   paid: number;
   remaining: number;
   paidToday: number;
-  checkIn: CheckIn[];
+  checkIn: CheckInInput[];
 };
 interface ConfirmationDialogProps {
   open: boolean;
@@ -64,10 +65,6 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   const classes = useStyles();
 
-  const [alertDialogToggle, setAlertDialogToggle] = useState(false);
-  const [proceedToAction, setProceedToAction] = useState(false);
-
-  // const [checkInPrices, setCheckInPrices] = useState<CheckInPrice[]>();
   const [medicationsCheckIn, setMedicationsCheckIn] = useState<
     PrescriptionCheckIns[]
   >();
@@ -81,17 +78,19 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         perDay: medication.perDay,
         paid: 0,
         paidToday: 0,
-        checkIn: medication.checkIn
+        checkIn: medication.checkIn.map(checkIn => {
+          return {
+            date: checkIn.date,
+            price: checkIn.price,
+            status: checkIn.status.map(status => ({
+              isPaid: status.isPaid,
+              isCompleted: status.isCompleted
+            }))
+          };
+        })
       }))
     );
-    console.log(medicationsCheckIn, prescription.medications);
   }, [open, prescription.medications]);
-
-  useEffect(() => {
-    if (proceedToAction) {
-      handleSuccess();
-    }
-  }, [proceedToAction]);
 
   const [
     updatePrescriptionCheckIn,
@@ -106,10 +105,15 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     setOpen(false);
   };
   const handleSuccess = async () => {
+    if (!medicationsCheckIn) {
+      return;
+    }
     await updatePrescriptionCheckIn({
       variables: {
         id: prescription.id,
-        checkIn: medicationsCheckIn!.map(({ checkIn }) => checkIn)
+        checkIn: medicationsCheckIn.map(
+          medicationsCheckIn => medicationsCheckIn.checkIn
+        )
       }
     });
     setOpen(false);
@@ -187,21 +191,13 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             // disabled={loadinag}
             disabled={false}
             autoFocus
-            onClick={() => setAlertDialogToggle(true)}
+            onClick={handleSuccess}
             color="primary"
           >
             {!loading ? 'Payment Successful' : 'Submitting...'}
           </Button>
         </DialogActions>
       </Dialog>
-      <AlertDialog
-        dialogText="Are you sure you want to proceed?"
-        state={{
-          dialogToggle: alertDialogToggle,
-          setDialogToggle: setAlertDialogToggle,
-          setProceedToAction
-        }}
-      />
     </>
   );
 };

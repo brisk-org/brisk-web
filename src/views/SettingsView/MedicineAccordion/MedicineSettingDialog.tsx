@@ -8,11 +8,16 @@ import {
   TextField,
   DialogActions,
   SelectChangeEvent,
-  Button
+  Button,
+  TextareaAutosize
 } from '@mui/material';
 import SelectTextField from '../../../components/helpers/SelectTextField';
 import { AddMedicineMutationVariables } from '../../../generated/graphql';
 import { perDayOption } from './SingleMedicine';
+
+interface MedicineType extends AddMedicineMutationVariables {
+  other?: string;
+}
 
 interface Props {
   type: 'add' | 'update' | 'request';
@@ -20,10 +25,8 @@ interface Props {
   buttonText: string;
   open: boolean;
   onClose: () => void;
-  medicine: AddMedicineMutationVariables;
-  setMedicine: React.Dispatch<
-    React.SetStateAction<AddMedicineMutationVariables>
-  >;
+  medicine: MedicineType;
+  setMedicine: React.Dispatch<React.SetStateAction<MedicineType>>;
   handleSubmit: React.FormEventHandler<HTMLFormElement>;
   loading: boolean;
 }
@@ -129,6 +132,19 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
                   onChange={handleChange}
                   margin="dense"
                   variant="standard"
+                />
+              )}
+              {type === 'request' && (
+                <TextareaAutosize
+                  style={{
+                    maxWidth: '100%',
+                    padding: '20px 10px',
+                    minHeight: '100px'
+                  }}
+                  name="other"
+                  value={medicine.other}
+                  placeholder="Other:"
+                  onChange={handleChange}
                 />
               )}
             </FormControl>

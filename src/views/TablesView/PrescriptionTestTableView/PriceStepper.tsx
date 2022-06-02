@@ -46,7 +46,8 @@ const PriceStepper: React.FC<Props> = ({
   const classes = useStyles();
 
   const [activeStep, setActiveStep] = useState(
-    medicationsCheckIn.checkIn.findIndex(checkIn => !checkIn.status[0].isPaid)
+    // medicationsCheckIn.checkIn.findIndex(checkIn => !checkIn.status[0].isPaid)
+    0
   );
 
   useEffect(() => {
@@ -88,7 +89,6 @@ const PriceStepper: React.FC<Props> = ({
 
   const handleStepperClick = (index: number) => {
     if (lastCheckIn && lastCheckIn[index].status[0].isPaid) return;
-    console.log(index);
     setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
       prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn =>
         prevPrescriptionCheckIn.name === medicationsCheckIn.name
@@ -99,7 +99,7 @@ const PriceStepper: React.FC<Props> = ({
                   ...checkIn,
                   status: checkIn.status.map(status => ({
                     ...status,
-                    isPaid: index * 2 + 1 >= checkInIndex
+                    isPaid: index >= checkInIndex
                   }))
                 })
               )
@@ -113,56 +113,61 @@ const PriceStepper: React.FC<Props> = ({
   const handleNext = () => {
     if (activeStep > medicationsCheckIn.checkIn.length - 1) return;
     setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
-      prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn =>
-        prevPrescriptionCheckIn.name === medicationsCheckIn.name
-          ? {
-              ...prevPrescriptionCheckIn,
-              checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) =>
-                index === activeStep
-                  ? {
-                      ...checkIn,
-                      status: checkIn.status.map(status => ({
-                        ...status,
-                        isPaid: true
-                      }))
-                    }
-                  : { ...checkIn }
-              )
+      prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn => {
+        if (prevPrescriptionCheckIn.name !== medicationsCheckIn.name) {
+          return {
+            ...prevPrescriptionCheckIn
+          };
+        }
+        return {
+          ...prevPrescriptionCheckIn,
+          checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) => {
+            if (index === activeStep) {
+              setActiveStep(prevActiveStep => prevActiveStep + 1);
+              return {
+                ...checkIn,
+                status: checkIn.status.map(status => ({
+                  ...status,
+                  isPaid: true
+                }))
+              };
             }
-          : {
-              ...prevPrescriptionCheckIn
-            }
-      )
+            return { ...checkIn };
+          })
+        };
+      })
     );
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
   };
 
   const handleBack = () => {
     if (activeStep < 1) return;
     if (lastCheckIn && lastCheckIn[activeStep - 1].status[0].isPaid) return;
     setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
-      prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn =>
-        prevPrescriptionCheckIn.name === medicationsCheckIn.name
-          ? {
-              ...prevPrescriptionCheckIn,
-              checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) =>
-                index === activeStep - 1
-                  ? {
-                      ...checkIn,
-                      status: checkIn.status.map(status => ({
-                        ...status,
-                        isPaid: false
-                      }))
-                    }
-                  : { ...checkIn }
-              )
+      prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn => {
+        if (prevPrescriptionCheckIn.name !== medicationsCheckIn.name) {
+          return {
+            ...prevPrescriptionCheckIn
+          };
+        }
+
+        return {
+          ...prevPrescriptionCheckIn,
+          checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) => {
+            if (index === activeStep - 1) {
+              setActiveStep(prevActiveStep => prevActiveStep - 1);
+              return {
+                ...checkIn,
+                status: checkIn.status.map(status => ({
+                  ...status,
+                  isPaid: false
+                }))
+              };
             }
-          : {
-              ...prevPrescriptionCheckIn
-            }
-      )
+            return { ...checkIn };
+          })
+        };
+      })
     );
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
   };
 
   return (
@@ -226,42 +231,38 @@ const PriceStepper: React.FC<Props> = ({
         }}
         alternativeLabel
       >
-        {medicationsCheckIn.checkIn
-          .filter((medication, index) =>
-            medicationsCheckIn.perDay === PerDay.Bid ? index % 2 === 1 : true
-          )
-          .map((checkIn, index) => (
-            <Step
-              onClick={() => handleStepperClick(index)}
-              sx={{ cursor: 'pointer' }}
-              key={index}
-              completed={checkIn.status[0].isPaid}
+        {medicationsCheckIn.checkIn.map((checkIn, index) => (
+          <Step
+            onClick={() => handleStepperClick(index)}
+            sx={{ cursor: 'pointer' }}
+            key={index}
+            completed={checkIn.status[0].isPaid}
+          >
+            <StepLabel
+              error={
+                isBefore(
+                  new Date(checkIn.date),
+                  sub(new Date(), { hours: 1 })
+                ) && !checkIn.status[0].isPaid
+              }
+              className={clsx({
+                [classes.stepSuccess]:
+                  lastCheckIn && !lastCheckIn[index].status[0].isPaid
+              })}
+              optional={
+                isToday(new Date(checkIn.date)) && (
+                  <Box textAlign="center">
+                    <Typography variant="caption">(today)</Typography>
+                  </Box>
+                )
+              }
             >
-              <StepLabel
-                error={
-                  isBefore(
-                    new Date(checkIn.date),
-                    sub(new Date(), { hours: 1 })
-                  ) && !checkIn.status[0].isPaid
-                }
-                className={clsx({
-                  [classes.stepSuccess]:
-                    lastCheckIn && !lastCheckIn[index].status[0].isPaid
-                })}
-                optional={
-                  isToday(new Date(checkIn.date)) && (
-                    <Box textAlign="center">
-                      <Typography variant="caption">(today)</Typography>
-                    </Box>
-                  )
-                }
-              >
-                <Typography variant="body2" color="gray">
-                  {format(new Date(checkIn.date), 'iii')}
-                </Typography>
-              </StepLabel>
-            </Step>
-          ))}
+              <Typography variant="body2" color="gray">
+                {format(new Date(checkIn.date), 'iii')}
+              </Typography>
+            </StepLabel>
+          </Step>
+        ))}
       </Stepper>
       {/* <Box sx={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
         <Button size="small" sx={{ textTransform: 'capitalize' }}>

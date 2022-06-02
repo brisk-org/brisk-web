@@ -68,8 +68,8 @@ const useStyles = makeStyles(theme => ({
   textarea: {
     backgroundColor: theme.palette.background.paper,
     border: '1px solid gray',
-    maxWidth: '100%',
     width: '100%',
+    maxWidth: '100%',
     padding: '20px 10px',
     minHeight: '100px'
   }

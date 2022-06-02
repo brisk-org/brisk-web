@@ -125,51 +125,57 @@ const PrescriptionTestFormView = () => {
 
   const handleSubmit = async () => {
     if (!medications) return;
-    const createdMedications: CreateMedicationsInput[] = [];
-    const selectedMedicines: SelectablePrescription[] = medications.filter(
-      medication => medication.selected
-    );
-
     if (!prescriptionInfo.cardId) return;
+
+    const selectedMedicines: CreateMedicationsInput[] = medications
+      .filter(medication => medication.selected)
+      .map(selectedMedicine => {
+        const checkIn: CheckIn[] = [];
+
+        for (let i = 0; i < selectedMedicine.forDays; i++) {
+          const checkInStatus = [
+            {
+              isPaid: false,
+              isCompleted: false
+            },
+            {
+              isPaid: false,
+              isCompleted: false
+            }
+          ];
+          checkIn.push({
+            date: add(new Date(), { days: i }).toISOString(),
+            price:
+              selectedMedicine.perDay === PerDay['Bid']
+                ? selectedMedicine.medicine.price * 2
+                : selectedMedicine.medicine.price,
+            status: checkInStatus.splice(
+              0,
+              selectedMedicine.perDay === PerDay['Bid'] ? 2 : 1
+            )
+          });
+        }
+        return {
+          forDays: selectedMedicine.forDays,
+          medicineId: selectedMedicine.medicine.id,
+          perDay: selectedMedicine.perDay,
+          other: selectedMedicine.other,
+          strength: selectedMedicine.strength,
+          checkIn
+        };
+      });
+
     if (!selectedMedicines[0]) {
       enqueueSnackbar('Select atleast One medicine', { variant: 'warning' });
       return;
     }
-
-    for (let i = 0; i < selectedMedicines.length; i++) {
-      const checkIn: CheckIn[] = [];
-
-      for (let j = 0; j < selectedMedicines[i].forDays; j++) {
-        const checkInStatus = [
-          {
-            isPaid: false,
-            isCompleted: false
-          },
-          {
-            isPaid: false,
-            isCompleted: false
-          }
-        ];
-        checkIn.push({
-          date: add(new Date(), { days: j }).toISOString(),
-          price: selectedMedicines[i].medicine.price,
-          status: checkInStatus.splice(
-            0,
-            selectedMedicines[i].perDay === PerDay['Bid'] ? 2 : 1
-          )
-        });
-      }
-      createdMedications.push({
-        ...selectedMedicines[i],
-        medicineId: selectedMedicines[i].medicine.id,
-        checkIn
-      });
-    }
-
+    console.log(1, selectedMedicines);
     const price = selectedMedicines.reduce(
       (prevPrice, currentMedicine) =>
         prevPrice +
-        currentMedicine.medicine.price *
+        medications.find(
+          ({ medicine }) => medicine.id === currentMedicine.medicineId
+        )!.medicine.price *
           currentMedicine.forDays *
           (currentMedicine.perDay === PerDay.Bid ? 2 : 1),
       0
@@ -178,7 +184,7 @@ const PrescriptionTestFormView = () => {
     const prescription = await createPrescriptionTest({
       variables: {
         cardId: prescriptionInfo.cardId,
-        medications: createdMedications,
+        medications: [...selectedMedicines],
         rx: prescriptionInfo.rx,
         price
       }
