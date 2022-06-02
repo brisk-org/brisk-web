@@ -8,7 +8,6 @@ import {
   StepLabel,
   Chip
 } from '@mui/material';
-import { PrescriptionCheckIn } from '../../../context/SettingContext';
 import { format, isBefore, isToday, sub } from 'date-fns';
 import {
   ArrowForward as ArrowForwardIcon,
@@ -53,7 +52,7 @@ const PriceStepper: React.FC<Props> = ({
   useEffect(() => {
     const paid = medicationsCheckIn.checkIn.reduce(
       (prevValue, currentCheckInEdit) =>
-        currentCheckInEdit.status[0].isPaid
+        currentCheckInEdit.status.every(status => status.isPaid)
           ? prevValue + currentCheckInEdit.price
           : prevValue,
       0
