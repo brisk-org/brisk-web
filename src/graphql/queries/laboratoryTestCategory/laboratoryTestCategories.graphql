@@ -1,0 +1,38 @@
+query LaboraotryTestCategories {
+  laboratoryTestCategories {
+    name
+    price
+    laboratoryTests {
+      id
+      name
+      normalValue
+      commonValues
+      price
+      hasIndividualPrice
+      inStock
+      trackInStock
+      created_at
+    }
+    subCategories {
+      id
+      name
+      price
+      laboratoryTests {
+        id
+        name
+        normalValue
+        commonValues
+        price
+        hasIndividualPrice
+        inStock
+        trackInStock
+        created_at
+      }
+      created_at
+    }
+    inStock
+    trackInStock
+    created_at
+    updated_at
+  }
+}

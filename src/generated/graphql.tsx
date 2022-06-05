@@ -166,7 +166,7 @@ export type LaboratoryTest = {
   normalValue: Scalars['String'];
   commonValues: Array<Scalars['String']>;
   category: LaboratoryTest;
-  subCategory: LaboratoryTestCategory;
+  subCategory: LaboratoryTestSubCategory;
   laboratoryTestRequests: Array<LaboratoryTestRequest>;
   price?: Maybe<Scalars['Float']>;
   hasIndividualPrice: Scalars['Boolean'];
@@ -182,7 +182,7 @@ export type LaboratoryTestCategory = {
   name: Scalars['String'];
   price?: Maybe<Scalars['Float']>;
   laboratoryTests: Array<LaboratoryTest>;
-  subCateogries: Array<LaboratoryTestSubCategory>;
+  subCategories: Array<LaboratoryTestSubCategory>;
   inStock?: Maybe<Scalars['Float']>;
   trackInStock: Scalars['Boolean'];
   created_at: Scalars['String'];
@@ -261,7 +261,7 @@ export type Mutation = {
   createLaboraotryTest: LaboratoryTest;
   updateLaboratoryTest: LaboratoryTest;
   deleteLaboratoryTest: Scalars['Boolean'];
-  createLaboraotryTestCategory: LaboratoryTestCategory;
+  createLaboratoryTestCategory: LaboratoryTestCategory;
   updateLaboratoryTestCategory: LaboratoryTestCategory;
   deleteLaboratoryTestCategory: Scalars['Boolean'];
   createLaboraotryTestSubCategory: LaboratoryTestSubCategory;
@@ -393,7 +393,7 @@ export type MutationDeleteLaboratoryTestArgs = {
 };
 
 
-export type MutationCreateLaboraotryTestCategoryArgs = {
+export type MutationCreateLaboratoryTestCategoryArgs = {
   name: Scalars['String'];
   price: Scalars['Float'];
   inStock?: Maybe<Scalars['Float']>;
@@ -1087,6 +1087,49 @@ export type PayForLaboratoryExaminationMutation = (
   ) }
 );
 
+export type CreateLaboratoryTestCategoryMutationVariables = Exact<{
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
+}>;
+
+
+export type CreateLaboratoryTestCategoryMutation = (
+  { __typename?: 'Mutation' }
+  & { createLaboratoryTestCategory: (
+    { __typename?: 'LaboratoryTestCategory' }
+    & Pick<LaboratoryTestCategory, 'id' | 'name' | 'inStock' | 'trackInStock' | 'created_at' | 'updated_at'>
+  ) }
+);
+
+export type DeleteLaboratoryTestCategoryMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DeleteLaboratoryTestCategoryMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteLaboratoryTestCategory'>
+);
+
+export type UpdateLaboratoryTestCategoryMutationVariables = Exact<{
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
+}>;
+
+
+export type UpdateLaboratoryTestCategoryMutation = (
+  { __typename?: 'Mutation' }
+  & { updateLaboratoryTestCategory: (
+    { __typename?: 'LaboratoryTestCategory' }
+    & Pick<LaboratoryTestCategory, 'id' | 'name' | 'inStock' | 'trackInStock' | 'created_at' | 'updated_at'>
+  ) }
+);
+
 export type AddMedicineMutationVariables = Exact<{
   name: Scalars['String'];
   price: Scalars['Float'];
@@ -1670,6 +1713,28 @@ export type SearchLaboratoryExaminationQuery = (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name'>
     ) }
+  )> }
+);
+
+export type LaboraotryTestCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LaboraotryTestCategoriesQuery = (
+  { __typename?: 'Query' }
+  & { laboratoryTestCategories: Array<(
+    { __typename?: 'LaboratoryTestCategory' }
+    & Pick<LaboratoryTestCategory, 'name' | 'price' | 'inStock' | 'trackInStock' | 'created_at' | 'updated_at'>
+    & { laboratoryTests: Array<(
+      { __typename?: 'LaboratoryTest' }
+      & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasIndividualPrice' | 'inStock' | 'trackInStock' | 'created_at'>
+    )>, subCategories: Array<(
+      { __typename?: 'LaboratoryTestSubCategory' }
+      & Pick<LaboratoryTestSubCategory, 'id' | 'name' | 'price' | 'created_at'>
+      & { laboratoryTests: Array<(
+        { __typename?: 'LaboratoryTest' }
+        & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasIndividualPrice' | 'inStock' | 'trackInStock' | 'created_at'>
+      )> }
+    )> }
   )> }
 );
 
@@ -2706,6 +2771,131 @@ export function usePayForLaboratoryExaminationMutation(baseOptions?: Apollo.Muta
 export type PayForLaboratoryExaminationMutationHookResult = ReturnType<typeof usePayForLaboratoryExaminationMutation>;
 export type PayForLaboratoryExaminationMutationResult = Apollo.MutationResult<PayForLaboratoryExaminationMutation>;
 export type PayForLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<PayForLaboratoryExaminationMutation, PayForLaboratoryExaminationMutationVariables>;
+export const CreateLaboratoryTestCategoryDocument = gql`
+    mutation CreateLaboratoryTestCategory($name: String!, $price: Float!, $inStock: Float, $trackInStock: Boolean!) {
+  createLaboratoryTestCategory(
+    name: $name
+    price: $price
+    inStock: $inStock
+    trackInStock: $trackInStock
+  ) {
+    id
+    name
+    inStock
+    trackInStock
+    created_at
+    updated_at
+  }
+}
+    `;
+export type CreateLaboratoryTestCategoryMutationFn = Apollo.MutationFunction<CreateLaboratoryTestCategoryMutation, CreateLaboratoryTestCategoryMutationVariables>;
+
+/**
+ * __useCreateLaboratoryTestCategoryMutation__
+ *
+ * To run a mutation, you first call `useCreateLaboratoryTestCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateLaboratoryTestCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createLaboratoryTestCategoryMutation, { data, loading, error }] = useCreateLaboratoryTestCategoryMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      price: // value for 'price'
+ *      inStock: // value for 'inStock'
+ *      trackInStock: // value for 'trackInStock'
+ *   },
+ * });
+ */
+export function useCreateLaboratoryTestCategoryMutation(baseOptions?: Apollo.MutationHookOptions<CreateLaboratoryTestCategoryMutation, CreateLaboratoryTestCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateLaboratoryTestCategoryMutation, CreateLaboratoryTestCategoryMutationVariables>(CreateLaboratoryTestCategoryDocument, options);
+      }
+export type CreateLaboratoryTestCategoryMutationHookResult = ReturnType<typeof useCreateLaboratoryTestCategoryMutation>;
+export type CreateLaboratoryTestCategoryMutationResult = Apollo.MutationResult<CreateLaboratoryTestCategoryMutation>;
+export type CreateLaboratoryTestCategoryMutationOptions = Apollo.BaseMutationOptions<CreateLaboratoryTestCategoryMutation, CreateLaboratoryTestCategoryMutationVariables>;
+export const DeleteLaboratoryTestCategoryDocument = gql`
+    mutation DeleteLaboratoryTestCategory($id: ID!) {
+  deleteLaboratoryTestCategory(id: $id)
+}
+    `;
+export type DeleteLaboratoryTestCategoryMutationFn = Apollo.MutationFunction<DeleteLaboratoryTestCategoryMutation, DeleteLaboratoryTestCategoryMutationVariables>;
+
+/**
+ * __useDeleteLaboratoryTestCategoryMutation__
+ *
+ * To run a mutation, you first call `useDeleteLaboratoryTestCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteLaboratoryTestCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteLaboratoryTestCategoryMutation, { data, loading, error }] = useDeleteLaboratoryTestCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteLaboratoryTestCategoryMutation(baseOptions?: Apollo.MutationHookOptions<DeleteLaboratoryTestCategoryMutation, DeleteLaboratoryTestCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteLaboratoryTestCategoryMutation, DeleteLaboratoryTestCategoryMutationVariables>(DeleteLaboratoryTestCategoryDocument, options);
+      }
+export type DeleteLaboratoryTestCategoryMutationHookResult = ReturnType<typeof useDeleteLaboratoryTestCategoryMutation>;
+export type DeleteLaboratoryTestCategoryMutationResult = Apollo.MutationResult<DeleteLaboratoryTestCategoryMutation>;
+export type DeleteLaboratoryTestCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteLaboratoryTestCategoryMutation, DeleteLaboratoryTestCategoryMutationVariables>;
+export const UpdateLaboratoryTestCategoryDocument = gql`
+    mutation UpdateLaboratoryTestCategory($id: ID!, $name: String!, $price: Float!, $inStock: Float, $trackInStock: Boolean!) {
+  updateLaboratoryTestCategory(
+    id: $id
+    name: $name
+    price: $price
+    inStock: $inStock
+    trackInStock: $trackInStock
+  ) {
+    id
+    name
+    inStock
+    trackInStock
+    created_at
+    updated_at
+  }
+}
+    `;
+export type UpdateLaboratoryTestCategoryMutationFn = Apollo.MutationFunction<UpdateLaboratoryTestCategoryMutation, UpdateLaboratoryTestCategoryMutationVariables>;
+
+/**
+ * __useUpdateLaboratoryTestCategoryMutation__
+ *
+ * To run a mutation, you first call `useUpdateLaboratoryTestCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateLaboratoryTestCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateLaboratoryTestCategoryMutation, { data, loading, error }] = useUpdateLaboratoryTestCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *      price: // value for 'price'
+ *      inStock: // value for 'inStock'
+ *      trackInStock: // value for 'trackInStock'
+ *   },
+ * });
+ */
+export function useUpdateLaboratoryTestCategoryMutation(baseOptions?: Apollo.MutationHookOptions<UpdateLaboratoryTestCategoryMutation, UpdateLaboratoryTestCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateLaboratoryTestCategoryMutation, UpdateLaboratoryTestCategoryMutationVariables>(UpdateLaboratoryTestCategoryDocument, options);
+      }
+export type UpdateLaboratoryTestCategoryMutationHookResult = ReturnType<typeof useUpdateLaboratoryTestCategoryMutation>;
+export type UpdateLaboratoryTestCategoryMutationResult = Apollo.MutationResult<UpdateLaboratoryTestCategoryMutation>;
+export type UpdateLaboratoryTestCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateLaboratoryTestCategoryMutation, UpdateLaboratoryTestCategoryMutationVariables>;
 export const AddMedicineDocument = gql`
     mutation AddMedicine($name: String!, $price: Float!, $inStock: Float!, $strength: String, $perDay: PerDay, $forDays: Float) {
   addMedicine(
@@ -4224,6 +4414,73 @@ export function useSearchLaboratoryExaminationLazyQuery(baseOptions?: Apollo.Laz
 export type SearchLaboratoryExaminationQueryHookResult = ReturnType<typeof useSearchLaboratoryExaminationQuery>;
 export type SearchLaboratoryExaminationLazyQueryHookResult = ReturnType<typeof useSearchLaboratoryExaminationLazyQuery>;
 export type SearchLaboratoryExaminationQueryResult = Apollo.QueryResult<SearchLaboratoryExaminationQuery, SearchLaboratoryExaminationQueryVariables>;
+export const LaboraotryTestCategoriesDocument = gql`
+    query LaboraotryTestCategories {
+  laboratoryTestCategories {
+    name
+    price
+    laboratoryTests {
+      id
+      name
+      normalValue
+      commonValues
+      price
+      hasIndividualPrice
+      inStock
+      trackInStock
+      created_at
+    }
+    subCategories {
+      id
+      name
+      price
+      laboratoryTests {
+        id
+        name
+        normalValue
+        commonValues
+        price
+        hasIndividualPrice
+        inStock
+        trackInStock
+        created_at
+      }
+      created_at
+    }
+    inStock
+    trackInStock
+    created_at
+    updated_at
+  }
+}
+    `;
+
+/**
+ * __useLaboraotryTestCategoriesQuery__
+ *
+ * To run a query within a React component, call `useLaboraotryTestCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLaboraotryTestCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLaboraotryTestCategoriesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLaboraotryTestCategoriesQuery(baseOptions?: Apollo.QueryHookOptions<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>(LaboraotryTestCategoriesDocument, options);
+      }
+export function useLaboraotryTestCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>(LaboraotryTestCategoriesDocument, options);
+        }
+export type LaboraotryTestCategoriesQueryHookResult = ReturnType<typeof useLaboraotryTestCategoriesQuery>;
+export type LaboraotryTestCategoriesLazyQueryHookResult = ReturnType<typeof useLaboraotryTestCategoriesLazyQuery>;
+export type LaboraotryTestCategoriesQueryResult = Apollo.QueryResult<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>;
 export const MedicationDocument = gql`
     query Medication($id: ID!) {
   medication(id: $id) {

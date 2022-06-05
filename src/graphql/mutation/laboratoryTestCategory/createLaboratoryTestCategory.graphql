@@ -1,0 +1,20 @@
+mutation CreateLaboratoryTestCategory(
+  $name: String!
+  $price: Float!
+  $inStock: Float
+  $trackInStock: Boolean!
+) {
+  createLaboratoryTestCategory(
+    name: $name
+    price: $price
+    inStock: $inStock
+    trackInStock: $trackInStock
+  ) {
+    id
+    name
+    inStock
+    trackInStock
+    created_at
+    updated_at
+  }
+}
