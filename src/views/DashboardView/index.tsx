@@ -19,8 +19,8 @@ import {
   useQuickLaboratoryTestsForDashboardQuery,
   NewCreatedQuickLaboratoryTestDocument,
   NewCreatedQuickPrescriptionTestDocument,
-  useLaboratoryTestsForDashboardQuery,
-  NewCreatedLaboratoryTestDocument
+  useLaboratoryExaminationsForDashboardQuery,
+  NewCreatedLaboratoryExaminationDocument
 } from '../../generated/graphql';
 
 const DashboardView = () => {
@@ -32,7 +32,9 @@ const DashboardView = () => {
   const {
     data: laboratoryTestsData,
     subscribeToMore: subscribeToMoreLaboratoryTests
-  } = useLaboratoryTestsForDashboardQuery({ variables: { skip: 0, take: 0 } });
+  } = useLaboratoryExaminationsForDashboardQuery({
+    variables: { skip: 0, take: 0 }
+  });
   const {
     data: prescriptionData,
     subscribeToMore: subscribeToMoreprescription
@@ -66,12 +68,12 @@ const DashboardView = () => {
       onError: err => console.log(err)
     });
     subscribeToMoreLaboratoryTests({
-      document: NewCreatedLaboratoryTestDocument,
+      document: NewCreatedLaboratoryExaminationDocument,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const newCreatedCard = subscriptionData.data;
         return Object.assign({}, prev, {
-          laboratoryTests: [newCreatedCard, ...prev.laboratoryTests]
+          laboratoryTests: [newCreatedCard, ...prev.laboratoryExaminations]
         });
       },
       onError: err => console.log(err)
@@ -131,7 +133,7 @@ const DashboardView = () => {
           <Grid item xs={12}>
             <SalesContainer
               cardSales={cardSales}
-              laboratoryTestSales={laboratoryTestsData?.laboratoryTests}
+              laboratoryTestSales={laboratoryTestsData?.laboratoryExaminations}
               prescriptionSales={prescriptionData?.prescriptions}
               quickLaboratoryTestSales={
                 quickLaboratoryTestData?.quickLaboratoryTests
@@ -168,7 +170,8 @@ const DashboardView = () => {
           </Grid>
           <Grid item lg={12} md={12} xl={9} xs={12}>
             <LaboratoryTestsCategoryGraph
-              laboratoryTests={laboratoryTestsData?.laboratoryTests}
+              laboratoryTests={[{ result: '', created_at: '' }]}
+              // laboratoryTests={laboratoryTestsData?.laboratoryExaminations}
             />
           </Grid>
           <Grid item lg={12} md={12} xl={9} xs={12}>

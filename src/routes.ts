@@ -25,8 +25,8 @@ import CardTableView from './views/TablesView/CardTableView';
 import QuickLaboratoryTestTableView from './views/TablesView/QuickLaboratoryTestTableView';
 import QuickPrescriptionTestTableView from './views/TablesView/QuickPrescriptionTestTable';
 import MedicalCertificateFormView from './views/FormsView/MedicalCertificateFormView';
-import RequestLaboratoryTestFormView from './views/FormsView/LaboratoryTestFormView/RequestLaboratoryTestFormView';
-import CompleteLaboratoryTestFormView from './views/FormsView/LaboratoryTestFormView/CompleteLaboratoryTestFormView';
+import RequestLaboratoryExaminationFormView from './views/FormsView/LaboratoryExaminationFormView/RequestForm';
+import CompleteLaboratoryExaminationFormView from './views/FormsView/LaboratoryExaminationFormView/CompleteForm';
 import PrescriptionTestTableView from './views/TablesView/PrescriptionTestTableView';
 import DetailedCardView from './views/DetailedCardView/Index';
 import LaboratoryTestTableView from './views/TablesView/LaboratoryTestTableView';
@@ -135,12 +135,12 @@ export const useRoutes = function(): Routes[] {
     {
       path: '/app/form/laboratory-test/request',
       routeOccupation: [Occupation.Doctor],
-      component: RequestLaboratoryTestFormView
+      component: RequestLaboratoryExaminationFormView
     },
     {
       path: '/app/form/laboratory-test/complete',
       routeOccupation: [Occupation.Doctor, Occupation.Laboratory],
-      component: CompleteLaboratoryTestFormView
+      component: CompleteLaboratoryExaminationFormView
     },
     {
       path: '/app/form/prescription-test',

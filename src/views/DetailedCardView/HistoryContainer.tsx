@@ -8,18 +8,17 @@ import {
   Divider,
   Grid,
   TextField,
-  Typography,
+  Typography
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { useHistory } from 'react-router-dom';
 import { DeleteOutline, EditOutlined, GraphicEq } from '@mui/icons-material';
 
-import { useDeleteHistoryMutation } from '../../generated/graphql';
+import { CardQuery, useDeleteHistoryMutation } from '../../generated/graphql';
 import VSHistory from './VSHistory';
 import GeneralDetails from './GeneralDetails';
 import OrganHistory from './OrganHistory';
 import DetailedHistory from './DetailedHistory';
-import { HistoryFromCardQuery } from '../../@types/Cards';
 import { format } from 'date-fns';
 import AlertDialog from '../../components/AlertDialog';
 import { editHistoryQuery } from '../../constants/queries';
@@ -67,7 +66,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface HistoryContainerProps {
-  history: HistoryFromCardQuery[];
+  history: NonNullable<CardQuery['card']['history']>;
 }
 
 const HistoryContainer: React.FC<HistoryContainerProps> = ({ history }) => {
@@ -131,7 +130,7 @@ const HistoryContainer: React.FC<HistoryContainerProps> = ({ history }) => {
       locationHistory.push(
         editHistoryQuery({
           ...history[viewedHistoryIndex],
-          id: String(history[viewedHistoryIndex].cardId),
+          id: `${history[viewedHistoryIndex].cardId}`,
           historyId: history[viewedHistoryIndex].id
         })
       );

@@ -155,10 +155,7 @@ const ChangeRates = () => {
             setDate: setCardExpirationDate
           }}
         />
-        <LaboratoryTestSettingMainAccordion
-          laboratoryTestCategories={laboratoryTestCategories}
-          setLaboratoryTestCategories={setLaboratoryTestCategories}
-        />
+        <LaboratoryTestSettingMainAccordion />
         <MedicineAccordion
         // prescription={prescriptionettingData}
         // setPrescription={setPrescriptionSettingData}

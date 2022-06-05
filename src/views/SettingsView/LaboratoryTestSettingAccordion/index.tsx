@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Accordion,
   AccordionSummary,
@@ -8,18 +8,14 @@ import {
 } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import LaboratoryCategoriesAccordion from './LaboratoryCategoriesAccordion';
-import { LaboratoryTestCatagories } from '../../../data/testsSeed';
+// import { LaboratoryTestCatagories } from '../../../data/testsSeed';
+import { useLaboratoryTestCategoriesQuery } from '../../../generated/graphql';
 
-interface LabRatesProps {
-  laboratoryTestCategories: LaboratoryTestCatagories[] | undefined;
-  setLaboratoryTestCategories: React.Dispatch<
-    React.SetStateAction<LaboratoryTestCatagories[] | undefined>
-  >;
-}
-const LaboratoryTestSettingMainAccordion: React.FC<LabRatesProps> = ({
-  laboratoryTestCategories,
-  setLaboratoryTestCategories
-}) => {
+const LaboratoryTestSettingMainAccordion = () => {
+  // const [laboratoryTestCategories, setLaboratoryTestCategories] = useState<LaboraotryTestCategoriesQuery['laboratoryTestCategories']>(
+  //   );
+  const { data, loading } = useLaboratoryTestCategoriesQuery();
+
   return (
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMore />}>
@@ -27,13 +23,15 @@ const LaboratoryTestSettingMainAccordion: React.FC<LabRatesProps> = ({
       </AccordionSummary>
       <AccordionDetails>
         <Grid container spacing={1}>
-          {laboratoryTestCategories?.map((category, index) => (
-            <LaboratoryCategoriesAccordion
-              category={category}
-              index={index}
-              setCategory={setLaboratoryTestCategories}
-            />
-          ))}
+          {loading && 'Loading...'}
+          {data &&
+            !loading &&
+            data.laboratoryTestCategories &&
+            'No Categories Found'}
+          {data &&
+            data.laboratoryTestCategories?.map(category => (
+              <LaboratoryCategoriesAccordion category={category} />
+            ))}
         </Grid>
       </AccordionDetails>
     </Accordion>

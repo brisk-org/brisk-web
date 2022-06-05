@@ -4,7 +4,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../components/Page';
 import SimpleCardInfo from './SimpleCardInfo';
 import HistoryContainer from './HistoryContainer';
-import TestsContainer from './TestsContainer';
+import LaboratoryExaminationConatiner from './LaboratoryExaminationConatiner';
 import { useLocation } from 'react-router-dom';
 import { useCardQuery } from '../../generated/graphql';
 import PrescriptionContainer from './PrescriptionContainer';
@@ -44,12 +44,13 @@ const DetailedCardView = () => {
           <Grid container spacing={3}>
             <Grid item md={4} sm={12} style={{ height: 'auto' }}>
               <SimpleCardInfo data={data} />
-              {data.card.laboratory_tests && data.card.laboratory_tests[0] && (
-                <TestsContainer
-                  name={data.card.name}
-                  tests={data.card.laboratory_tests}
-                />
-              )}
+              {data.card.laboratoryExaminations &&
+                data.card.laboratoryExaminations[0] && (
+                  <LaboratoryExaminationConatiner
+                    cardName={data.card.name}
+                    laboratoryExaminations={data.card.laboratoryExaminations}
+                  />
+                )}
             </Grid>
             <Grid item md={8} sm={12}>
               {data.card.history && data.card.history[0] && (

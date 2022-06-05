@@ -1,4 +1,4 @@
-query LaboraotryTestCategories {
+query LaboratoryTestCategories {
   laboratoryTestCategories {
     name
     price
@@ -8,7 +8,8 @@ query LaboraotryTestCategories {
       normalValue
       commonValues
       price
-      hasIndividualPrice
+      hasPrice
+      isInfluencedByCategory
       inStock
       trackInStock
       created_at
@@ -23,7 +24,8 @@ query LaboraotryTestCategories {
         normalValue
         commonValues
         price
-        hasIndividualPrice
+        hasPrice
+        isInfluencedByCategory
         inStock
         trackInStock
         created_at

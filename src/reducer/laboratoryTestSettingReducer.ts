@@ -1,6 +1,7 @@
-import { LaboratoryTestCatagories } from '../data/testsSeed';
+import { LaboratoryTestCategoriesQuery } from '../generated/graphql';
 
-interface State extends LaboratoryTestCatagories {
+type Category = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0];
+interface State extends Omit<Category, '__typename'> {
   index: number;
 }
 
@@ -141,25 +142,10 @@ export type LaboratoryTestSettingReducerAction =
       };
     }
   | {
-      type: 'hasIndividualPrice';
+      type: 'hasPrice';
       payload: {
         testName: string;
-        hasIndividualPrice: boolean;
-      };
-    }
-  | {
-      type: 'hasNormalValue';
-      payload: {
-        testName: string;
-        hasNormalValue: boolean;
-      };
-    }
-  | {
-      type: 'hasSubCategoryTestNormalValue';
-      payload: {
-        subCategoryName: string;
-        testName: string;
-        hasNormalValue: boolean;
+        hasPrice: boolean;
       };
     }
   | {
@@ -174,359 +160,331 @@ type CategoryEditReducer = (
   action: LaboratoryTestSettingReducerAction
 ) => State;
 
-export const laboaratoryTestSettingReducer: CategoryEditReducer = (
-  state,
-  action
-) => {
-  switch (action.type) {
-    case 'changeCategoryName':
-      return {
-        ...state,
-        name:
-          state.name === action.payload.categoryName
-            ? action.payload.newName
-            : state.name
-      };
-    case 'changeCategoryPrice':
-      return {
-        ...state,
-        price:
-          state.name === action.payload.categoryName
-            ? action.payload.newPrice
-            : state.price
-      };
-    case 'changeSubCategoryName':
-      if (!state.subCategories) {
-        return { ...state };
-      }
-      return {
-        ...state,
-        subCategories: state.subCategories.map(subCategory => ({
-          ...subCategory,
-          name:
-            subCategory.name === action.payload.subCategoryName
-              ? action.payload.newName
-              : subCategory.name
-        }))
-      };
-    case 'changeSubCategoryPrice':
-      if (!state.subCategories) {
-        return { ...state };
-      }
-      return {
-        ...state,
-        subCategories: state.subCategories.map(subCategory => ({
-          ...subCategory,
-          price:
-            subCategory.name === action.payload.subCategoryName
-              ? action.payload.newPrice
-              : subCategory.price
-        }))
-      };
-    case 'addNewTest':
-      return {
-        ...state,
-        tests: [
-          ...state.tests,
-          {
-            name: action.payload.name,
-            individualPrice: action.payload.price,
-            hasIndividualPrice: true,
-            hasNormalValue: false,
-            value: '',
-            isInfluencedByCategory: false
-          }
-        ]
-      };
-    case 'deleteTest':
-      return {
-        ...state,
-        tests: state.tests.filter(test => test.name !== action.payload.name)
-      };
-    case 'addNewSubCategory':
-      if (!state.subCategories) {
-        return {
-          ...state,
-          subCategories: [
-            {
-              name: action.payload.name,
-              price: action.payload.price,
-              tests: []
-            }
-          ]
-        };
-      }
-      return {
-        ...state,
-        subCategories: [
-          ...state.subCategories,
-          {
-            name: action.payload.name,
-            price: action.payload.price,
-            tests: []
-          }
-        ]
-      };
-    case 'deleteSubCategory':
-      return {
-        ...state,
-        subCategories: state.subCategories?.filter(
-          subCategory => subCategory.name !== action.payload.name
-        )
-      };
-    case 'addNewSubCategoryTest':
-      if (!state.subCategories) {
-        console.log('error check this log, isnt supposed to happen');
-        return { ...state };
-      }
-      return {
-        ...state,
-        subCategories: state.subCategories.map(subCategory => {
-          if (subCategory.name !== action.payload.subCategoryName) {
-            return {
-              ...subCategory
-            };
-          }
-          return {
-            ...subCategory,
-            tests: [
-              ...subCategory.tests,
-              {
-                name: action.payload.testName,
-                value: '',
-                hasNormalValue: false
-              }
-            ]
-          };
-        })
-      };
-    case 'deleteSubCategoryTest':
-      if (!state.subCategories) {
-        console.log('error check this log, isnt supposed to happen');
-        return { ...state };
-      }
-      return {
-        ...state,
-        subCategories: state.subCategories.map(subCategory => {
-          if (subCategory.name !== action.payload.subCategoryName) {
-            return {
-              ...subCategory
-            };
-          }
-          return {
-            ...subCategory,
-            tests: subCategory.tests.filter(
-              test => test.name !== action.payload.name
-            )
-          };
-        })
-      };
-    case 'changeTestPrice':
-      return {
-        ...state,
-        tests: state.tests.map(test => ({
-          ...test,
-          individualPrice:
-            test.name === action.payload.testName
-              ? action.payload.price
-              : test.individualPrice
-        }))
-      };
-    case 'changeTestNormalValue':
-      return {
-        ...state,
-        tests: state.tests.map(test => ({
-          ...test,
-          normalValue:
-            test.name === action.payload.testName
-              ? action.payload.normalValue
-              : test.normalValue
-        }))
-      };
-    case 'changeSubCategoryTestNormalValue':
-      if (!state.subCategories) {
-        return { ...state };
-      }
-      return {
-        ...state,
-        subCategories: state.subCategories.map(subCategory => ({
-          ...subCategory,
-          tests:
-            subCategory.name === action.payload.subCategoryName
-              ? subCategory.tests.map(test => ({
-                  ...test,
-                  normalValue:
-                    test.name === action.payload.testName
-                      ? action.payload.normalValue
-                      : test.normalValue
-                }))
-              : subCategory.tests
-        }))
-      };
-    case 'addNewCommonValueForTest':
-      console.log(state);
-      return {
-        ...state,
-        tests: state.tests.map(test => {
-          if (test.name !== action.payload.testName) {
-            return { ...test };
-          }
-          return {
-            ...test,
-            commonValues: !test.commonValues
-              ? [action.payload.newCommonValue]
-              : [...test.commonValues, action.payload.newCommonValue]
-          };
-        })
-      };
-    case 'deleteCommonValueForTest':
-      return {
-        ...state,
-        tests: state.tests.map(test => {
-          if (test.name !== action.payload.testName) {
-            return { ...test };
-          }
+// export const laboaratoryTestSettingReducer: CategoryEditReducer = (
+//   state,
+//   action
+// ) => {
+//   switch (action.type) {
+//     case 'changeCategoryName':
+//       return {
+//         ...state,
 
-          return {
-            ...test,
-            commonValues: test.commonValues?.filter(
-              (_, index) => index !== action.payload.commonValueIndex
-            )
-          };
-        })
-      };
-    case 'addNewCommonValueForSubCategoryTest':
-      if (!state.subCategories) {
-        console.log('NOt supposed to happen');
-        return { ...state };
-      }
+//         name:
+//           state.name === action.payload.categoryName
+//             ? action.payload.newName
+//             : state.name
+//       };
+//     case 'changeCategoryPrice':
+//       return {
+//         ...state,
+//         price:
+//           state.name === action.payload.categoryName
+//             ? action.payload.newPrice
+//             : state.price
+//       };
+//     case 'changeSubCategoryName':
+//       if (!state.subCategories) {
+//         return { ...state };
+//       }
+//       return {
+//         ...state,
+//         subCategories: state.subCategories.map(subCategory => ({
+//           ...subCategory,
+//           name:
+//             subCategory.name === action.payload.subCategoryName
+//               ? action.payload.newName
+//               : subCategory.name
+//         }))
+//       };
+//     case 'changeSubCategoryPrice':
+//       if (!state.subCategories) {
+//         return { ...state };
+//       }
+//       return {
+//         ...state,
+//         subCategories: state.subCategories.map(subCategory => ({
+//           ...subCategory,
+//           price:
+//             subCategory.name === action.payload.subCategoryName
+//               ? action.payload.newPrice
+//               : subCategory.price
+//         }))
+//       };
+//     case 'addNewTest':
+//       return {
+//         ...state,
+//         laboratoryTests: [
+//           ...state.laboratoryTests,
+//           {
+//             name: action.payload.name,
+//             price: action.payload.price,
+//             hasPrice: true,
+//             value: '',
+//             isInfluencedByCategory: false
+//           }
+//         ]
+//       };
+//     case 'deleteTest':
+//       return {
+//         ...state,
+//         laboratoryTests: state.laboratoryTests.filter(
+//           test => test.name !== action.payload.name
+//         )
+//       };
+//     case 'addNewSubCategory':
+//       if (!state.subCategories) {
+//         return {
+//           ...state,
+//           subCategories: [
+//             {
+//               name: action.payload.name,
+//               price: action.payload.price,
+//               laboratoryTests: []
+//             }
+//           ]
+//         };
+//       }
+//       return {
+//         ...state,
+//         subCategories: [
+//           ...state.subCategories,
+//           {
+//             name: action.payload.name,
+//             price: action.payload.price,
+//             laboratoryTests: []
+//           }
+//         ]
+//       };
+//     case 'deleteSubCategory':
+//       return {
+//         ...state,
+//         subCategories: state.subCategories?.filter(
+//           subCategory => subCategory.name !== action.payload.name
+//         )
+//       };
+//     case 'addNewSubCategoryTest':
+//       if (!state.subCategories) {
+//         console.log('error check this log, isnt supposed to happen');
+//         return { ...state };
+//       }
+//       return {
+//         ...state,
+//         subCategories: state.subCategories.map(subCategory => {
+//           if (subCategory.name !== action.payload.subCategoryName) {
+//             return {
+//               ...subCategory
+//             };
+//           }
+//           return {
+//             ...subCategory,
+//             laboratoryTests: [
+//               ...subCategory.laboratoryTests,
+//               {
+//                 name: action.payload.testName,
+//                 value: ''
+//               }
+//             ]
+//           };
+//         })
+//       };
+//     case 'deleteSubCategoryTest':
+//       if (!state.subCategories) {
+//         console.log('error check this log, isnt supposed to happen');
+//         return { ...state };
+//       }
+//       return {
+//         ...state,
+//         subCategories: state.subCategories.map(subCategory => {
+//           if (subCategory.name !== action.payload.subCategoryName) {
+//             return {
+//               ...subCategory
+//             };
+//           }
+//           return {
+//             ...subCategory,
+//             laboratoryTests: subCategory.laboratoryTests.filter(
+//               test => test.name !== action.payload.name
+//             )
+//           };
+//         })
+//       };
+//     case 'changeTestPrice':
+//       return {
+//         ...state,
+//         laboratoryTests: state.laboratoryTests.map(test => ({
+//           ...test,
+//           price:
+//             test.name === action.payload.testName
+//               ? action.payload.price
+//               : test.price
+//         }))
+//       };
+//     case 'changeTestNormalValue':
+//       return {
+//         ...state,
+//         laboratoryTests: state.laboratoryTests.map(test => ({
+//           ...test,
+//           normalValue:
+//             test.name === action.payload.testName
+//               ? action.payload.normalValue
+//               : test.normalValue
+//         }))
+//       };
+//     case 'changeSubCategoryTestNormalValue':
+//       if (!state.subCategories) {
+//         return { ...state };
+//       }
+//       return {
+//         ...state,
+//         subCategories: state.subCategories.map(subCategory => ({
+//           ...subCategory,
+//           laboratoryTests:
+//             subCategory.name === action.payload.subCategoryName
+//               ? subCategory.laboratoryTests.map(test => ({
+//                   ...test,
+//                   normalValue:
+//                     test.name === action.payload.testName
+//                       ? action.payload.normalValue
+//                       : test.normalValue
+//                 }))
+//               : subCategory.laboratoryTests
+//         }))
+//       };
+//     case 'addNewCommonValueForTest':
+//       console.log(state);
+//       return {
+//         ...state,
+//         laboratoryTests: state.laboratoryTests.map(test => {
+//           if (test.name !== action.payload.testName) {
+//             return { ...test };
+//           }
+//           return {
+//             ...test,
+//             commonValues: !test.commonValues
+//               ? [action.payload.newCommonValue]
+//               : [...test.commonValues, action.payload.newCommonValue]
+//           };
+//         })
+//       };
+//     case 'deleteCommonValueForTest':
+//       return {
+//         ...state,
+//         laboratoryTests: state.laboratoryTests.map(test => {
+//           if (test.name !== action.payload.testName) {
+//             return { ...test };
+//           }
 
-      return {
-        ...state,
-        subCategories: state.subCategories.map(subCategory => {
-          if (subCategory.name !== action.payload.subCategoryName) {
-            return { ...subCategory };
-          }
-          return {
-            ...subCategory,
-            tests: subCategory.tests.map(test => {
-              if (test.name !== action.payload.testName) {
-                return { ...test };
-              }
-              return {
-                ...test,
-                commonValues: !test.commonValues
-                  ? [action.payload.newCommonValue]
-                  : [...test.commonValues, action.payload.newCommonValue]
-              };
-            })
-          };
-        })
-      };
+//           return {
+//             ...test,
+//             commonValues: test.commonValues?.filter(
+//               (_, index) => index !== action.payload.commonValueIndex
+//             )
+//           };
+//         })
+//       };
+//     case 'addNewCommonValueForSubCategoryTest':
+//       if (!state.subCategories) {
+//         console.log('NOt supposed to happen');
+//         return { ...state };
+//       }
 
-    case 'deleteCommonValueForSubCategoryTest':
-      if (!state.subCategories) {
-        console.log('NOt supposed to happen');
-        return { ...state };
-      }
+//       return {
+//         ...state,
+//         subCategories: state.subCategories.map(subCategory => {
+//           if (subCategory.name !== action.payload.subCategoryName) {
+//             return { ...subCategory };
+//           }
+//           return {
+//             ...subCategory,
+//             laboratoryTests: subCategory.laboratoryTests.map(test => {
+//               if (test.name !== action.payload.testName) {
+//                 return { ...test };
+//               }
+//               return {
+//                 ...test,
+//                 commonValues: !test.commonValues
+//                   ? [action.payload.newCommonValue]
+//                   : [...test.commonValues, action.payload.newCommonValue]
+//               };
+//             })
+//           };
+//         })
+//       };
 
-      return {
-        ...state,
-        subCategories: state.subCategories.map(subCategory => {
-          if (subCategory.name !== action.payload.subCategoryName) {
-            return { ...subCategory };
-          }
-          return {
-            ...subCategory,
-            tests: subCategory.tests.map(test => {
-              if (test.name !== action.payload.testName) {
-                return { ...test };
-              }
-              return {
-                ...test,
+//     case 'deleteCommonValueForSubCategoryTest':
+//       if (!state.subCategories) {
+//         console.log('NOt supposed to happen');
+//         return { ...state };
+//       }
 
-                commonValues: test.commonValues?.filter(
-                  (_, index) => index !== action.payload.commonValueIndex
-                )
-              };
-            })
-          };
-        })
-      };
+//       return {
+//         ...state,
+//         subCategories: state.subCategories.map(subCategory => {
+//           if (subCategory.name !== action.payload.subCategoryName) {
+//             return { ...subCategory };
+//           }
+//           return {
+//             ...subCategory,
+//             laboratoryTests: subCategory.laboratoryTests.map(test => {
+//               if (test.name !== action.payload.testName) {
+//                 return { ...test };
+//               }
+//               return {
+//                 ...test,
 
-    case 'changeCommonValue':
-      return {
-        ...state
-        // tests: state.tests.map(test => ({
-        //   ...test,
-        //   commonValues:
-        //     test.name === action.payload.testName && test.commonValues
-        //       ? test.commonValues.map((value, index) =>
-        //           index === action.payload.index
-        //             ? [...value, action.payload.newCommonValue]
-        //             : [...value]
-        //         )
-        //       : test.commonValues
-        // }))
-      };
-    case 'isTestInfluencedByCategory':
-      return {
-        ...state,
-        tests: state.tests.map(test => {
-          if (test.name === action.payload.testName) {
-            return {
-              ...test,
-              isInfluencedByCategory: action.payload.isInfluencedByCategory,
-              hasIndividualPrice: !action.payload.isInfluencedByCategory
-                ? true
-                : test.hasIndividualPrice
-            };
-          }
-          return { ...test };
-        })
-      };
-    case 'hasIndividualPrice':
-      return {
-        ...state,
-        tests: state.tests.map(test => ({
-          ...test,
-          hasIndividualPrice:
-            test.name === action.payload.testName
-              ? action.payload.hasIndividualPrice
-              : test.hasIndividualPrice
-        }))
-      };
-    case 'hasNormalValue':
-      return {
-        ...state,
-        tests: state.tests.map(test => ({
-          ...test,
-          hasNormalValue:
-            test.name === action.payload.testName
-              ? action.payload.hasNormalValue
-              : test.hasNormalValue
-        }))
-      };
-    case 'hasSubCategoryTestNormalValue':
-      return {
-        ...state,
-        subCategories:
-          state.subCategories &&
-          state.subCategories.map(subCategory => ({
-            ...subCategory,
-            tests:
-              subCategory.name === action.payload.subCategoryName
-                ? subCategory.tests.map(test => ({
-                    ...test,
-                    hasNormalValue:
-                      test.name === action.payload.testName
-                        ? action.payload.hasNormalValue
-                        : test.hasNormalValue
-                  }))
-                : subCategory.tests
-          }))
-      };
-    default:
-      return { ...state };
-  }
-};
+//                 commonValues: test.commonValues?.filter(
+//                   (_, index) => index !== action.payload.commonValueIndex
+//                 )
+//               };
+//             })
+//           };
+//         })
+//       };
+
+//     case 'changeCommonValue':
+//       return {
+//         ...state
+//         // tests: state.tests.map(test => ({
+//         //   ...test,
+//         //   commonValues:
+//         //     test.name === action.payload.testName && test.commonValues
+//         //       ? test.commonValues.map((value, index) =>
+//         //           index === action.payload.index
+//         //             ? [...value, action.payload.newCommonValue]
+//         //             : [...value]
+//         //         )
+//         //       : test.commonValues
+//         // }))
+//       };
+//     case 'isTestInfluencedByCategory':
+//       return {
+//         ...state,
+//         laboratoryTests: state.laboratoryTests.map(test => {
+//           if (test.name === action.payload.testName) {
+//             return {
+//               ...test,
+//               isInfluencedByCategory: action.payload.isInfluencedByCategory,
+//               hasPrice: !action.payload.isInfluencedByCategory
+//                 ? true
+//                 : test.hasPrice
+//             };
+//           }
+//           return { ...test };
+//         })
+//       };
+//     case 'hasPrice':
+//       return {
+//         ...state,
+//         laboratoryTests: state.laboratoryTests.map(test => ({
+//           ...test,
+//           hasPrice:
+//             test.name === action.payload.testName
+//               ? action.payload.hasPrice
+//               : test.hasPrice
+//         }))
+//       };
+
+//     default:
+//       return { ...state };
+//   }
+// };

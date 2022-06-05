@@ -18,7 +18,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import { LaboratoryTestCatagories } from '../../../data/testsSeed';
 import SingleLabTestRate from './SingleLabTestRate';
 import LaboratoryTestSettingDialog from './LaboratoryTestSettingDialog';
-import { laboaratoryTestSettingReducer } from '../../../reducer/laboratoryTestSettingReducer';
+// import { laboaratoryTestSettingReducer } from '../../../reducer/laboratoryTestSettingReducer';
+import { LaboratoryTestCategoriesQuery } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -35,25 +36,18 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface Props {
-  index: number;
-  category: LaboratoryTestCatagories;
-  setCategory: React.Dispatch<
-    React.SetStateAction<LaboratoryTestCatagories[] | undefined>
-  >;
+  // category: LaboratoryTestCatagories;
+  category: LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0];
 }
-const LaboratoryCategoriesAccordion: React.FC<Props> = ({
-  index,
-  category,
-  setCategory
-}) => {
+const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
   const classes = useStyles();
-  const [singleCategoryEdit, dispatch] = useReducer(
-    laboaratoryTestSettingReducer,
-    {
-      ...category,
-      index
-    }
-  );
+  // const [singleCategoryEdit, dispatch] = useReducer(
+  //   laboaratoryTestSettingReducer,
+  //   {
+  //     ...category,
+  //     index
+  //   }
+  // );
   const [parentAccordionDialogOpen, setParentAccordionDialogOpen] = useState(
     false
   );
@@ -61,21 +55,21 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({
     setParentAccordionDialogOpen(false);
   };
 
-  const handleDuplicateCategoryToMain: React.FormEventHandler<HTMLFormElement> = event => {
-    event.preventDefault();
-    setCategory(prevCategories => {
-      if (!prevCategories) return;
-      return [
-        ...prevCategories.map((prevCategory, prevCategoryIndex) => {
-          if (prevCategoryIndex !== index) {
-            return { ...prevCategory };
-          }
-          return { ...singleCategoryEdit };
-        })
-      ];
-    });
-    setParentAccordionDialogOpen(false);
-  };
+  // const handleDuplicateCategoryToMain: React.FormEventHandler<HTMLFormElement> = event => {
+  //   event.preventDefault();
+  //   setCategory(prevCategories => {
+  //     if (!prevCategories) return;
+  //     return [
+  //       ...prevCategories.map((prevCategory, prevCategoryIndex) => {
+  //         if (prevCategoryIndex !== index) {
+  //           return { ...prevCategory };
+  //         }
+  //         return { ...singleCategoryEdit };
+  //       })
+  //     ];
+  //   });
+  //   setParentAccordionDialogOpen(false);
+  // };
 
   return (
     <Grid item md={4} sm={6} xs={12}>
@@ -112,66 +106,68 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({
                   </AccordionSummary>
                   <List dense>
                     {subCategory &&
-                      subCategory.tests.map((test, index) => (
-                        <ListItem>
-                          <ListItemText
-                            primary={test.name}
-                            secondary={
-                              test.normalValue && (
-                                <Typography
-                                  sx={{ display: 'block' }}
-                                  variant="caption"
-                                >
-                                  nv: {test.normalValue}
-                                </Typography>
-                              )
-                            }
-                          />
+                      subCategory.laboratoryTests.map(
+                        (laboratoryTest, index) => (
+                          <ListItem>
+                            <ListItemText
+                              primary={laboratoryTest.name}
+                              secondary={
+                                laboratoryTest.normalValue && (
+                                  <Typography
+                                    sx={{ display: 'block' }}
+                                    variant="caption"
+                                  >
+                                    nv: {laboratoryTest.normalValue}
+                                  </Typography>
+                                )
+                              }
+                            />
 
-                          <Divider />
-                        </ListItem>
-                        // <AccordionDetails
-                        //   className={clsx({
+                            <Divider />
+                          </ListItem>
+                          // <AccordionDetails
+                          //   className={clsx({
 
-                        //     [classes.details]: false
-                        //     // category === 'Clinical Chemistry'
-                        //   })}
-                        // >
-                        /* <SingleLabTestRate
+                          //     [classes.details]: false
+                          //     // category === 'Clinical Chemistry'
+                          //   })}
+                          // >
+                          /* <SingleLabTestRate
                             key={index}
                             testDetails={{ ...test }}
                             categoryName={category.name}
                             subCategoryName={subCategory.name}
                             dispatch={dispatch}
                           /> */
-                        // </AccordionDetails>
-                      ))}
+                          // </AccordionDetails>
+                        )
+                      )}
                   </List>
                 </Accordion>
               ))}
-            {category.tests &&
-              category.tests.map(test => (
+            {category.laboratoryTests &&
+              category.laboratoryTests.map(laboratoryTest => (
                 <>
                   <Divider />
                   <ListItem sx={{ mt: 1 }}>
                     <ListItemText
                       primary={
                         <Typography variant="body1">
-                          {test.name}{' '}
-                          {test.hasIndividualPrice && (
+                          {laboratoryTest.name}{' '}
+                          {laboratoryTest.hasPrice && (
                             <Typography variant="caption">
-                              ({test.individualPrice}birr)
+                              ({laboratoryTest.price}birr)
                             </Typography>
                           )}
                         </Typography>
                       }
                       secondary={
-                        test.normalValue && (
+                        laboratoryTest.normalValue && (
                           <Typography
                             sx={{ display: 'block' }}
                             variant="caption"
                           >
-                            nv: {test.normalValue}
+                            nv: {laboratoryTest.normalValue}
                           </Typography>
                         )
                       }
@@ -185,9 +181,9 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({
       <LaboratoryTestSettingDialog
         open={parentAccordionDialogOpen}
         handleClose={handleParentAccordionDialogClose}
-        handleSubmit={handleDuplicateCategoryToMain}
-        category={singleCategoryEdit}
-        dispatch={dispatch}
+        // handleSubmit={handleDuplicateCategoryToMain}
+        category={category}
+        dispatch={() => ''}
       />
     </Grid>
   );

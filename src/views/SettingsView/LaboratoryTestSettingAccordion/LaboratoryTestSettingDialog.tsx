@@ -21,26 +21,27 @@ import {
   InputLabel,
   IconButton
 } from '@mui/material';
-import { LaboratoryTestCatagories } from '../../../data/testsSeed';
+// import { LaboratorylaboratoryTestCatagories } from '../../../data/testsSeed';
 import DialogExaminationCollapseListItem from './DialogExaminationCollapseListItem';
 import AddNewFieldsFormDialog from './AddNewFieldsFormDialog';
 import CommonValuesCollapse from './CommonValuesCollapse';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { LaboratoryTestSettingReducerAction } from '../../../reducer/laboratoryTestSettingReducer';
+// import { LaboratorylaboratoryTestSettingReducerAction } from '../../../reducer/laboratoryTestSettingReducer';
+import { LaboratoryTestCategoriesQuery } from '../../../generated/graphql';
 
 interface Props {
   open: boolean;
   handleClose: () => void;
-  category: LaboratoryTestCatagories;
-  dispatch: React.Dispatch<LaboratoryTestSettingReducerAction>;
-  handleSubmit: React.FormEventHandler<HTMLFormElement>;
+  category: LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0];
+  dispatch: (i: any) => any;
+  // handleSubmit: React.FormEventHandler<HTMLFormElement>;
 }
-const LaboratoryTestSettingDialog: React.FC<Props> = ({
+const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
   open,
   handleClose,
   category,
-  dispatch,
-  handleSubmit
+  dispatch
+  // handleSubmit
 }) => {
   const [isExaminationExpanded, setIsExaminationExpanded] = useState('');
   const [isSubCategoryExpanded, setIsSubCategoryExpanded] = useState('');
@@ -52,35 +53,15 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
 
   const preSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
-    const emptyCategory = category.tests.find(
-      test =>
-        (test.hasIndividualPrice && !test.individualPrice) ||
-        (test.hasNormalValue && !test.normalValue)
+    const emptyCategory = category.laboratoryTests.find(
+      laboratoryTest => laboratoryTest.hasPrice && !laboratoryTest.price
     );
-    const emptySubCategory = category.subCategories
-      ?.filter(subCategory =>
-        subCategory.tests?.find(
-          test => test.hasNormalValue && !test.normalValue
-        )
-      )
-      .map(subCategory => {
-        return {
-          ...subCategory,
-          tests: subCategory.tests.filter(
-            test => test.hasNormalValue && !test.normalValue
-          )
-        };
-      });
 
-    console.log(emptyCategory, emptySubCategory);
     if (emptyCategory) {
       setIsExaminationExpanded(emptyCategory.name);
-    } else if (emptySubCategory && emptySubCategory[0]) {
-      setIsSubCategoryExpanded(emptySubCategory[0].name);
-      setIsExaminationExpanded(emptySubCategory[0].tests[0].name);
-    } else {
-      handleSubmit(event);
+      return;
     }
+    // handleSubmit(event);
   };
   return (
     <Dialog
@@ -95,8 +76,11 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
             {category.name}
             <Typography sx={{ ml: 1 }} variant="caption">
               (
-              {category.tests
-                .map(test => test.isInfluencedByCategory && test.name)
+              {category.laboratoryTests
+                .map(
+                  laboratoryTest =>
+                    laboratoryTest.isInfluencedByCategory && laboratoryTest.name
+                )
                 .filter(value => !!value)
                 .join(', ')}
               )
@@ -146,33 +130,33 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
               </ListSubheader>
             }
           >
-            {category.tests.map(test => (
+            {category.laboratoryTests.map(laboratoryTest => (
               <DialogExaminationCollapseListItem
-                isExpanded={isExaminationExpanded === test.name}
-                listItemPrimaryText={test.name}
-                listItemSecondaryText={test.individualPrice}
+                isExpanded={isExaminationExpanded === laboratoryTest.name}
+                listItemPrimaryText={laboratoryTest.name}
+                listItemSecondaryText={`${laboratoryTest.price}`}
                 handleClick={() =>
                   setIsExaminationExpanded(prevExpanded =>
-                    prevExpanded === test.name ? '' : test.name
+                    prevExpanded === laboratoryTest.name ? '' : test.name
                   )
                 }
                 handleDelete={() => {
                   dispatch({
-                    type: 'deleteTest',
-                    payload: { name: test.name }
+                    type: 'deletelaboratoryTest',
+                    payload: { name: laboratoryTest.name }
                   });
                 }}
               >
                 <ListItem>
                   <ListItemIcon>
                     <Checkbox
-                      checked={test.isInfluencedByCategory}
+                      checked={laboratoryTest.isInfluencedByCategory}
                       onChange={(_, checked) => {
                         dispatch({
-                          type: 'isTestInfluencedByCategory',
+                          type: 'islaboratoryTestInfluencedByCategory',
                           payload: {
                             isInfluencedByCategory: checked,
-                            testName: test.name
+                            laboratoryTestName: test.name
                           }
                         });
                       }}
@@ -187,13 +171,13 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                   <ListItemIcon>
                     <Checkbox
                       color="secondary"
-                      checked={test.hasIndividualPrice}
-                      disabled={!test.isInfluencedByCategory}
+                      checked={laboratoryTest.hasPrice}
+                      disabled={!laboratoryTest.isInfluencedByCategory}
                       onChange={(_, checked) => {
                         dispatch({
                           type: 'hasIndividualPrice',
                           payload: {
-                            testName: test.name,
+                            laboratoryTestName: test.name,
                             hasIndividualPrice: checked
                           }
                         });
@@ -211,29 +195,29 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                       primary="has individual price"
                       secondary="can be requested individually"
                     />
-                    {test.hasIndividualPrice && (
+                    {laboratoryTest.hasPrice && (
                       <FormControl
                         required
-                        error={!test.individualPrice}
+                        error={!laboratoryTest.price}
                         variant="standard"
                       >
-                        <InputLabel>{test.name} price</InputLabel>
+                        <InputLabel>{laboratoryTest.name} price</InputLabel>
                         <Input
                           autoFocus
                           sx={{ ml: '5px' }}
                           onChange={e =>
                             dispatch({
-                              type: 'changeTestPrice',
+                              type: 'changelaboratoryTestPrice',
                               payload: {
-                                testName: test.name,
+                                laboratoryTestName: test.name,
                                 price: parseInt(e.target.value)
                               }
                             })
                           }
                           type="number"
-                          value={test.individualPrice}
+                          value={laboratoryTest.price}
                         />
-                        {!test.individualPrice && (
+                        {!laboratoryTest.price && (
                           <FormHelperText>cannot be empty</FormHelperText>
                         )}
                       </FormControl>
@@ -243,21 +227,21 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                 <Divider />
 
                 <ListItem>
-                  <ListItemIcon>
+                  {/* <ListItemIcon>
                     <Checkbox
                       color="success"
-                      checked={test.hasNormalValue}
+                      checked={laboratoryTest.hasNormalValue}
                       onChange={(_, checked) => {
                         dispatch({
                           type: 'hasNormalValue',
                           payload: {
-                            testName: test.name,
+                            laboratoryTestName: test.name,
                             hasNormalValue: checked
                           }
                         });
                       }}
                     />
-                  </ListItemIcon>
+                  </ListItemIcon> */}
                   <Box
                     sx={{
                       display: 'flex',
@@ -269,32 +253,30 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                       primary="has normal value"
                       secondary="a constant reference"
                     />
-                    {test.hasNormalValue && (
-                      <FormControl
-                        error={!test.normalValue}
-                        variant="standard"
-                        sx={{ ml: 6 }}
-                      >
-                        <InputLabel>{test.name} normal value</InputLabel>
-                        <Input
-                          autoFocus
-                          sx={{ ml: '5px' }}
-                          onChange={e =>
-                            dispatch({
-                              type: 'changeTestNormalValue',
-                              payload: {
-                                testName: test.name,
-                                normalValue: e.target.value
-                              }
-                            })
-                          }
-                          value={test.normalValue}
-                        />
-                        {!test.normalValue && (
-                          <FormHelperText>cannot be empty</FormHelperText>
-                        )}
-                      </FormControl>
-                    )}
+                    (
+                    <FormControl variant="standard" sx={{ ml: 6 }}>
+                      <InputLabel>
+                        {laboratoryTest.name} normal value
+                      </InputLabel>
+                      <Input
+                        autoFocus
+                        sx={{ ml: '5px' }}
+                        onChange={e =>
+                          dispatch({
+                            type: 'changelaboratoryTestNormalValue',
+                            payload: {
+                              laboratoryTestName: test.name,
+                              normalValue: e.target.value
+                            }
+                          })
+                        }
+                        value={laboratoryTest.normalValue}
+                      />
+                      {!laboratoryTest.normalValue && (
+                        <FormHelperText>cannot be empty</FormHelperText>
+                      )}
+                    </FormControl>
+                    )
                   </Box>
                 </ListItem>
                 <CommonValuesCollapse
@@ -302,26 +284,26 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                   setCommonValue={setNewCommonValue}
                   onSubmit={() => {
                     dispatch({
-                      type: 'addNewCommonValueForTest',
+                      type: 'addNewCommonValueForlaboratoryTest',
                       payload: {
-                        testName: test.name,
+                        laboratoryTestName: test.name,
                         newCommonValue
                       }
                     });
                     setNewCommonValue('');
                   }}
                 >
-                  {test.commonValues &&
-                    test.commonValues.map((commonValue, index) => (
+                  {laboratoryTest.commonValues &&
+                    laboratoryTest.commonValues.map((commonValue, index) => (
                       <>
                         <ListItem
                           secondaryAction={
                             <IconButton
                               onClick={() => {
                                 dispatch({
-                                  type: 'deleteCommonValueForTest',
+                                  type: 'deleteCommonValueForlaboratoryTest',
                                   payload: {
-                                    testName: test.name,
+                                    laboratoryTestName: test.name,
                                     commonValueIndex: index
                                   }
                                 });
@@ -344,12 +326,12 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
             ))}
 
             <AddNewFieldsFormDialog
-              title="Add a Laboratory Test"
+              title="Add a Laboratory laboratoryTest"
               field={newAddedField}
               setField={setNewAddedField}
               onSubmit={() => {
                 dispatch({
-                  type: 'addNewTest',
+                  type: 'addNewlaboratoryTest',
                   payload: {
                     name: newAddedField.name,
                     price: newAddedField.price
@@ -371,7 +353,7 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                 <DialogExaminationCollapseListItem
                   isExpanded={isSubCategoryExpanded === subCategory.name}
                   listItemPrimaryText={subCategory.name.toUpperCase()}
-                  listItemSecondaryText={subCategory.price}
+                  listItemSecondaryText={`${subCategory.price}`}
                   handleClick={() =>
                     setIsSubCategoryExpanded(prevExpanded =>
                       prevExpanded === subCategory.name ? '' : subCategory.name
@@ -421,42 +403,42 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                     />
                   </Box>
 
-                  {subCategory.tests.map(test => (
+                  {subCategory.laboratoryTests.map(laboratoryTest => (
                     <DialogExaminationCollapseListItem
-                      isExpanded={isExaminationExpanded === test.name}
-                      listItemPrimaryText={test.name}
+                      isExpanded={isExaminationExpanded === laboratoryTest.name}
+                      listItemPrimaryText={laboratoryTest.name}
                       handleClick={() =>
                         setIsExaminationExpanded(prevExpanded =>
-                          prevExpanded === test.name ? '' : test.name
+                          prevExpanded === laboratoryTest.name ? '' : test.name
                         )
                       }
                       handleDelete={() => {
                         dispatch({
-                          type: 'deleteSubCategoryTest',
+                          type: 'deleteSubCategorylaboratoryTest',
                           payload: {
                             subCategoryName: subCategory.name,
-                            name: test.name
+                            name: laboratoryTest.name
                           }
                         });
                       }}
                     >
                       <ListItem>
-                        <ListItemIcon>
+                        {/* <ListItemIcon>
                           <Checkbox
                             color="success"
-                            checked={test.hasNormalValue}
+                            checked={laboratoryTest.hasNormalValue}
                             onChange={(_, checked) => {
                               dispatch({
-                                type: 'hasSubCategoryTestNormalValue',
+                                type: 'hasSubCategorylaboratoryTestNormalValue',
                                 payload: {
-                                  testName: test.name,
+                                  laboratoryTestName: test.name,
                                   subCategoryName: subCategory.name,
                                   hasNormalValue: checked
                                 }
                               });
                             }}
                           />
-                        </ListItemIcon>
+                        </ListItemIcon> */}
                         <Box
                           sx={{
                             display: 'flex',
@@ -468,33 +450,30 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                             primary="has normal value"
                             secondary="a constant reference"
                           />
-                          {test.hasNormalValue && (
-                            <FormControl
-                              error={!test.normalValue}
-                              variant="standard"
-                              sx={{ ml: 6 }}
-                            >
-                              <InputLabel>{test.name} normal value</InputLabel>
-                              <Input
-                                autoFocus
-                                sx={{ ml: '5px' }}
-                                onChange={e =>
-                                  dispatch({
-                                    type: 'changeSubCategoryTestNormalValue',
-                                    payload: {
-                                      testName: test.name,
-                                      subCategoryName: subCategory.name,
-                                      normalValue: e.target.value
-                                    }
-                                  })
-                                }
-                                value={test.normalValue}
-                              />
-                              {!test.normalValue && (
-                                <FormHelperText>cannot be empty</FormHelperText>
-                              )}
-                            </FormControl>
-                          )}
+                          <FormControl variant="standard" sx={{ ml: 6 }}>
+                            <InputLabel>
+                              {laboratoryTest.name} normal value
+                            </InputLabel>
+                            <Input
+                              autoFocus
+                              sx={{ ml: '5px' }}
+                              onChange={e =>
+                                dispatch({
+                                  type:
+                                    'changeSubCategorylaboratoryTestNormalValue',
+                                  payload: {
+                                    laboratoryTestName: test.name,
+                                    subCategoryName: subCategory.name,
+                                    normalValue: e.target.value
+                                  }
+                                })
+                              }
+                              value={laboratoryTest.normalValue}
+                            />
+                            {!laboratoryTest.normalValue && (
+                              <FormHelperText>cannot be empty</FormHelperText>
+                            )}
+                          </FormControl>
                         </Box>
                       </ListItem>
 
@@ -503,57 +482,60 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
                         setCommonValue={setNewCommonValue}
                         onSubmit={() => {
                           dispatch({
-                            type: 'addNewCommonValueForSubCategoryTest',
+                            type:
+                              'addNewCommonValueForSubCategorylaboratoryTest',
                             payload: {
-                              testName: test.name,
+                              laboratoryTestName: test.name,
                               subCategoryName: subCategory.name,
                               newCommonValue
                             }
                           });
                         }}
                       >
-                        {test.commonValues &&
-                          test.commonValues.map((commonValue, index) => (
-                            <>
-                              <ListItem
-                                secondaryAction={
-                                  <IconButton
-                                    onClick={() => {
-                                      dispatch({
-                                        type:
-                                          'deleteCommonValueForSubCategoryTest',
-                                        payload: {
-                                          subCategoryName: subCategory.name,
-                                          testName: test.name,
-                                          commonValueIndex: index
-                                        }
-                                      });
-                                    }}
-                                    color="secondary"
-                                    size="small"
-                                    edge="end"
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                }
-                              >
-                                <ListItemText primary={commonValue} />
-                              </ListItem>
-                              <Divider />
-                            </>
-                          ))}
+                        {laboratoryTest.commonValues &&
+                          laboratoryTest.commonValues.map(
+                            (commonValue, index) => (
+                              <>
+                                <ListItem
+                                  secondaryAction={
+                                    <IconButton
+                                      onClick={() => {
+                                        dispatch({
+                                          type:
+                                            'deleteCommonValueForSubCategorylaboratoryTest',
+                                          payload: {
+                                            subCategoryName: subCategory.name,
+                                            laboratoryTestName: test.name,
+                                            commonValueIndex: index
+                                          }
+                                        });
+                                      }}
+                                      color="secondary"
+                                      size="small"
+                                      edge="end"
+                                    >
+                                      <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                  }
+                                >
+                                  <ListItemText primary={commonValue} />
+                                </ListItem>
+                                <Divider />
+                              </>
+                            )
+                          )}
                       </CommonValuesCollapse>
                     </DialogExaminationCollapseListItem>
                   ))}
                   <AddNewFieldsFormDialog
-                    title={`Add a LaboratoryTest under ${subCategory.name}`}
+                    title={`Add a LaboratorylaboratoryTest under ${subCategory.name}`}
                     field={newAddedField}
                     setField={setNewAddedField}
                     onSubmit={() => {
                       dispatch({
-                        type: 'addNewSubCategoryTest',
+                        type: 'addNewSubCategorylaboratoryTest',
                         payload: {
-                          testName: newAddedField.name,
+                          laboratoryTestName: newAddedField.name,
                           subCategoryName: subCategory.name
                         }
                       });
@@ -592,4 +574,4 @@ const LaboratoryTestSettingDialog: React.FC<Props> = ({
   );
 };
 
-export default LaboratoryTestSettingDialog;
+export default LaboratorylaboratoryTestSettingDialog;

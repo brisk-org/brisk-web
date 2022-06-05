@@ -37,7 +37,7 @@ query Card($id: ID!) {
       created_at
       updated_at
     }
-    laboratory_tests {
+    laboratoryExaminations {
       id
       cardId
       paid

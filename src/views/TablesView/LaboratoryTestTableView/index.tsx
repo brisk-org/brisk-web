@@ -7,16 +7,16 @@ import Page from '../../../components/Page';
 import Toolbar from '../../../components/Toolbar';
 import { Link } from 'react-router-dom';
 import {
-  SearchLaboratoryTestsQuery,
-  LaboratoryTestsQuery,
-  useSearchLaboratoryTestsQuery,
-  useLaboratoryTestsQuery,
-  NewCreatedLaboratoryTestDocument,
-  useLaboratoryTestsCountQuery,
+  SearchLaboratoryExaminationQuery,
+  LaboratoryExaminationsQuery,
+  useSearchLaboratoryExaminationQuery,
+  useLaboratoryExaminationsQuery,
+  NewCreatedLaboratoryExaminationDocument,
+  useLaboratoryExaminationCountQuery,
   Occupation
 } from '../../../generated/graphql';
 import MainContainerTable from '../../../components/MainContainerTable';
-import SingleTestRow from './SingleTestRow';
+import SingleExaminationRow from './SingleTestRow';
 import { SearchTermsType } from '../../../@types';
 import { defaultTableHeads } from '../../../constants/tableHeads';
 import { AuthContext } from '../../../context/AuthContext';
@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const LaboratoryTestTableView = () => {
+const LaboratoryExaminationTableView = () => {
   const classes = useStyles();
   const [terms, setTerms] = useState<SearchTermsType>({
     name: ''
@@ -39,29 +39,28 @@ const LaboratoryTestTableView = () => {
   const firstRender = useRef<HTMLDivElement>(null);
   const [skip, setSkip] = useState(0);
   const [take, setTake] = useState(10);
-  const { data: countData } = useLaboratoryTestsCountQuery();
+  const { data: countData } = useLaboratoryExaminationCountQuery();
 
   const isBeingSearched = terms.name;
 
-  const [allTests, setAllTests] = useState<LaboratoryTestsQuery>();
-  const [searchedTests, setSearchedTests] = useState<
-    SearchLaboratoryTestsQuery
+  const [laboratoryExaminations, setLaboratoryExaminations] = useState<
+    LaboratoryExaminationsQuery['laboratoryExaminations']
   >();
 
   const {
-    loading: searchedTestsLoading,
-    data: searchedTestsData
-  } = useSearchLaboratoryTestsQuery({
+    loading: searchedLaboratoryExaminationsLoading,
+    data: searchedLaboratoryExaminationsData
+  } = useSearchLaboratoryExaminationQuery({
     variables: { term: terms.name!, skip, take },
     skip: !isBeingSearched,
     onError: err => console.log(err)
   });
 
   const {
-    loading: allTestsLoading,
-    data: allTestsData,
+    loading: laboratoryExaminationsLoading,
+    data: laboratoryExaminationData,
     subscribeToMore
-  } = useLaboratoryTestsQuery({
+  } = useLaboratoryExaminationsQuery({
     variables: { skip, take },
     skip: !!isBeingSearched,
     fetchPolicy: firstRender.current ? 'cache-first' : 'network-only',
@@ -69,50 +68,57 @@ const LaboratoryTestTableView = () => {
   });
 
   subscribeToMore({
-    document: NewCreatedLaboratoryTestDocument,
+    document: NewCreatedLaboratoryExaminationDocument,
     updateQuery: (prev, { subscriptionData }) => {
-      const newCreatedLaboratoryTest = subscriptionData.data;
-      if (!newCreatedLaboratoryTest) return prev;
+      const newCreatedLaboratoryExamination = subscriptionData.data;
+      if (!newCreatedLaboratoryExamination) return prev;
       return Object.assign({}, prev, {
-        laboratoryTests: prev.laboratoryTests
-          ? [newCreatedLaboratoryTest, ...prev.laboratoryTests]
-          : [newCreatedLaboratoryTest]
+        laboratoryExaminations: prev.laboratoryExaminations
+          ? [newCreatedLaboratoryExamination, ...prev.laboratoryExaminations]
+          : [newCreatedLaboratoryExamination]
       });
     },
     onError: err => console.log(err)
   });
   subscribeToMore({
-    document: NewCreatedLaboratoryTestDocument,
+    document: NewCreatedLaboratoryExaminationDocument,
     updateQuery: (prev, { subscriptionData }) => {
-      const newPaidLaboratoryTest = subscriptionData.data;
-      if (!newPaidLaboratoryTest) return prev;
-      if (!prev.laboratoryTests && newPaidLaboratoryTest)
-        return { laboratoryTests: newPaidLaboratoryTest as any };
-      const filteredPrevWithoutPaidLaboratoryTest = prev.laboratoryTests.filter(
+      const newPaidLaboratoryExamination = subscriptionData.data;
+      if (!newPaidLaboratoryExamination) return prev;
+      if (!prev.laboratoryExaminations && newPaidLaboratoryExamination)
+        return { laboratoryExaminations: newPaidLaboratoryExamination as any };
+      const filteredPrevWithoutPaidLaboratoryExamination = prev.laboratoryExaminations.filter(
         test =>
-          test.id !== (newPaidLaboratoryTest as any).newCreatedLaboratoryTest.id
+          test.id !==
+          (newPaidLaboratoryExamination as any).newCreatedLaboratoryTest.id
       );
       return Object.assign({}, prev, {
-        laboratoryTests: [
-          newPaidLaboratoryTest,
-          ...filteredPrevWithoutPaidLaboratoryTest
+        laboratoryExaminations: [
+          newPaidLaboratoryExamination,
+          ...filteredPrevWithoutPaidLaboratoryExamination
         ]
       });
     },
     onError: err => console.log(err)
   });
-
   useEffect(() => {
-    (function() {
-      isBeingSearched && setAllTests(undefined);
-      isBeingSearched
-        ? setSearchedTests(searchedTestsData)
-        : setAllTests(allTestsData);
-    })();
-  }, [allTestsData, searchedTestsData, terms]);
+    if (isBeingSearched) {
+      setLaboratoryExaminations(
+        searchedLaboratoryExaminationsData?.searchLaboratoryExamination
+      );
+      return;
+    }
+    setLaboratoryExaminations(
+      laboratoryExaminationData?.laboratoryExaminations
+    );
+  }, [
+    laboratoryExaminationData,
+    searchedLaboratoryExaminationsData,
+    isBeingSearched
+  ]);
 
   return (
-    <Page className={classes.root} title="Laboratory Test">
+    <Page className={classes.root} title="Laboratory Examination">
       <Container ref={firstRender} maxWidth={false}>
         <Box display="flex" justifyContent="flex-end">
           <Link to="card/add">
@@ -122,53 +128,45 @@ const LaboratoryTestTableView = () => {
           </Link>
         </Box>
         <Toolbar
-          loading={searchedTestsLoading}
+          loading={searchedLaboratoryExaminationsLoading}
           searchState={{ terms, setTerms }}
           disablePhoneSearchField={true}
         />
 
         <Box mt={3}>
-          {!allTests?.laboratoryTests[0] &&
-            !searchedTests?.searchLaboratoryTests[0] &&
-            'No result'}
-          {(allTestsLoading || searchedTestsLoading) && 'Loading...'}
-          {allTests?.laboratoryTests ? (
+          {laboratoryExaminations && !laboratoryExaminations[0] && 'No result'}
+          {(laboratoryExaminationsLoading ||
+            searchedLaboratoryExaminationsLoading) &&
+            'Loading...'}
+          {laboratoryExaminations && (
             <MainContainerTable
               skipState={{ skip, setSkip }}
               takeState={{ take, setTake }}
               tableHead={defaultTableHeads}
-              count={countData?.laboratoryTestsCount}
+              count={countData?.laboratoryExaminationCount}
             >
-              {allTests.laboratoryTests.map((test, index) => {
+              {laboratoryExaminations.map((laboratoryExamination, index) => {
                 return occupation === Occupation.Doctor ? (
-                  <SingleTestRow key={index} test={test} />
-                ) : test.paid && !test.completed ? (
+                  <SingleExaminationRow
+                    key={index}
+                    laboratoryExamination={laboratoryExamination}
+                  />
+                ) : laboratoryExamination.paid &&
+                  !laboratoryExamination.completed ? (
                   occupation === Occupation.Laboratory && (
-                    <SingleTestRow key={index} test={test} />
+                    <SingleExaminationRow
+                      key={index}
+                      laboratoryExamination={laboratoryExamination}
+                    />
                   )
                 ) : (
                   occupation === Occupation.Reception &&
-                  !test.paid && <SingleTestRow key={index} test={test} />
-                );
-              })}
-            </MainContainerTable>
-          ) : (
-            <MainContainerTable
-              skipState={{ skip, setSkip }}
-              takeState={{ take, setTake }}
-              tableHead={defaultTableHeads}
-              count={countData?.laboratoryTestsCount}
-            >
-              {searchedTests?.searchLaboratoryTests.map((test, index) => {
-                return occupation === Occupation.Doctor ? (
-                  <SingleTestRow key={index} test={test} />
-                ) : test.paid && !test.completed ? (
-                  occupation === Occupation.Laboratory && (
-                    <SingleTestRow key={index} test={test} />
+                  !laboratoryExamination.paid && (
+                    <SingleExaminationRow
+                      key={index}
+                      laboratoryExamination={laboratoryExamination}
+                    />
                   )
-                ) : (
-                  occupation === Occupation.Reception &&
-                  !test.paid && <SingleTestRow key={index} test={test} />
                 );
               })}
             </MainContainerTable>
@@ -179,4 +177,4 @@ const LaboratoryTestTableView = () => {
   );
 };
 
-export default LaboratoryTestTableView;
+export default LaboratoryExaminationTableView;

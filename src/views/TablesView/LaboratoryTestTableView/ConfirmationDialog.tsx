@@ -8,15 +8,15 @@ import {
   Dialog,
   Button,
   Box,
-  colors,
+  colors
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { AttachMoney, Close } from '@mui/icons-material';
 import {
-  LaboratoryTestDocument,
-  usePayForLaboratoryTestMutation
+  LaboratoryExaminationDocument,
+  LaboratoryExaminationsQuery,
+  usePayForLaboratoryExaminationMutation
 } from '../../../generated/graphql';
-import { LaboratoryTestType } from '../../../@types/LaboratoryTest';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -38,27 +38,27 @@ const useStyles = makeStyles(theme => ({
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  test: LaboratoryTestType;
+  laboraotryExamination: LaboratoryExaminationsQuery['laboratoryExaminations'][0];
 }
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,
   setOpen,
-  test
+  laboraotryExamination
 }) => {
   const classes = useStyles();
 
-  const [laboratoryPaymentSuccess] = usePayForLaboratoryTestMutation({
+  const [laboratoryPaymentSuccess] = usePayForLaboratoryExaminationMutation({
     variables: {
-      id: test.id
+      id: laboraotryExamination.id
     },
     onError: err => {
       console.log(err);
     },
     refetchQueries: [
       {
-        query: LaboratoryTestDocument,
+        query: LaboratoryExaminationDocument,
         variables: {
-          id: test.id
+          id: laboraotryExamination.id
         }
       }
     ]
@@ -81,7 +81,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     >
       <DialogTitle>
         <Typography variant="h6">
-          Verify Labratory Payment for {test.card.name}
+          Verify Labratory Payment for {laboraotryExamination.card.name}
         </Typography>
         <IconButton
           className={classes.closeButton}
@@ -102,7 +102,8 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           </IconButton>
         </Box>
         <Typography gutterBottom>
-          The Laboratory Tests Price Is {test.price} birr before you Continue!
+          The Laboratory Tests Price Is {laboraotryExamination.price} birr
+          before you Continue!
         </Typography>
       </DialogContent>
       <DialogActions>

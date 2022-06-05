@@ -8,7 +8,7 @@ import {
   Dialog,
   Button,
   Box,
-  colors,
+  colors
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import {
@@ -17,8 +17,10 @@ import {
   MoneyOff,
   OpenInNewOutlined
 } from '@mui/icons-material';
-import { useMarkCardAsNewMutation } from '../../../generated/graphql';
-import { CardType } from '../../../@types/Cards';
+import {
+  CardsQuery,
+  useMarkCardAsNewMutation
+} from '../../../generated/graphql';
 import { formatDistanceToNow, getTime, startOfTomorrow, sub } from 'date-fns';
 import { SettingsContext } from '../../../context/SettingContext';
 import { useHistory } from 'react-router-dom';
@@ -44,7 +46,7 @@ const useStyles = makeStyles(theme => ({
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  card: CardType;
+  card: CardsQuery['cards'][0];
 }
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,

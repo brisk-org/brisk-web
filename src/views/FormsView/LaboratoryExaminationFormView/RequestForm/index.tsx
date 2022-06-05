@@ -19,7 +19,7 @@ import Page from '../../../../components/Page';
 //   PlaceholderTestType
 // } from '../../../../data/testsPlaceHolder';
 import SingleAccordion from './SingleAccordion';
-import { useCreateLaboratoryTestMutation } from '../../../../generated/graphql';
+import { useCreateLaboratoryExaminationMutation } from '../../../../generated/graphql';
 // import SnackbarSuccess from '../../../../components/AlertSnackbar';
 import { cardQuery } from '../../../../constants/queries';
 import { SettingsContext } from '../../../../context/SettingContext';
@@ -70,7 +70,7 @@ const RequestLaboratoryTestFormView = () => {
     categoriesInitialState
   );
 
-  const [addLabTest] = useCreateLaboratoryTestMutation({
+  const [createLaboratoryExamination] = useCreateLaboratoryExaminationMutation({
     onError: err => console.log(err)
   });
 
@@ -153,11 +153,13 @@ const RequestLaboratoryTestFormView = () => {
       }
 
       console.log('result', selectedCategories, price);
-      const test = await addLabTest({
+      const test = await createLaboratoryExamination({
         variables: {
           cardId: fromQuery.id,
-          totalPrice: price,
-          result: JSON.stringify(selectedCategories)
+          price,
+          laboratoryTestRequest: [{ laboratoryTestId: '1', value: 'ksdf' }]
+
+          // result: JSON.stringify(selectedCategories)
         }
       });
       setSuccessSnackbarOpen(true);
@@ -168,7 +170,7 @@ const RequestLaboratoryTestFormView = () => {
       history.push(
         cardQuery({
           id: fromQuery.id,
-          testId: test.data?.createLaboratoryTest.id
+          testId: test.data?.createLaboratoryExamination.id
         })
       );
     } catch (err) {

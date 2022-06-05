@@ -17,7 +17,7 @@ export type Scalars = {
 export type Card = {
   __typename?: 'Card';
   id: Scalars['ID'];
-  laboratory_tests?: Maybe<Array<LaboratoryExamination>>;
+  laboratoryExaminations?: Maybe<Array<LaboratoryExamination>>;
   prescriptions?: Maybe<Array<Prescription>>;
   notifications?: Maybe<Array<Notification>>;
   name: Scalars['String'];
@@ -169,7 +169,8 @@ export type LaboratoryTest = {
   subCategory: LaboratoryTestSubCategory;
   laboratoryTestRequests: Array<LaboratoryTestRequest>;
   price?: Maybe<Scalars['Float']>;
-  hasIndividualPrice: Scalars['Boolean'];
+  hasPrice: Scalars['Boolean'];
+  isInfluencedByCategory: Scalars['Boolean'];
   inStock?: Maybe<Scalars['Float']>;
   trackInStock: Scalars['Boolean'];
   created_at: Scalars['String'];
@@ -368,7 +369,8 @@ export type MutationCreateLaboraotryTestArgs = {
   normalValue: Scalars['String'];
   commonValues: Array<Scalars['String']>;
   price?: Maybe<Scalars['Float']>;
-  hasIndividualPrice: Scalars['Boolean'];
+  hasPrice: Scalars['Boolean'];
+  isInfluencedByCategory: Scalars['Boolean'];
   inStock?: Maybe<Scalars['Float']>;
   trackInStock: Scalars['Boolean'];
   subCategoryId: Scalars['ID'];
@@ -381,7 +383,8 @@ export type MutationUpdateLaboratoryTestArgs = {
   normalValue: Scalars['String'];
   commonValues: Array<Scalars['String']>;
   price?: Maybe<Scalars['Float']>;
-  hasIndividualPrice: Scalars['Boolean'];
+  hasPrice: Scalars['Boolean'];
+  isInfluencedByCategory: Scalars['Boolean'];
   inStock?: Maybe<Scalars['Float']>;
   trackInStock: Scalars['Boolean'];
   id: Scalars['ID'];
@@ -1531,7 +1534,7 @@ export type CardQuery = (
           & Pick<Medicine, 'id' | 'name' | 'price'>
         ) }
       )>> }
-    )>>, laboratory_tests?: Maybe<Array<(
+    )>>, laboratoryExaminations?: Maybe<Array<(
       { __typename?: 'LaboratoryExamination' }
       & Pick<LaboratoryExamination, 'id' | 'cardId' | 'paid' | 'new' | 'completed' | 'price' | 'created_at' | 'updated_at'>
     )>>, history?: Maybe<Array<(
@@ -1708,7 +1711,7 @@ export type SearchLaboratoryExaminationQuery = (
   { __typename?: 'Query' }
   & { searchLaboratoryExamination: Array<(
     { __typename?: 'LaboratoryExamination' }
-    & Pick<LaboratoryExamination, 'id' | 'paid' | 'price' | 'new' | 'completed' | 'created_at'>
+    & Pick<LaboratoryExamination, 'id' | 'paid' | 'price' | 'new' | 'completed' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name'>
@@ -1716,23 +1719,23 @@ export type SearchLaboratoryExaminationQuery = (
   )> }
 );
 
-export type LaboraotryTestCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+export type LaboratoryTestCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LaboraotryTestCategoriesQuery = (
+export type LaboratoryTestCategoriesQuery = (
   { __typename?: 'Query' }
   & { laboratoryTestCategories: Array<(
     { __typename?: 'LaboratoryTestCategory' }
     & Pick<LaboratoryTestCategory, 'name' | 'price' | 'inStock' | 'trackInStock' | 'created_at' | 'updated_at'>
     & { laboratoryTests: Array<(
       { __typename?: 'LaboratoryTest' }
-      & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasIndividualPrice' | 'inStock' | 'trackInStock' | 'created_at'>
+      & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasPrice' | 'isInfluencedByCategory' | 'inStock' | 'trackInStock' | 'created_at'>
     )>, subCategories: Array<(
       { __typename?: 'LaboratoryTestSubCategory' }
       & Pick<LaboratoryTestSubCategory, 'id' | 'name' | 'price' | 'created_at'>
       & { laboratoryTests: Array<(
         { __typename?: 'LaboratoryTest' }
-        & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasIndividualPrice' | 'inStock' | 'trackInStock' | 'created_at'>
+        & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasPrice' | 'isInfluencedByCategory' | 'inStock' | 'trackInStock' | 'created_at'>
       )> }
     )> }
   )> }
@@ -3888,7 +3891,7 @@ export const CardDocument = gql`
       created_at
       updated_at
     }
-    laboratory_tests {
+    laboratoryExaminations {
       id
       cardId
       paid
@@ -4381,6 +4384,7 @@ export const SearchLaboratoryExaminationDocument = gql`
       name
     }
     created_at
+    updated_at
   }
 }
     `;
@@ -4414,8 +4418,8 @@ export function useSearchLaboratoryExaminationLazyQuery(baseOptions?: Apollo.Laz
 export type SearchLaboratoryExaminationQueryHookResult = ReturnType<typeof useSearchLaboratoryExaminationQuery>;
 export type SearchLaboratoryExaminationLazyQueryHookResult = ReturnType<typeof useSearchLaboratoryExaminationLazyQuery>;
 export type SearchLaboratoryExaminationQueryResult = Apollo.QueryResult<SearchLaboratoryExaminationQuery, SearchLaboratoryExaminationQueryVariables>;
-export const LaboraotryTestCategoriesDocument = gql`
-    query LaboraotryTestCategories {
+export const LaboratoryTestCategoriesDocument = gql`
+    query LaboratoryTestCategories {
   laboratoryTestCategories {
     name
     price
@@ -4425,7 +4429,8 @@ export const LaboraotryTestCategoriesDocument = gql`
       normalValue
       commonValues
       price
-      hasIndividualPrice
+      hasPrice
+      isInfluencedByCategory
       inStock
       trackInStock
       created_at
@@ -4440,7 +4445,8 @@ export const LaboraotryTestCategoriesDocument = gql`
         normalValue
         commonValues
         price
-        hasIndividualPrice
+        hasPrice
+        isInfluencedByCategory
         inStock
         trackInStock
         created_at
@@ -4456,31 +4462,31 @@ export const LaboraotryTestCategoriesDocument = gql`
     `;
 
 /**
- * __useLaboraotryTestCategoriesQuery__
+ * __useLaboratoryTestCategoriesQuery__
  *
- * To run a query within a React component, call `useLaboraotryTestCategoriesQuery` and pass it any options that fit your needs.
- * When your component renders, `useLaboraotryTestCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useLaboratoryTestCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLaboratoryTestCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useLaboraotryTestCategoriesQuery({
+ * const { data, loading, error } = useLaboratoryTestCategoriesQuery({
  *   variables: {
  *   },
  * });
  */
-export function useLaboraotryTestCategoriesQuery(baseOptions?: Apollo.QueryHookOptions<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>) {
+export function useLaboratoryTestCategoriesQuery(baseOptions?: Apollo.QueryHookOptions<LaboratoryTestCategoriesQuery, LaboratoryTestCategoriesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>(LaboraotryTestCategoriesDocument, options);
+        return Apollo.useQuery<LaboratoryTestCategoriesQuery, LaboratoryTestCategoriesQueryVariables>(LaboratoryTestCategoriesDocument, options);
       }
-export function useLaboraotryTestCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>) {
+export function useLaboratoryTestCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryTestCategoriesQuery, LaboratoryTestCategoriesQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>(LaboraotryTestCategoriesDocument, options);
+          return Apollo.useLazyQuery<LaboratoryTestCategoriesQuery, LaboratoryTestCategoriesQueryVariables>(LaboratoryTestCategoriesDocument, options);
         }
-export type LaboraotryTestCategoriesQueryHookResult = ReturnType<typeof useLaboraotryTestCategoriesQuery>;
-export type LaboraotryTestCategoriesLazyQueryHookResult = ReturnType<typeof useLaboraotryTestCategoriesLazyQuery>;
-export type LaboraotryTestCategoriesQueryResult = Apollo.QueryResult<LaboraotryTestCategoriesQuery, LaboraotryTestCategoriesQueryVariables>;
+export type LaboratoryTestCategoriesQueryHookResult = ReturnType<typeof useLaboratoryTestCategoriesQuery>;
+export type LaboratoryTestCategoriesLazyQueryHookResult = ReturnType<typeof useLaboratoryTestCategoriesLazyQuery>;
+export type LaboratoryTestCategoriesQueryResult = Apollo.QueryResult<LaboratoryTestCategoriesQuery, LaboratoryTestCategoriesQueryVariables>;
 export const MedicationDocument = gql`
     query Medication($id: ID!) {
   medication(id: $id) {

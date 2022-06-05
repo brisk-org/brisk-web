@@ -10,8 +10,8 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { WindowOutlined } from '@mui/icons-material';
 import { createStyles } from '@mui/styles';
-import { TestsFromCardQuery } from '../../@types/Cards';
-import SingleDetailedTest from './SingleDetailedTest';
+import LaboratoryExaminationItem from './LaboratoryExaminationItem';
+import { CardQuery } from '../../generated/graphql';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,29 +47,37 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface TestsContainerProps {
-  name: string;
-  tests: TestsFromCardQuery[];
+interface Props {
+  cardName: string;
+  laboratoryExaminations: NonNullable<
+    CardQuery['card']['laboratoryExaminations']
+  >;
 }
-const TestsContainer: React.FC<TestsContainerProps> = ({ name, tests }) => {
+const LaboratoryExaminationConatiner: React.FC<Props> = ({
+  cardName,
+  laboratoryExaminations
+}) => {
   const classes = useStyles();
 
   // Helps while Sorting
-  const mutableTests = [...tests];
+  const mutableTests = [...laboratoryExaminations];
   return (
     <Card className={classes.root}>
       <CardHeader
         className={classes.header}
         avatar={<WindowOutlined />}
-        title={`All ${name}'s Laboratory Report`}
+        title={`All ${cardName}'s Laboratory Report`}
       />
       <Divider />
       <CardContent>
         <List>
           {mutableTests
             .sort((a, b) => parseInt(b.id) - parseInt(a.id))
-            .map((test, index) => (
-              <SingleDetailedTest key={index} test={test} />
+            .map((laboratoryTest, index) => (
+              <LaboratoryExaminationItem
+                key={index}
+                laboratoryExaminations={laboratoryTest}
+              />
             ))}
         </List>
       </CardContent>
@@ -77,4 +85,4 @@ const TestsContainer: React.FC<TestsContainerProps> = ({ name, tests }) => {
   );
 };
 
-export default TestsContainer;
+export default LaboratoryExaminationConatiner;

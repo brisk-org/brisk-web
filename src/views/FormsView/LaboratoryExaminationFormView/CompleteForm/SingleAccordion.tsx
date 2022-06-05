@@ -3,14 +3,16 @@ import React from 'react';
 import { Grid, TextField } from '@mui/material';
 
 import {
-  LaboratoryTestCatagories,
+  // LaboratoryTestCatagories,
   LaboratoryTestDetails
 } from '../../../../data/testsSeed';
 
+import { LaboratoryTestCategory } from '../../../../generated/graphql';
+
 interface Props {
-  test: LaboratoryTestDetails;
+  test: LaboratoryTestCategory;
   setLabCategories: React.Dispatch<
-    React.SetStateAction<LaboratoryTestCatagories[] | undefined>
+    React.SetStateAction<LaboratoryTestCategory[] | undefined>
   >;
 }
 
@@ -19,7 +21,7 @@ const SingleAccordion: React.FC<Props> = ({ test, setLabCategories }) => {
     setLabCategories(prevCategories =>
       prevCategories?.map(category => ({
         ...category,
-        tests: category.tests.map(test =>
+        tests: category.laboratoryTests.map(test =>
           test.name === event.target.name
             ? { ...test, value: event.target.value }
             : { ...test }
@@ -32,10 +34,10 @@ const SingleAccordion: React.FC<Props> = ({ test, setLabCategories }) => {
       <TextField
         fullWidth
         label={test.name}
-        value={test.value}
+        // value={test.value}
         onChange={handleChange}
         name={test.name}
-        helperText={test.normalValue}
+        // helperText={test.normalValue}
         required
         variant="standard"
       />

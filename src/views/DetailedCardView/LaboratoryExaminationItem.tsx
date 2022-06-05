@@ -11,19 +11,19 @@ import {
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { TestsFromCardQuery } from '../../@types/Cards';
 import { useLocation } from 'react-router';
 import { format } from 'date-fns';
 import {
-  LaboratoryTestsQuery,
-  LaboratoryTestsDocument,
-  useDeleteLaboratoryTestMutation
+  LaboratoryExaminationsQuery,
+  LaboratoryExaminationsDocument,
+  useDeleteLaboratoryExaminationMutation,
+  CardQuery
 } from '../../generated/graphql';
 import AlertDialog from '../../components/AlertDialog';
 import { useHistory } from 'react-router-dom';
 import clsx from 'clsx';
 import { useReactToPrint } from 'react-to-print';
-import SingleLaboratoryTestCategory from './SingleLaboratoryTestCategory';
+import SingleLaboratoryExaminationCategory from './SingleLaboratoryTestCategory';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,9 +47,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const SingleDetailedTest: React.FC<{
-  test: TestsFromCardQuery;
-}> = ({ test }) => {
+const LaboratoryExaminationItem: React.FC<{
+  laboratoryExaminations: NonNullable<
+    CardQuery['card']['laboratoryExaminations']
+  >[0];
+}> = ({ laboratoryExaminations }) => {
   const classes = useStyles();
   const itemDom = useRef<HTMLDivElement>(null);
 
@@ -72,60 +74,66 @@ const SingleDetailedTest: React.FC<{
     print && print();
   };
 
-  const [deleteLabTest, { client }] = useDeleteLaboratoryTestMutation({
+  const [
+    deleteLabExamination,
+    { client }
+  ] = useDeleteLaboratoryExaminationMutation({
     onError: err => console.error,
     variables: {
-      id: test.id
+      id: laboratoryExaminations.id
     },
     onCompleted() {
-      const laboratoryTestsCache: LaboratoryTestsQuery | null = client.readQuery(
+      const laboratoryExaminationsCache: LaboratoryExaminationsQuery | null = client.readQuery(
         {
-          query: LaboratoryTestsDocument
+          query: LaboratoryExaminationsDocument
         }
       );
-      if (!laboratoryTestsCache) return;
-      const deletedItemRemoved = laboratoryTestsCache.laboratoryTests.filter(
-        labTest => labTest.id !== test.id
+      if (!laboratoryExaminationsCache) return;
+      const deletedItemRemoved = laboratoryExaminationsCache.laboratoryExaminations.filter(
+        labExamination => labExamination.id !== laboratoryExaminations.id
       );
       client.writeQuery({
-        query: LaboratoryTestsDocument,
-        data: { laboratoryTests: [...deletedItemRemoved] }
+        query: LaboratoryExaminationsDocument,
+        data: { laboratoryExaminations: [...deletedItemRemoved] }
       });
     }
   });
 
   useEffect(() => {
-    if (id === test.id) {
+    if (id === laboratoryExaminations.id) {
       setOpen(true);
       itemDom.current?.scrollIntoView();
     }
-  }, [id, test.id]);
+  }, [id, laboratoryExaminations.id]);
   useEffect(() => {
     if (!proceedToDeleteAction) return;
-    deleteLabTest();
+    deleteLabExamination();
     history.push('/app/data/laboratory-test');
   }, [proceedToDeleteAction]);
 
   return (
     <>
       <ListItemButton
-        className={clsx({ [classes.queried]: test.id === id })}
+        className={clsx({
+          [classes.queried]: laboratoryExaminations.id === id
+        })}
         ref={itemDom}
         onClick={() => setOpen(!open)}
       >
         <ListItemText
           primary={
-            'Tests Issued: ' + format(Number(test.created_at), 'MM/dd/yyyy')
+            'Examinations Issued: ' +
+            format(Number(laboratoryExaminations.created_at), 'MM/dd/yyyy')
           }
-          secondary={`Total Price: ${test.price}birr`}
+          secondary={`Total Price: ${laboratoryExaminations.price}birr`}
         />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List className={classes.sticky} subheader={<li />}>
-          <SingleLaboratoryTestCategory
+          <SingleLaboratoryExaminationCategory
             componentToBePrinted={componentToBePrinted}
-            test={test}
+            laboratoryExamination={laboratoryExaminations}
             onPrint={onPrint}
           />
 
@@ -144,12 +152,12 @@ const SingleDetailedTest: React.FC<{
             variant="contained"
             color="secondary"
           >
-            Delete Laboratory Test
+            Delete Laboratory Examination
           </Button>
         </List>
       </Collapse>
       <AlertDialog
-        dialogText={`Delete #${test.id} test`}
+        dialogText={`Delete #${laboratoryExaminations.id} test`}
         state={{
           dialogToggle,
           setDialogToggle,
@@ -159,4 +167,4 @@ const SingleDetailedTest: React.FC<{
     </>
   );
 };
-export default SingleDetailedTest;
+export default LaboratoryExaminationItem;

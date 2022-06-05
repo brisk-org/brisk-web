@@ -172,7 +172,6 @@ const PrescriptionTestTableView = () => {
       return;
     }
     setPrescriptions(allPrescriptionsData?.prescriptions);
-    console.log(prescriptions, allPrescriptionsData);
   }, [allPrescriptionsData, searchedPrescriptionData, isBeingSearched]);
 
   return (

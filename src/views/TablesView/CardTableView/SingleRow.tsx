@@ -14,8 +14,8 @@ import { UnfoldMore } from '@mui/icons-material';
 import clsx from 'clsx';
 import { format, isBefore, sub } from 'date-fns';
 import FieldShortner from '../../../components/helpers/TextShortner';
-import { CardType } from '../../../@types/Cards';
 import {
+  CardsQuery,
   Occupation,
   useInvalidateCardMutation
 } from '../../../generated/graphql';
@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SingleRow: React.FC<{ card: CardType }> = ({ card }) => {
+const SingleRow: React.FC<{ card: CardsQuery['cards'][0] }> = ({ card }) => {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);

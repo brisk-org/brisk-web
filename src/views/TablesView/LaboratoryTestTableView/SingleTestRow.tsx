@@ -15,7 +15,6 @@ import {
   MoreVert
 } from '@mui/icons-material';
 import { format } from 'date-fns';
-import { LaboratoryTestType } from '../../../@types/LaboratoryTest';
 import { AuthContext } from '../../../context/AuthContext';
 import { BallTriangle, useLoading } from '@agney/react-loading';
 import clsx from 'clsx';
@@ -23,8 +22,9 @@ import { useHistory } from 'react-router';
 import { cardQuery, completeTestQuery } from '../../../constants/queries';
 import ConfirmationDialog from './ConfirmationDialog';
 import {
+  LaboratoryExaminationsQuery,
   Occupation,
-  useMarkLaboratoryTestAsSeenMutation
+  useMarkLaboratoryExaminationAsSeenMutation
 } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
@@ -59,7 +59,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SingleTestRow: React.FC<{ test: LaboratoryTestType }> = ({ test }) => {
+const SingleTestRow: React.FC<{
+  laboratoryExamination: LaboratoryExaminationsQuery['laboratoryExaminations'][0];
+}> = ({ laboratoryExamination }) => {
   const classes = useStyles();
   const { containerProps, indicatorEl } = useLoading({
     loading: true,
@@ -68,7 +70,9 @@ const SingleTestRow: React.FC<{ test: LaboratoryTestType }> = ({ test }) => {
   const [open, setOpen] = useState(false);
 
   const history = useHistory();
-  const [markLaboratoryTestAsSeen] = useMarkLaboratoryTestAsSeenMutation();
+  const [
+    markLaboratoryTestAsSeen
+  ] = useMarkLaboratoryExaminationAsSeenMutation();
   const { occupation } = useContext(AuthContext);
 
   const handleClick:
@@ -80,16 +84,21 @@ const SingleTestRow: React.FC<{ test: LaboratoryTestType }> = ({ test }) => {
         setOpen(true);
         break;
       case Occupation.Laboratory:
-        history.push(completeTestQuery(test.id));
+        history.push(completeTestQuery(laboratoryExamination.id));
         break;
       case Occupation.Doctor:
-        test.completed &&
+        laboratoryExamination.completed &&
           markLaboratoryTestAsSeen({
             variables: {
-              id: test.id
+              id: laboratoryExamination.id
             }
           });
-        history.push(cardQuery({ id: test.card.id, testId: test.id }));
+        history.push(
+          cardQuery({
+            id: laboratoryExamination.card.id,
+            testId: laboratoryExamination.id
+          })
+        );
         break;
     }
   };
@@ -114,36 +123,42 @@ const SingleTestRow: React.FC<{ test: LaboratoryTestType }> = ({ test }) => {
     <TableRow
       hover
       className={clsx(classes.root, {
-        [classes.newRow]: test.new
+        [classes.newRow]: laboratoryExamination.new
       })}
     >
       <TableCell padding="checkbox">
         <IconButton aria-label="expand row" size="small" onClick={handleClick}>
           <MoreVert />
         </IconButton>
-        <ConfirmationDialog open={open} setOpen={setOpen} test={test} />
+        <ConfirmationDialog
+          open={open}
+          setOpen={setOpen}
+          laboraotryExamination={laboratoryExamination}
+        />
       </TableCell>
       <TableCell>
         <Typography color="textPrimary" variant="body1" noWrap>
-          {test.card.name}
+          {laboratoryExamination.card.name}
         </Typography>
       </TableCell>
       <TableCell>
         <Typography color="textPrimary" variant="body1" noWrap>
-          {test.paid ? successIcon : pendingIcon}
+          {laboratoryExamination.paid ? successIcon : pendingIcon}
         </Typography>
       </TableCell>
       <TableCell>
         <Typography color="textPrimary" variant="body1" noWrap>
-          {!test.paid
+          {!laboratoryExamination.paid
             ? canceledIcon
-            : test.completed
+            : laboratoryExamination.completed
             ? successIcon
             : pendingIcon}
         </Typography>
       </TableCell>
 
-      <TableCell>{format(Number(test.created_at), 'dd/MM/yyyy')}</TableCell>
+      <TableCell>
+        {format(Number(laboratoryExamination.created_at), 'dd/MM/yyyy')}
+      </TableCell>
     </TableRow>
   );
 };

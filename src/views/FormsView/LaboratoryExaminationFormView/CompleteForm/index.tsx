@@ -22,13 +22,14 @@ import Page from '../../../../components/Page';
 import SingleAccordion from './SingleAccordion';
 import { Alert } from '@mui/material';
 import {
-  useCompleteLaboratoryTestMutation,
-  useLaboratoryTestQuery,
+  useCompleteLaboratoryExaminationMutation,
+  useLaboratoryExaminationQuery,
   CardDocument,
-  useSaveLaboratoryTestMutation
+  useSaveLaboratoryExaminationMutation,
+  LaboratoryTestCategory
 } from '../../../../generated/graphql';
 import { ExpandMore } from '@mui/icons-material';
-import { LaboratoryTestCatagories } from '../../../../data/testsSeed';
+// import { LaboratoryExaminationCatagories } from '../../../../data/testsSeed';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -38,7 +39,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CompleteLaboratoryTestFormView = () => {
+const CompleteLaboratoryExaminationFormView = () => {
   const classes = useStyles();
   const query = new URLSearchParams(useLocation().search);
   const history = useHistory();
@@ -46,29 +47,32 @@ const CompleteLaboratoryTestFormView = () => {
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
   const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false);
   const [labCategories, setLabCategories] = useState<
-    LaboratoryTestCatagories[]
+    LaboratoryTestCategory[]
   >();
   const queryId = query.get('id') || '';
 
-  const { data, loading } = useLaboratoryTestQuery({
+  const { data, loading } = useLaboratoryExaminationQuery({
     variables: {
       id: queryId
     },
     onError: err => console.error
   });
-  const [completeLaboratoryTest] = useCompleteLaboratoryTestMutation({
+  const [
+    completeLaboratoryExamination
+  ] = useCompleteLaboratoryExaminationMutation({
     onError: err => console.error
   });
-  const [completeLaboratoryTestLater] = useSaveLaboratoryTestMutation({
+  const [
+    completeLaboratoryExaminationLater
+  ] = useSaveLaboratoryExaminationMutation({
     onError: err => console.error
   });
 
   useEffect(() => {
     if (!data) return;
-    console.log(JSON.parse(data.laboratoryTest.result));
-    setLabCategories(
-      JSON.parse(data.laboratoryTest.result) as LaboratoryTestCatagories[]
-    );
+    // setLabCategories(
+    //   JSON.parse(data.laboratoryExamination.result) as LaboratoryTestCatagories[]
+    // );
     console.log(labCategories);
   }, [data, loading]);
 
@@ -77,13 +81,13 @@ const CompleteLaboratoryTestFormView = () => {
     | undefined = event => {
     if (!labCategories) return;
     event.preventDefault();
-    completeLaboratoryTest({
+    completeLaboratoryExamination({
       variables: { id: queryId, result: JSON.stringify(labCategories) },
       refetchQueries: [
         {
           query: CardDocument,
           variables: {
-            id: data?.laboratoryTest.cardId || ''
+            id: data?.laboratoryExamination.cardId || ''
           }
         }
       ]
@@ -96,13 +100,13 @@ const CompleteLaboratoryTestFormView = () => {
     | React.MouseEventHandler<HTMLButtonElement>
     | undefined = event => {
     if (!labCategories) return;
-    completeLaboratoryTestLater({
+    completeLaboratoryExaminationLater({
       variables: { id: queryId, result: JSON.stringify(labCategories) },
       refetchQueries: [
         {
           query: CardDocument,
           variables: {
-            id: data?.laboratoryTest.cardId || ''
+            id: data?.laboratoryExamination.cardId || ''
           }
         }
       ]
@@ -132,11 +136,11 @@ const CompleteLaboratoryTestFormView = () => {
               title={
                 data ? (
                   <Typography variant="h5" gutterBottom>
-                    This is a Laboratory Test for{' '}
-                    {data.laboratoryTest.card.name}
+                    This is a Laboratory Examination for{' '}
+                    {data.laboratoryExamination.card.name}
                     <Typography variant="body1" gutterBottom>
-                      Age {data.laboratoryTest.card?.age} | Gender{' '}
-                      {data.laboratoryTest.card?.gender}
+                      Age {data.laboratoryExamination.card?.age} | Gender{' '}
+                      {data.laboratoryExamination.card?.gender}
                     </Typography>
                   </Typography>
                 ) : (
@@ -167,11 +171,12 @@ const CompleteLaboratoryTestFormView = () => {
                     </AccordionSummary>
                     <AccordionDetails sx={{ borderRadius: 'none' }}>
                       <Grid container spacing={3}>
-                        {category.tests.map((test, index) => (
-                          <SingleAccordion
-                            test={test}
-                            setLabCategories={setLabCategories}
-                          />
+                        {category.laboratoryTests.map((test, index) => (
+                          // <SingleAccordion
+                          //   test={test}
+                          //   setLabCategories={setLabCategories}
+                          // />
+                          <div></div>
                         ))}
                       </Grid>
                     </AccordionDetails>
@@ -194,7 +199,7 @@ const CompleteLaboratoryTestFormView = () => {
                   <form onSubmit={e => e.preventDefault()}>
                     <SingleAccordion
                       category={category}
-                      testsState={{ tests, setTests }}
+                      testsState={{ tests, setExaminations }}
                     />
                   </form>
                 </Grid>
@@ -231,11 +236,11 @@ const CompleteLaboratoryTestFormView = () => {
           onClose={handleCloseSnackbar}
         >
           <Alert onClose={handleCloseSnackbar} severity="error">
-            You havent Filled All the Possible Test Values
+            You havent Filled All the Possible Examination Values
           </Alert>
         </Snackbar>
       </Container>
     </Page>
   );
 };
-export default CompleteLaboratoryTestFormView;
+export default CompleteLaboratoryExaminationFormView;

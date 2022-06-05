@@ -9,8 +9,7 @@ import {
   editCardQuery
 } from '../../constants/queries';
 import AlertDialog from '../../components/AlertDialog';
-import { useDeleteCardMutation } from '../../generated/graphql';
-import { FullCardType } from '../../@types/Cards';
+import { CardQuery, useDeleteCardMutation } from '../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   btn: {
@@ -25,7 +24,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface LinksListProps {
-  card: FullCardType;
+  card: CardQuery['card'];
 }
 const LinksList: React.FC<LinksListProps> = ({ card }) => {
   const classes = useStyles();

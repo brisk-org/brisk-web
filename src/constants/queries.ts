@@ -1,5 +1,4 @@
-import { HistoryFromCardQuery } from '../@types/Cards';
-import { UpdateCardMutationVariables } from '../generated/graphql';
+import { CardQuery, UpdateCardMutationVariables } from '../generated/graphql';
 
 const joinQueryies = function(props: any) {
   return Object.entries(props)
@@ -25,7 +24,8 @@ export const createHistoryQuery = (
 interface UpdateId {
   historyId: string;
 }
-interface EditHistoryQueryType extends HistoryFromCardQuery, UpdateId {}
+type HistoryFromCard = NonNullable<CardQuery['card']['history']>[0];
+interface EditHistoryQueryType extends HistoryFromCard, UpdateId {}
 
 export const editHistoryQuery = (props: EditHistoryQueryType) => {
   return `/app/form/card?history=true&${joinQueryies(props)}`;
