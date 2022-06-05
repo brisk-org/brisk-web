@@ -1,0 +1,19 @@
+mutation CreateLaboratoryExamination(
+  $cardId: ID!
+  $laboratoryTestRequest: [LaboratoryTestRequestInput!]!
+  $price: Float!
+) {
+  createLaboratoryExamination(
+    input: {
+      cardId: $cardId
+      laboratoryTestRequest: $laboratoryTestRequest
+      price: $price
+    }
+  ) {
+    id
+    card {
+      name
+    }
+    price
+  }
+}

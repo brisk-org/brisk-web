@@ -1,5 +1,0 @@
-mutation PayForLaboratoryTest($id: ID!) {
-  payForLaboratoryTest(id: $id) {
-    id
-  }
-}

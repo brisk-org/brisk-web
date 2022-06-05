@@ -168,41 +168,21 @@ const CompletePrescDialog: React.FC<ConfirmationDialogProps> = ({
                 {prescription.card?.gender}
               </Typography>
             </Typography>
-            {prescriptionsCheckIn &&
-              prescriptionsCheckIn.map(prescriptionCheckIn => (
-                <MedicationStepper
-                  prescriptionCheckIn={prescriptionCheckIn}
-                  lastCheckIn={
-                    (prescription.medications?.find(
-                      medication =>
-                        medication.medicine.name === prescriptionCheckIn.name
-                    )?.checkIn as unknown) as PrescriptionCheckIn[]
-                  }
-                  setPrescriptionsCheckIn={setPrescriptionsCheckIn}
-                />
-              ))}
-            <Grid container>
-              {/* {loading && 'Loading...'} */}
-
-              {/* {data &&
-                (JSON.parse(
-                  data.prescriptionTest.result
-                ) as PrescriptionSettingDataType[]).map(
-                  ({ name, strength, forDays, perDay, other }, index) => (
-                    <Grid item md={6} sm={12} key={index}>
-                      <Fab className={classes.doneAllIcon} size="large">
-                        <DoneAllRounded />
-                      </Fab>
-                      <Typography>
-                        {name} {strength && ` - ${strength}`}
-                      </Typography>
-                      <Typography>{perDay}</Typography>
-                      <Typography>For {forDays} days</Typography>
-                      <Typography>{other}</Typography>
-                    </Grid>
-                  )
-                )} */}
-            </Grid>
+            {
+              /* {prescriptionsCheckIn &&
+              prescriptionsCheckIn.map(prescriptionCheckIn => ( */
+              // <MedicationStepper
+              //   prescriptionCheckIn={prescriptionCheckIn}
+              //   lastCheckIn={
+              //     (prescription.medications?.find(
+              //       medication =>
+              //         medication.medicine.name === prescriptionCheckIn.name
+              //     )?.checkIn as unknown) as PrescriptionCheckIn[]
+              //   }
+              //   setPrescriptionsCheckIn={setPrescriptionsCheckIn}
+              // />
+              // ))}
+            }
           </Box>
         </DialogContent>
         {!prescription.completed && (

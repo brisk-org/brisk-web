@@ -82,7 +82,7 @@ const SinglePrescriptionRow: React.FC<{
         !prescription.paid && setPaymentDialogOpen(true);
         break;
       case Occupation.Nurse:
-        setCompletePrescDialogOpen(true);
+        setPaymentDialogOpen(true);
         break;
       case Occupation.Doctor:
         prescription.new &&

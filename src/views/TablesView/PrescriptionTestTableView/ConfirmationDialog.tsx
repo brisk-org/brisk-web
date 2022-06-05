@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   DialogActions,
   DialogTitle,
@@ -20,11 +20,14 @@ import AlertDialog from '../../../components/AlertDialog';
 import {
   CheckIn,
   CheckInInput,
+  Occupation,
   PerDay,
   PrescriptionsQuery,
   useMarkPrescriptionAsPaidMutation,
   useUpdatePrescriptionCheckInMutation
 } from '../../../generated/graphql';
+import { AuthContext } from '../../../context/AuthContext';
+import MedicationStepper from './MedicationStepper';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -48,6 +51,7 @@ const useStyles = makeStyles(theme => ({
 export type PrescriptionCheckIns = {
   name: string;
   perDay: PerDay;
+  completed: number;
   paid: number;
   remaining: number;
   paidToday: number;
@@ -65,6 +69,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   const classes = useStyles();
 
+  const { occupation } = useContext(AuthContext);
   const [medicationsCheckIn, setMedicationsCheckIn] = useState<
     PrescriptionCheckIns[]
   >();
@@ -74,10 +79,23 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     setMedicationsCheckIn(
       prescription.medications?.map(medication => ({
         name: medication.medicine.name,
-        remaining: medication.medicine.price,
+        remaining: medication.checkIn.reduce(
+          (prevPrice, medication) =>
+            !medication.status.some(status => status.isPaid)
+              ? prevPrice + medication.price
+              : prevPrice,
+          0
+        ),
         perDay: medication.perDay,
-        paid: 0,
+        paid: medication.checkIn.reduce(
+          (prevPrice, medication) =>
+            medication.status.some(status => status.isPaid)
+              ? prevPrice + medication.price
+              : prevPrice,
+          0
+        ),
         paidToday: 0,
+        completed: 0,
         checkIn: medication.checkIn.map(checkIn => {
           return {
             date: checkIn.date,
@@ -134,7 +152,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             <Close />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ minWidth: 400 }}>
           <Box textAlign="center">
             <IconButton
               className={classes.moneyIcon}
@@ -143,12 +161,18 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             >
               <AttachMoney fontSize="large" />
             </IconButton>
+            <Typography gutterBottom>
+              This is a Prescription for {prescription.card?.name}
+              <Typography variant="body2" gutterBottom>
+                Age {prescription.card?.age} | Gender{' '}
+                {prescription.card?.gender}
+              </Typography>
+            </Typography>
           </Box>
-          <Typography gutterBottom>
-            The Prescription for {prescription.card?.name} Costs a total of{' '}
-            {prescription.price} birr
+          <Typography variant="body1">
+            Costs a total of {prescription.price} birr
           </Typography>
-          <Typography variant="body1" gutterBottom>
+          <Typography variant="body2">
             Paid(
             {medicationsCheckIn?.reduce(
               (prevPrice, currentCheckInPrices) =>
@@ -173,18 +197,32 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             etb)
           </Typography>
           {medicationsCheckIn &&
-            medicationsCheckIn.map(medicationCheckIn => (
-              <PriceStepper
-                prescriptionCheckIn={medicationCheckIn}
-                lastCheckIn={
-                  prescription.medications?.find(
-                    medication =>
-                      medication.medicine.name === medicationCheckIn.name
-                  )?.checkIn
-                }
-                setPrescriptionsCheckIn={setMedicationsCheckIn}
-              />
-            ))}
+            medicationsCheckIn.map(medicationCheckIn => {
+              console.log(medicationCheckIn, prescription.medications);
+              return occupation === Occupation['Reception'] ? (
+                <PriceStepper
+                  prescriptionCheckIn={medicationCheckIn}
+                  lastCheckIn={
+                    prescription.medications?.find(
+                      medication =>
+                        medication.medicine.name === medicationCheckIn.name
+                    )?.checkIn
+                  }
+                  setPrescriptionsCheckIn={setMedicationsCheckIn}
+                />
+              ) : (
+                <MedicationStepper
+                  prescriptionCheckIn={medicationCheckIn}
+                  lastCheckIn={
+                    prescription.medications?.find(
+                      medication =>
+                        medication.medicine.name === medicationCheckIn.name
+                    )?.checkIn
+                  }
+                  setPrescriptionsCheckIn={setMedicationsCheckIn}
+                />
+              );
+            })}
         </DialogContent>
         <DialogActions>
           <Button

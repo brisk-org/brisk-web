@@ -40,7 +40,6 @@ query Card($id: ID!) {
     laboratory_tests {
       id
       cardId
-      result
       paid
       new
       completed

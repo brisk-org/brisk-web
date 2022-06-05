@@ -1,0 +1,5 @@
+mutation PayForLaboratoryExamination($id: ID!) {
+  payForLaboratoryExamination(id: $id) {
+    id
+  }
+}

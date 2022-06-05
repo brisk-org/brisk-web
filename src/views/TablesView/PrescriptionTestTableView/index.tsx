@@ -7,11 +7,14 @@ import Page from '../../../components/Page';
 import Toolbar from '../../../components/Toolbar';
 import {
   NewCreatedPrescriptionDocument,
+  NewMedicationUpdateDocument,
   Occupation,
   PrescriptionsQuery,
   usePrescriptionCountQuery,
   usePrescriptionsQuery,
-  useSearchPrescriptionsQuery
+  useNewMedicationUpdateSubscription,
+  useSearchPrescriptionsQuery,
+  NewMedicationUpdateSubscription
 } from '../../../generated/graphql';
 import { SearchTermsType } from '../../../@types';
 import MainContainerTable from '../../../components/MainContainerTable';
@@ -81,6 +84,30 @@ const PrescriptionTestTableView = () => {
     fetchPolicy: firstRender.current ? 'cache-first' : 'network-only',
     onError: err => console.log(err)
   });
+  // const {
+  //   data: newMedicationUpdateData,
+  //   loading: newMedicationUpdateLoading
+  // } = useNewMedicationUpdateSubscription();
+
+  // useEffect(() => {
+  //   console.log('render');
+  //   if (!newMedicationUpdateData) return;
+  //   console.log(newMedicationUpdateData, 'hi');
+  //   setPrescriptions(prescriptions =>
+  //     prescriptions?.map(prescription => {
+  //       if (
+  //         newMedicationUpdateData.newMedicationUpdate[0].prescription.id !==
+  //         prescription.id
+  //       ) {
+  //         return { ...prescription };
+  //       }
+  //       return {
+  //         ...prescription,
+  //         medications: newMedicationUpdateData.newMedicationUpdate
+  //       };
+  //     })
+  //   );
+  // }, [newMedicationUpdateData, newMedicationUpdateLoading]);
 
   subscribeToMore({
     document: NewCreatedPrescriptionDocument,
@@ -94,50 +121,51 @@ const PrescriptionTestTableView = () => {
           : [newCreatedPrescriptionTest]
       });
     },
-    onError: err => console.log(err)
+    onError: err => console.log(err, 'yooio')
   });
   subscribeToMore({
-    document: NewCreatedPrescriptionDocument,
+    document: NewMedicationUpdateDocument,
     updateQuery: (prev, { subscriptionData }) => {
-      const newPaidPrescriptionTest = subscriptionData.data;
-      if (!newPaidPrescriptionTest) return prev;
-      if (!prev && newPaidPrescriptionTest)
-        return { prescriptions: newPaidPrescriptionTest as any };
+      const newMedicationUpdate = (subscriptionData.data as unknown) as NewMedicationUpdateSubscription['newMedicationUpdate'];
+      if (!newMedicationUpdate) return prev;
+      if (!prev && newMedicationUpdate)
+        return { prescriptions: [newMedicationUpdate] };
+      console.log(subscriptionData);
       const filteredPrevWithoutPaidLaboratoryTest = prev.prescriptions.filter(
-        prescription =>
-          prescription.id !==
-          (newPaidPrescriptionTest as any).newCreatedPrescriptionTest.id
+        prescription => prescription.id !== newMedicationUpdate.id
       );
-      return Object.assign({}, prev, {
+      return {
+        ...prev,
         prescriptions: [
-          newPaidPrescriptionTest,
+          newMedicationUpdate,
           ...filteredPrevWithoutPaidLaboratoryTest
         ]
-      });
+      };
     },
-    onError: err => console.log(err)
+    onError: err => console.log(err, 'Hioo')
   });
-  subscribeToMore({
-    document: NewCreatedPrescriptionDocument,
-    updateQuery: (prev, { subscriptionData }) => {
-      const newPaidPrescriptionTest = subscriptionData.data;
-      if (!newPaidPrescriptionTest) return prev;
-      if (!prev && newPaidPrescriptionTest)
-        return { prescriptions: newPaidPrescriptionTest as any };
-      const filteredPrevWithoutPaidLaboratoryTest = prev.prescriptions.filter(
-        prescription =>
-          prescription.id !==
-          (newPaidPrescriptionTest as any).newCreatedPrescriptionTest.id
-      );
-      return Object.assign({}, prev, {
-        prescriptions: [
-          newPaidPrescriptionTest,
-          ...filteredPrevWithoutPaidLaboratoryTest
-        ]
-      });
-    },
-    onError: err => console.log(err)
-  });
+  // subscribeToMore({
+  //   document: NewCreatedPrescriptionDocument,
+  //   updateQuery: (prev, { subscriptionData }) => {
+  //     const newPaidPrescriptionTest = subscriptionData.data;
+  //     if (!newPaidPrescriptionTest) return prev;
+  //     if (!prev && newPaidPrescriptionTest)
+  //       return { prescriptions: newPaidPrescriptionTest as any };
+  //     const filteredPrevWithoutPaidLaboratoryTest = prev.prescriptions.filter(
+  //       prescription =>
+  //         prescription.id !==
+  //         (newPaidPrescriptionTest as any).newCreatedPrescriptionTest.id
+  //     );
+  //     return Object.assign({}, prev, {
+  //       prescriptions: [
+  //         newPaidPrescriptionTest,
+  //         ...filteredPrevWithoutPaidLaboratoryTest
+  //       ]
+  //     });
+  //   },
+  //   onError: err => console.log(err)
+  // });
+
   useEffect(() => {
     if (isBeingSearched) {
       setPrescriptions(searchedPrescriptionData?.searchPrescriptions);

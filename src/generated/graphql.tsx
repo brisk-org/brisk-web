@@ -17,7 +17,7 @@ export type Scalars = {
 export type Card = {
   __typename?: 'Card';
   id: Scalars['ID'];
-  laboratory_tests?: Maybe<Array<LaboratoryTest>>;
+  laboratory_tests?: Maybe<Array<LaboratoryExamination>>;
   prescriptions?: Maybe<Array<Prescription>>;
   notifications?: Maybe<Array<Notification>>;
   name: Scalars['String'];
@@ -99,8 +99,8 @@ export type CompleteQuickPrescriptionTestInput = {
 
 export type CreateLaboratoryTestInput = {
   cardId: Scalars['ID'];
-  totalPrice: Scalars['Float'];
-  result: Scalars['String'];
+  price: Scalars['Float'];
+  laboratoryTestRequest: Array<LaboratoryTestRequestInput>;
 };
 
 export type CreateMedicationsInput = {
@@ -144,17 +144,74 @@ export type History = {
   updated_at: Scalars['String'];
 };
 
-export type LaboratoryTest = {
-  __typename?: 'LaboratoryTest';
+export type LaboratoryExamination = {
+  __typename?: 'LaboratoryExamination';
   id: Scalars['ID'];
   cardId: Scalars['Float'];
   card: Card;
   notifications?: Maybe<Array<Notification>>;
-  result: Scalars['String'];
+  laboratoryTestRequests: Array<LaboratoryTestRequest>;
   paid: Scalars['Boolean'];
   price: Scalars['Float'];
   completed: Scalars['Boolean'];
   new: Scalars['Boolean'];
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
+};
+
+export type LaboratoryTest = {
+  __typename?: 'LaboratoryTest';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  normalValue: Scalars['String'];
+  commonValues: Array<Scalars['String']>;
+  category: LaboratoryTest;
+  subCategory: LaboratoryTestCategory;
+  laboratoryTestRequests: Array<LaboratoryTestRequest>;
+  price?: Maybe<Scalars['Float']>;
+  hasIndividualPrice: Scalars['Boolean'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
+};
+
+export type LaboratoryTestCategory = {
+  __typename?: 'LaboratoryTestCategory';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  price?: Maybe<Scalars['Float']>;
+  laboratoryTests: Array<LaboratoryTest>;
+  subCateogries: Array<LaboratoryTestSubCategory>;
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
+};
+
+export type LaboratoryTestRequest = {
+  __typename?: 'LaboratoryTestRequest';
+  id: Scalars['ID'];
+  laboratoryTestId: Scalars['String'];
+  laboratoryTest: LaboratoryTest;
+  laboratoryExamination: LaboratoryExamination;
+  value: Scalars['String'];
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
+};
+
+export type LaboratoryTestRequestInput = {
+  value: Scalars['String'];
+  laboratoryTestId: Scalars['String'];
+};
+
+export type LaboratoryTestSubCategory = {
+  __typename?: 'LaboratoryTestSubCategory';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  price?: Maybe<Scalars['Float']>;
+  laboratoryTests: Array<LaboratoryTest>;
+  category: LaboratoryTestCategory;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
@@ -195,12 +252,21 @@ export type Mutation = {
   changeUserDetail: UserResponse;
   uploadPhoto: User;
   deleteUser: Scalars['Float'];
-  createLaboratoryTest: LaboratoryTest;
-  completeLaboratoryTest: LaboratoryTest;
-  saveLaboratoryTest: LaboratoryTest;
-  payForLaboratoryTest: LaboratoryTest;
+  createLaboratoryExamination: LaboratoryExamination;
+  completeLaboratoryExamination: LaboratoryExamination;
+  saveLaboratoryExamination: LaboratoryExamination;
+  payForLaboratoryExamination: LaboratoryExamination;
+  deleteLaboratoryExamination: Scalars['Boolean'];
+  markLaboratoryExaminationAsSeen: LaboratoryExamination;
+  createLaboraotryTest: LaboratoryTest;
+  updateLaboratoryTest: LaboratoryTest;
   deleteLaboratoryTest: Scalars['Boolean'];
-  markLaboratoryTestAsSeen: LaboratoryTest;
+  createLaboraotryTestCategory: LaboratoryTestCategory;
+  updateLaboratoryTestCategory: LaboratoryTestCategory;
+  deleteLaboratoryTestCategory: Scalars['Boolean'];
+  createLaboraotryTestSubCategory: LaboratoryTestSubCategory;
+  updateLaboratoryTestSubCategory: LaboratoryTestSubCategory;
+  deleteLaboratoryTestSubCategory: Scalars['Boolean'];
   changeSetting: Settings;
   createCard: Card;
   updateCard: Card;
@@ -265,24 +331,59 @@ export type MutationDeleteUserArgs = {
 };
 
 
-export type MutationCreateLaboratoryTestArgs = {
+export type MutationCreateLaboratoryExaminationArgs = {
   input: CreateLaboratoryTestInput;
 };
 
 
-export type MutationCompleteLaboratoryTestArgs = {
+export type MutationCompleteLaboratoryExaminationArgs = {
   result: Scalars['String'];
   id: Scalars['ID'];
 };
 
 
-export type MutationSaveLaboratoryTestArgs = {
+export type MutationSaveLaboratoryExaminationArgs = {
   result: Scalars['String'];
   id: Scalars['ID'];
 };
 
 
-export type MutationPayForLaboratoryTestArgs = {
+export type MutationPayForLaboratoryExaminationArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationDeleteLaboratoryExaminationArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationMarkLaboratoryExaminationAsSeenArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationCreateLaboraotryTestArgs = {
+  name: Scalars['String'];
+  normalValue: Scalars['String'];
+  commonValues: Array<Scalars['String']>;
+  price?: Maybe<Scalars['Float']>;
+  hasIndividualPrice: Scalars['Boolean'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
+  subCategoryId: Scalars['ID'];
+  categoryId: Scalars['ID'];
+};
+
+
+export type MutationUpdateLaboratoryTestArgs = {
+  name: Scalars['String'];
+  normalValue: Scalars['String'];
+  commonValues: Array<Scalars['String']>;
+  price?: Maybe<Scalars['Float']>;
+  hasIndividualPrice: Scalars['Boolean'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
   id: Scalars['ID'];
 };
 
@@ -292,7 +393,43 @@ export type MutationDeleteLaboratoryTestArgs = {
 };
 
 
-export type MutationMarkLaboratoryTestAsSeenArgs = {
+export type MutationCreateLaboraotryTestCategoryArgs = {
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
+};
+
+
+export type MutationUpdateLaboratoryTestCategoryArgs = {
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationDeleteLaboratoryTestCategoryArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationCreateLaboraotryTestSubCategoryArgs = {
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationUpdateLaboratoryTestSubCategoryArgs = {
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationDeleteLaboratoryTestSubCategoryArgs = {
   id: Scalars['ID'];
 };
 
@@ -470,7 +607,7 @@ export type Notification = {
   message: Scalars['String'];
   action: NotificationAction;
   card?: Maybe<Card>;
-  laboratory_test?: Maybe<LaboratoryTest>;
+  laboratory_test?: Maybe<LaboratoryExamination>;
   prescription?: Maybe<Prescription>;
   quick_prescription_test?: Maybe<QuickPrescriptionTest>;
   quick_laboratory_test?: Maybe<QuickLaboratoryTest>;
@@ -519,10 +656,12 @@ export type Query = {
   __typename?: 'Query';
   allUsers: Array<User>;
   me?: Maybe<User>;
-  laboratoryTestsCount: Scalars['Float'];
-  laboratoryTests: Array<LaboratoryTest>;
-  laboratoryTest: LaboratoryTest;
-  searchLaboratoryTests: Array<LaboratoryTest>;
+  laboratoryExaminationCount: Scalars['Float'];
+  laboratoryExaminations: Array<LaboratoryExamination>;
+  laboratoryExamination: LaboratoryExamination;
+  searchLaboratoryExamination: Array<LaboratoryExamination>;
+  laboratoryTestCategories: Array<LaboratoryTestCategory>;
+  laboratoryTests: Array<LaboratoryTestSubCategory>;
   setting: Settings;
   cardsCount: Scalars['Float'];
   cards: Array<Card>;
@@ -550,7 +689,7 @@ export type Query = {
 };
 
 
-export type QueryLaboratoryTestsArgs = {
+export type QueryLaboratoryExaminationsArgs = {
   skip: Scalars['Float'];
   take: Scalars['Float'];
   from?: Maybe<Scalars['String']>;
@@ -558,12 +697,12 @@ export type QueryLaboratoryTestsArgs = {
 };
 
 
-export type QueryLaboratoryTestArgs = {
+export type QueryLaboratoryExaminationArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QuerySearchLaboratoryTestsArgs = {
+export type QuerySearchLaboratoryExaminationArgs = {
   term: Scalars['String'];
   skip: Scalars['Float'];
   take: Scalars['Float'];
@@ -699,8 +838,9 @@ export type Settings = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  newCreatedLaboratoryTest: LaboratoryTest;
+  newCreatedLaboratoryExamination: LaboratoryExamination;
   newCreatedCard: Card;
+  newMedicationUpdate: Prescription;
   newCreatedPrescription: Prescription;
   newCreatedQuickPrescriptionTest: QuickPrescriptionTest;
   newCreatedQuickLaboratoryTest: QuickLaboratoryTest;
@@ -852,17 +992,17 @@ export type UpdateHistoryMutation = (
   ) }
 );
 
-export type CompleteLaboratoryTestMutationVariables = Exact<{
+export type CompleteLaboratoryExaminationMutationVariables = Exact<{
   result: Scalars['String'];
   id: Scalars['ID'];
 }>;
 
 
-export type CompleteLaboratoryTestMutation = (
+export type CompleteLaboratoryExaminationMutation = (
   { __typename?: 'Mutation' }
-  & { completeLaboratoryTest: (
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id' | 'result' | 'paid' | 'completed' | 'new' | 'price' | 'created_at'>
+  & { completeLaboratoryExamination: (
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'created_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'name' | 'phone'>
@@ -870,17 +1010,17 @@ export type CompleteLaboratoryTestMutation = (
   ) }
 );
 
-export type SaveLaboratoryTestMutationVariables = Exact<{
+export type SaveLaboratoryExaminationMutationVariables = Exact<{
   result: Scalars['String'];
   id: Scalars['ID'];
 }>;
 
 
-export type SaveLaboratoryTestMutation = (
+export type SaveLaboratoryExaminationMutation = (
   { __typename?: 'Mutation' }
-  & { saveLaboratoryTest: (
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id' | 'result' | 'paid' | 'completed' | 'new' | 'price' | 'created_at'>
+  & { saveLaboratoryExamination: (
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'created_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'name' | 'phone'>
@@ -888,18 +1028,18 @@ export type SaveLaboratoryTestMutation = (
   ) }
 );
 
-export type CreateLaboratoryTestMutationVariables = Exact<{
+export type CreateLaboratoryExaminationMutationVariables = Exact<{
   cardId: Scalars['ID'];
-  result: Scalars['String'];
-  totalPrice: Scalars['Float'];
+  laboratoryTestRequest: Array<LaboratoryTestRequestInput> | LaboratoryTestRequestInput;
+  price: Scalars['Float'];
 }>;
 
 
-export type CreateLaboratoryTestMutation = (
+export type CreateLaboratoryExaminationMutation = (
   { __typename?: 'Mutation' }
-  & { createLaboratoryTest: (
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id' | 'price'>
+  & { createLaboratoryExamination: (
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id' | 'price'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'name'>
@@ -907,26 +1047,26 @@ export type CreateLaboratoryTestMutation = (
   ) }
 );
 
-export type DeleteLaboratoryTestMutationVariables = Exact<{
+export type DeleteLaboratoryExaminationMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type DeleteLaboratoryTestMutation = (
+export type DeleteLaboratoryExaminationMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'deleteLaboratoryTest'>
+  & Pick<Mutation, 'deleteLaboratoryExamination'>
 );
 
-export type MarkLaboratoryTestAsSeenMutationVariables = Exact<{
+export type MarkLaboratoryExaminationAsSeenMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type MarkLaboratoryTestAsSeenMutation = (
+export type MarkLaboratoryExaminationAsSeenMutation = (
   { __typename?: 'Mutation' }
-  & { markLaboratoryTestAsSeen: (
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id'>
+  & { markLaboratoryExaminationAsSeen: (
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'name'>
@@ -934,16 +1074,16 @@ export type MarkLaboratoryTestAsSeenMutation = (
   ) }
 );
 
-export type PayForLaboratoryTestMutationVariables = Exact<{
+export type PayForLaboratoryExaminationMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type PayForLaboratoryTestMutation = (
+export type PayForLaboratoryExaminationMutation = (
   { __typename?: 'Mutation' }
-  & { payForLaboratoryTest: (
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id'>
+  & { payForLaboratoryExamination: (
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id'>
   ) }
 );
 
@@ -1349,8 +1489,8 @@ export type CardQuery = (
         ) }
       )>> }
     )>>, laboratory_tests?: Maybe<Array<(
-      { __typename?: 'LaboratoryTest' }
-      & Pick<LaboratoryTest, 'id' | 'cardId' | 'result' | 'paid' | 'new' | 'completed' | 'price' | 'created_at' | 'updated_at'>
+      { __typename?: 'LaboratoryExamination' }
+      & Pick<LaboratoryExamination, 'id' | 'cardId' | 'paid' | 'new' | 'completed' | 'price' | 'created_at' | 'updated_at'>
     )>>, history?: Maybe<Array<(
       { __typename?: 'History' }
       & Pick<History, 'id' | 'result' | 'cardId' | 'created_at' | 'updated_at'>
@@ -1457,16 +1597,16 @@ export type HistoryAsstQuery = (
   )> }
 );
 
-export type LaboratoryTestQueryVariables = Exact<{
+export type LaboratoryExaminationQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type LaboratoryTestQuery = (
+export type LaboratoryExaminationQuery = (
   { __typename?: 'Query' }
-  & { laboratoryTest: (
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'result' | 'cardId' | 'created_at'>
+  & { laboratoryExamination: (
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'cardId' | 'created_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'name' | 'phone' | 'age' | 'gender'>
@@ -1474,25 +1614,25 @@ export type LaboratoryTestQuery = (
   ) }
 );
 
-export type LaboratoryTestsCountQueryVariables = Exact<{ [key: string]: never; }>;
+export type LaboratoryExaminationCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LaboratoryTestsCountQuery = (
+export type LaboratoryExaminationCountQuery = (
   { __typename?: 'Query' }
-  & Pick<Query, 'laboratoryTestsCount'>
+  & Pick<Query, 'laboratoryExaminationCount'>
 );
 
-export type LaboratoryTestsQueryVariables = Exact<{
+export type LaboratoryExaminationsQueryVariables = Exact<{
   skip: Scalars['Float'];
   take: Scalars['Float'];
 }>;
 
 
-export type LaboratoryTestsQuery = (
+export type LaboratoryExaminationsQuery = (
   { __typename?: 'Query' }
-  & { laboratoryTests: Array<(
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id' | 'paid' | 'price' | 'new' | 'completed' | 'created_at' | 'updated_at'>
+  & { laboratoryExaminations: Array<(
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id' | 'paid' | 'price' | 'new' | 'completed' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name'>
@@ -1500,32 +1640,32 @@ export type LaboratoryTestsQuery = (
   )> }
 );
 
-export type LaboratoryTestsForDashboardQueryVariables = Exact<{
+export type LaboratoryExaminationsForDashboardQueryVariables = Exact<{
   skip: Scalars['Float'];
   take: Scalars['Float'];
 }>;
 
 
-export type LaboratoryTestsForDashboardQuery = (
+export type LaboratoryExaminationsForDashboardQuery = (
   { __typename?: 'Query' }
-  & { laboratoryTests: Array<(
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id' | 'result' | 'price' | 'paid' | 'updated_at' | 'created_at'>
+  & { laboratoryExaminations: Array<(
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id' | 'price' | 'paid' | 'updated_at' | 'created_at'>
   )> }
 );
 
-export type SearchLaboratoryTestsQueryVariables = Exact<{
+export type SearchLaboratoryExaminationQueryVariables = Exact<{
   term: Scalars['String'];
   skip: Scalars['Float'];
   take: Scalars['Float'];
 }>;
 
 
-export type SearchLaboratoryTestsQuery = (
+export type SearchLaboratoryExaminationQuery = (
   { __typename?: 'Query' }
-  & { searchLaboratoryTests: Array<(
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id' | 'paid' | 'price' | 'new' | 'completed' | 'created_at'>
+  & { searchLaboratoryExamination: Array<(
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id' | 'paid' | 'price' | 'new' | 'completed' | 'created_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name'>
@@ -1615,8 +1755,8 @@ export type NotificationsQuery = (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name'>
     )>, laboratory_test?: Maybe<(
-      { __typename?: 'LaboratoryTest' }
-      & Pick<LaboratoryTest, 'id' | 'created_at'>
+      { __typename?: 'LaboratoryExamination' }
+      & Pick<LaboratoryExamination, 'id' | 'created_at'>
       & { card: (
         { __typename?: 'Card' }
         & Pick<Card, 'id' | 'name'>
@@ -1861,14 +2001,14 @@ export type NewCreatedCardSubscription = (
   ) }
 );
 
-export type NewCreatedLaboratoryTestSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type NewCreatedLaboratoryExaminationSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NewCreatedLaboratoryTestSubscription = (
+export type NewCreatedLaboratoryExaminationSubscription = (
   { __typename?: 'Subscription' }
-  & { newCreatedLaboratoryTest: (
-    { __typename?: 'LaboratoryTest' }
-    & Pick<LaboratoryTest, 'id' | 'paid' | 'price' | 'new' | 'result' | 'completed' | 'created_at' | 'updated_at'>
+  & { newCreatedLaboratoryExamination: (
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id' | 'paid' | 'price' | 'new' | 'completed' | 'created_at' | 'updated_at'>
     & { card: (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name'>
@@ -1899,8 +2039,8 @@ export type NewNotificationSubscriptionSubscription = (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name'>
     )>, laboratory_test?: Maybe<(
-      { __typename?: 'LaboratoryTest' }
-      & Pick<LaboratoryTest, 'id' | 'created_at'>
+      { __typename?: 'LaboratoryExamination' }
+      & Pick<LaboratoryExamination, 'id' | 'created_at'>
       & { card: (
         { __typename?: 'Card' }
         & Pick<Card, 'id' | 'name'>
@@ -1934,6 +2074,35 @@ export type NewCreatedPrescriptionSubscription = (
       { __typename?: 'Card' }
       & Pick<Card, 'id' | 'name'>
     ) }
+  ) }
+);
+
+export type NewMedicationUpdateSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewMedicationUpdateSubscription = (
+  { __typename?: 'Subscription' }
+  & { newMedicationUpdate: (
+    { __typename?: 'Prescription' }
+    & Pick<Prescription, 'id' | 'paid' | 'inrolled' | 'price' | 'completed' | 'new' | 'rx' | 'created_at' | 'updated_at'>
+    & { card: (
+      { __typename?: 'Card' }
+      & Pick<Card, 'id' | 'name' | 'age' | 'gender'>
+    ), medications?: Maybe<Array<(
+      { __typename?: 'Medication' }
+      & Pick<Medication, 'id' | 'strength' | 'perDay' | 'forDays' | 'other' | 'created_at'>
+      & { medicine: (
+        { __typename?: 'Medicine' }
+        & Pick<Medicine, 'id' | 'name' | 'price' | 'inStock'>
+      ), checkIn: Array<(
+        { __typename?: 'CheckIn' }
+        & Pick<CheckIn, 'date' | 'price'>
+        & { status: Array<(
+          { __typename?: 'CheckInStatus' }
+          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+        )> }
+      )> }
+    )>> }
   ) }
 );
 
@@ -2310,11 +2479,10 @@ export function useUpdateHistoryMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateHistoryMutationHookResult = ReturnType<typeof useUpdateHistoryMutation>;
 export type UpdateHistoryMutationResult = Apollo.MutationResult<UpdateHistoryMutation>;
 export type UpdateHistoryMutationOptions = Apollo.BaseMutationOptions<UpdateHistoryMutation, UpdateHistoryMutationVariables>;
-export const CompleteLaboratoryTestDocument = gql`
-    mutation CompleteLaboratoryTest($result: String!, $id: ID!) {
-  completeLaboratoryTest(result: $result, id: $id) {
+export const CompleteLaboratoryExaminationDocument = gql`
+    mutation CompleteLaboratoryExamination($result: String!, $id: ID!) {
+  completeLaboratoryExamination(result: $result, id: $id) {
     id
-    result
     paid
     completed
     new
@@ -2327,38 +2495,37 @@ export const CompleteLaboratoryTestDocument = gql`
   }
 }
     `;
-export type CompleteLaboratoryTestMutationFn = Apollo.MutationFunction<CompleteLaboratoryTestMutation, CompleteLaboratoryTestMutationVariables>;
+export type CompleteLaboratoryExaminationMutationFn = Apollo.MutationFunction<CompleteLaboratoryExaminationMutation, CompleteLaboratoryExaminationMutationVariables>;
 
 /**
- * __useCompleteLaboratoryTestMutation__
+ * __useCompleteLaboratoryExaminationMutation__
  *
- * To run a mutation, you first call `useCompleteLaboratoryTestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCompleteLaboratoryTestMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCompleteLaboratoryExaminationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCompleteLaboratoryExaminationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [completeLaboratoryTestMutation, { data, loading, error }] = useCompleteLaboratoryTestMutation({
+ * const [completeLaboratoryExaminationMutation, { data, loading, error }] = useCompleteLaboratoryExaminationMutation({
  *   variables: {
  *      result: // value for 'result'
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useCompleteLaboratoryTestMutation(baseOptions?: Apollo.MutationHookOptions<CompleteLaboratoryTestMutation, CompleteLaboratoryTestMutationVariables>) {
+export function useCompleteLaboratoryExaminationMutation(baseOptions?: Apollo.MutationHookOptions<CompleteLaboratoryExaminationMutation, CompleteLaboratoryExaminationMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CompleteLaboratoryTestMutation, CompleteLaboratoryTestMutationVariables>(CompleteLaboratoryTestDocument, options);
+        return Apollo.useMutation<CompleteLaboratoryExaminationMutation, CompleteLaboratoryExaminationMutationVariables>(CompleteLaboratoryExaminationDocument, options);
       }
-export type CompleteLaboratoryTestMutationHookResult = ReturnType<typeof useCompleteLaboratoryTestMutation>;
-export type CompleteLaboratoryTestMutationResult = Apollo.MutationResult<CompleteLaboratoryTestMutation>;
-export type CompleteLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<CompleteLaboratoryTestMutation, CompleteLaboratoryTestMutationVariables>;
-export const SaveLaboratoryTestDocument = gql`
-    mutation SaveLaboratoryTest($result: String!, $id: ID!) {
-  saveLaboratoryTest(result: $result, id: $id) {
+export type CompleteLaboratoryExaminationMutationHookResult = ReturnType<typeof useCompleteLaboratoryExaminationMutation>;
+export type CompleteLaboratoryExaminationMutationResult = Apollo.MutationResult<CompleteLaboratoryExaminationMutation>;
+export type CompleteLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<CompleteLaboratoryExaminationMutation, CompleteLaboratoryExaminationMutationVariables>;
+export const SaveLaboratoryExaminationDocument = gql`
+    mutation SaveLaboratoryExamination($result: String!, $id: ID!) {
+  saveLaboratoryExamination(result: $result, id: $id) {
     id
-    result
     paid
     completed
     new
@@ -2371,37 +2538,37 @@ export const SaveLaboratoryTestDocument = gql`
   }
 }
     `;
-export type SaveLaboratoryTestMutationFn = Apollo.MutationFunction<SaveLaboratoryTestMutation, SaveLaboratoryTestMutationVariables>;
+export type SaveLaboratoryExaminationMutationFn = Apollo.MutationFunction<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>;
 
 /**
- * __useSaveLaboratoryTestMutation__
+ * __useSaveLaboratoryExaminationMutation__
  *
- * To run a mutation, you first call `useSaveLaboratoryTestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSaveLaboratoryTestMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSaveLaboratoryExaminationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveLaboratoryExaminationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [saveLaboratoryTestMutation, { data, loading, error }] = useSaveLaboratoryTestMutation({
+ * const [saveLaboratoryExaminationMutation, { data, loading, error }] = useSaveLaboratoryExaminationMutation({
  *   variables: {
  *      result: // value for 'result'
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useSaveLaboratoryTestMutation(baseOptions?: Apollo.MutationHookOptions<SaveLaboratoryTestMutation, SaveLaboratoryTestMutationVariables>) {
+export function useSaveLaboratoryExaminationMutation(baseOptions?: Apollo.MutationHookOptions<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SaveLaboratoryTestMutation, SaveLaboratoryTestMutationVariables>(SaveLaboratoryTestDocument, options);
+        return Apollo.useMutation<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>(SaveLaboratoryExaminationDocument, options);
       }
-export type SaveLaboratoryTestMutationHookResult = ReturnType<typeof useSaveLaboratoryTestMutation>;
-export type SaveLaboratoryTestMutationResult = Apollo.MutationResult<SaveLaboratoryTestMutation>;
-export type SaveLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<SaveLaboratoryTestMutation, SaveLaboratoryTestMutationVariables>;
-export const CreateLaboratoryTestDocument = gql`
-    mutation CreateLaboratoryTest($cardId: ID!, $result: String!, $totalPrice: Float!) {
-  createLaboratoryTest(
-    input: {cardId: $cardId, result: $result, totalPrice: $totalPrice}
+export type SaveLaboratoryExaminationMutationHookResult = ReturnType<typeof useSaveLaboratoryExaminationMutation>;
+export type SaveLaboratoryExaminationMutationResult = Apollo.MutationResult<SaveLaboratoryExaminationMutation>;
+export type SaveLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>;
+export const CreateLaboratoryExaminationDocument = gql`
+    mutation CreateLaboratoryExamination($cardId: ID!, $laboratoryTestRequest: [LaboratoryTestRequestInput!]!, $price: Float!) {
+  createLaboratoryExamination(
+    input: {cardId: $cardId, laboratoryTestRequest: $laboratoryTestRequest, price: $price}
   ) {
     id
     card {
@@ -2411,68 +2578,68 @@ export const CreateLaboratoryTestDocument = gql`
   }
 }
     `;
-export type CreateLaboratoryTestMutationFn = Apollo.MutationFunction<CreateLaboratoryTestMutation, CreateLaboratoryTestMutationVariables>;
+export type CreateLaboratoryExaminationMutationFn = Apollo.MutationFunction<CreateLaboratoryExaminationMutation, CreateLaboratoryExaminationMutationVariables>;
 
 /**
- * __useCreateLaboratoryTestMutation__
+ * __useCreateLaboratoryExaminationMutation__
  *
- * To run a mutation, you first call `useCreateLaboratoryTestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateLaboratoryTestMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCreateLaboratoryExaminationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateLaboratoryExaminationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createLaboratoryTestMutation, { data, loading, error }] = useCreateLaboratoryTestMutation({
+ * const [createLaboratoryExaminationMutation, { data, loading, error }] = useCreateLaboratoryExaminationMutation({
  *   variables: {
  *      cardId: // value for 'cardId'
- *      result: // value for 'result'
- *      totalPrice: // value for 'totalPrice'
+ *      laboratoryTestRequest: // value for 'laboratoryTestRequest'
+ *      price: // value for 'price'
  *   },
  * });
  */
-export function useCreateLaboratoryTestMutation(baseOptions?: Apollo.MutationHookOptions<CreateLaboratoryTestMutation, CreateLaboratoryTestMutationVariables>) {
+export function useCreateLaboratoryExaminationMutation(baseOptions?: Apollo.MutationHookOptions<CreateLaboratoryExaminationMutation, CreateLaboratoryExaminationMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateLaboratoryTestMutation, CreateLaboratoryTestMutationVariables>(CreateLaboratoryTestDocument, options);
+        return Apollo.useMutation<CreateLaboratoryExaminationMutation, CreateLaboratoryExaminationMutationVariables>(CreateLaboratoryExaminationDocument, options);
       }
-export type CreateLaboratoryTestMutationHookResult = ReturnType<typeof useCreateLaboratoryTestMutation>;
-export type CreateLaboratoryTestMutationResult = Apollo.MutationResult<CreateLaboratoryTestMutation>;
-export type CreateLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<CreateLaboratoryTestMutation, CreateLaboratoryTestMutationVariables>;
-export const DeleteLaboratoryTestDocument = gql`
-    mutation DeleteLaboratoryTest($id: ID!) {
-  deleteLaboratoryTest(id: $id)
+export type CreateLaboratoryExaminationMutationHookResult = ReturnType<typeof useCreateLaboratoryExaminationMutation>;
+export type CreateLaboratoryExaminationMutationResult = Apollo.MutationResult<CreateLaboratoryExaminationMutation>;
+export type CreateLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<CreateLaboratoryExaminationMutation, CreateLaboratoryExaminationMutationVariables>;
+export const DeleteLaboratoryExaminationDocument = gql`
+    mutation DeleteLaboratoryExamination($id: ID!) {
+  deleteLaboratoryExamination(id: $id)
 }
     `;
-export type DeleteLaboratoryTestMutationFn = Apollo.MutationFunction<DeleteLaboratoryTestMutation, DeleteLaboratoryTestMutationVariables>;
+export type DeleteLaboratoryExaminationMutationFn = Apollo.MutationFunction<DeleteLaboratoryExaminationMutation, DeleteLaboratoryExaminationMutationVariables>;
 
 /**
- * __useDeleteLaboratoryTestMutation__
+ * __useDeleteLaboratoryExaminationMutation__
  *
- * To run a mutation, you first call `useDeleteLaboratoryTestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDeleteLaboratoryTestMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useDeleteLaboratoryExaminationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteLaboratoryExaminationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [deleteLaboratoryTestMutation, { data, loading, error }] = useDeleteLaboratoryTestMutation({
+ * const [deleteLaboratoryExaminationMutation, { data, loading, error }] = useDeleteLaboratoryExaminationMutation({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useDeleteLaboratoryTestMutation(baseOptions?: Apollo.MutationHookOptions<DeleteLaboratoryTestMutation, DeleteLaboratoryTestMutationVariables>) {
+export function useDeleteLaboratoryExaminationMutation(baseOptions?: Apollo.MutationHookOptions<DeleteLaboratoryExaminationMutation, DeleteLaboratoryExaminationMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteLaboratoryTestMutation, DeleteLaboratoryTestMutationVariables>(DeleteLaboratoryTestDocument, options);
+        return Apollo.useMutation<DeleteLaboratoryExaminationMutation, DeleteLaboratoryExaminationMutationVariables>(DeleteLaboratoryExaminationDocument, options);
       }
-export type DeleteLaboratoryTestMutationHookResult = ReturnType<typeof useDeleteLaboratoryTestMutation>;
-export type DeleteLaboratoryTestMutationResult = Apollo.MutationResult<DeleteLaboratoryTestMutation>;
-export type DeleteLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<DeleteLaboratoryTestMutation, DeleteLaboratoryTestMutationVariables>;
-export const MarkLaboratoryTestAsSeenDocument = gql`
-    mutation MarkLaboratoryTestAsSeen($id: ID!) {
-  markLaboratoryTestAsSeen(id: $id) {
+export type DeleteLaboratoryExaminationMutationHookResult = ReturnType<typeof useDeleteLaboratoryExaminationMutation>;
+export type DeleteLaboratoryExaminationMutationResult = Apollo.MutationResult<DeleteLaboratoryExaminationMutation>;
+export type DeleteLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<DeleteLaboratoryExaminationMutation, DeleteLaboratoryExaminationMutationVariables>;
+export const MarkLaboratoryExaminationAsSeenDocument = gql`
+    mutation MarkLaboratoryExaminationAsSeen($id: ID!) {
+  markLaboratoryExaminationAsSeen(id: $id) {
     id
     card {
       name
@@ -2480,65 +2647,65 @@ export const MarkLaboratoryTestAsSeenDocument = gql`
   }
 }
     `;
-export type MarkLaboratoryTestAsSeenMutationFn = Apollo.MutationFunction<MarkLaboratoryTestAsSeenMutation, MarkLaboratoryTestAsSeenMutationVariables>;
+export type MarkLaboratoryExaminationAsSeenMutationFn = Apollo.MutationFunction<MarkLaboratoryExaminationAsSeenMutation, MarkLaboratoryExaminationAsSeenMutationVariables>;
 
 /**
- * __useMarkLaboratoryTestAsSeenMutation__
+ * __useMarkLaboratoryExaminationAsSeenMutation__
  *
- * To run a mutation, you first call `useMarkLaboratoryTestAsSeenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useMarkLaboratoryTestAsSeenMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useMarkLaboratoryExaminationAsSeenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkLaboratoryExaminationAsSeenMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [markLaboratoryTestAsSeenMutation, { data, loading, error }] = useMarkLaboratoryTestAsSeenMutation({
+ * const [markLaboratoryExaminationAsSeenMutation, { data, loading, error }] = useMarkLaboratoryExaminationAsSeenMutation({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useMarkLaboratoryTestAsSeenMutation(baseOptions?: Apollo.MutationHookOptions<MarkLaboratoryTestAsSeenMutation, MarkLaboratoryTestAsSeenMutationVariables>) {
+export function useMarkLaboratoryExaminationAsSeenMutation(baseOptions?: Apollo.MutationHookOptions<MarkLaboratoryExaminationAsSeenMutation, MarkLaboratoryExaminationAsSeenMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<MarkLaboratoryTestAsSeenMutation, MarkLaboratoryTestAsSeenMutationVariables>(MarkLaboratoryTestAsSeenDocument, options);
+        return Apollo.useMutation<MarkLaboratoryExaminationAsSeenMutation, MarkLaboratoryExaminationAsSeenMutationVariables>(MarkLaboratoryExaminationAsSeenDocument, options);
       }
-export type MarkLaboratoryTestAsSeenMutationHookResult = ReturnType<typeof useMarkLaboratoryTestAsSeenMutation>;
-export type MarkLaboratoryTestAsSeenMutationResult = Apollo.MutationResult<MarkLaboratoryTestAsSeenMutation>;
-export type MarkLaboratoryTestAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkLaboratoryTestAsSeenMutation, MarkLaboratoryTestAsSeenMutationVariables>;
-export const PayForLaboratoryTestDocument = gql`
-    mutation PayForLaboratoryTest($id: ID!) {
-  payForLaboratoryTest(id: $id) {
+export type MarkLaboratoryExaminationAsSeenMutationHookResult = ReturnType<typeof useMarkLaboratoryExaminationAsSeenMutation>;
+export type MarkLaboratoryExaminationAsSeenMutationResult = Apollo.MutationResult<MarkLaboratoryExaminationAsSeenMutation>;
+export type MarkLaboratoryExaminationAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkLaboratoryExaminationAsSeenMutation, MarkLaboratoryExaminationAsSeenMutationVariables>;
+export const PayForLaboratoryExaminationDocument = gql`
+    mutation PayForLaboratoryExamination($id: ID!) {
+  payForLaboratoryExamination(id: $id) {
     id
   }
 }
     `;
-export type PayForLaboratoryTestMutationFn = Apollo.MutationFunction<PayForLaboratoryTestMutation, PayForLaboratoryTestMutationVariables>;
+export type PayForLaboratoryExaminationMutationFn = Apollo.MutationFunction<PayForLaboratoryExaminationMutation, PayForLaboratoryExaminationMutationVariables>;
 
 /**
- * __usePayForLaboratoryTestMutation__
+ * __usePayForLaboratoryExaminationMutation__
  *
- * To run a mutation, you first call `usePayForLaboratoryTestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePayForLaboratoryTestMutation` returns a tuple that includes:
+ * To run a mutation, you first call `usePayForLaboratoryExaminationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePayForLaboratoryExaminationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [payForLaboratoryTestMutation, { data, loading, error }] = usePayForLaboratoryTestMutation({
+ * const [payForLaboratoryExaminationMutation, { data, loading, error }] = usePayForLaboratoryExaminationMutation({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function usePayForLaboratoryTestMutation(baseOptions?: Apollo.MutationHookOptions<PayForLaboratoryTestMutation, PayForLaboratoryTestMutationVariables>) {
+export function usePayForLaboratoryExaminationMutation(baseOptions?: Apollo.MutationHookOptions<PayForLaboratoryExaminationMutation, PayForLaboratoryExaminationMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<PayForLaboratoryTestMutation, PayForLaboratoryTestMutationVariables>(PayForLaboratoryTestDocument, options);
+        return Apollo.useMutation<PayForLaboratoryExaminationMutation, PayForLaboratoryExaminationMutationVariables>(PayForLaboratoryExaminationDocument, options);
       }
-export type PayForLaboratoryTestMutationHookResult = ReturnType<typeof usePayForLaboratoryTestMutation>;
-export type PayForLaboratoryTestMutationResult = Apollo.MutationResult<PayForLaboratoryTestMutation>;
-export type PayForLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<PayForLaboratoryTestMutation, PayForLaboratoryTestMutationVariables>;
+export type PayForLaboratoryExaminationMutationHookResult = ReturnType<typeof usePayForLaboratoryExaminationMutation>;
+export type PayForLaboratoryExaminationMutationResult = Apollo.MutationResult<PayForLaboratoryExaminationMutation>;
+export type PayForLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<PayForLaboratoryExaminationMutation, PayForLaboratoryExaminationMutationVariables>;
 export const AddMedicineDocument = gql`
     mutation AddMedicine($name: String!, $price: Float!, $inStock: Float!, $strength: String, $perDay: PerDay, $forDays: Float) {
   addMedicine(
@@ -3534,7 +3701,6 @@ export const CardDocument = gql`
     laboratory_tests {
       id
       cardId
-      result
       paid
       new
       completed
@@ -3847,15 +4013,14 @@ export function useHistoryAsstLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type HistoryAsstQueryHookResult = ReturnType<typeof useHistoryAsstQuery>;
 export type HistoryAsstLazyQueryHookResult = ReturnType<typeof useHistoryAsstLazyQuery>;
 export type HistoryAsstQueryResult = Apollo.QueryResult<HistoryAsstQuery, HistoryAsstQueryVariables>;
-export const LaboratoryTestDocument = gql`
-    query LaboratoryTest($id: ID!) {
-  laboratoryTest(id: $id) {
+export const LaboratoryExaminationDocument = gql`
+    query LaboratoryExamination($id: ID!) {
+  laboratoryExamination(id: $id) {
     id
     paid
     completed
     new
     price
-    result
     cardId
     card {
       name
@@ -3869,67 +4034,67 @@ export const LaboratoryTestDocument = gql`
     `;
 
 /**
- * __useLaboratoryTestQuery__
+ * __useLaboratoryExaminationQuery__
  *
- * To run a query within a React component, call `useLaboratoryTestQuery` and pass it any options that fit your needs.
- * When your component renders, `useLaboratoryTestQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useLaboratoryExaminationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLaboratoryExaminationQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useLaboratoryTestQuery({
+ * const { data, loading, error } = useLaboratoryExaminationQuery({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useLaboratoryTestQuery(baseOptions: Apollo.QueryHookOptions<LaboratoryTestQuery, LaboratoryTestQueryVariables>) {
+export function useLaboratoryExaminationQuery(baseOptions: Apollo.QueryHookOptions<LaboratoryExaminationQuery, LaboratoryExaminationQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<LaboratoryTestQuery, LaboratoryTestQueryVariables>(LaboratoryTestDocument, options);
+        return Apollo.useQuery<LaboratoryExaminationQuery, LaboratoryExaminationQueryVariables>(LaboratoryExaminationDocument, options);
       }
-export function useLaboratoryTestLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryTestQuery, LaboratoryTestQueryVariables>) {
+export function useLaboratoryExaminationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryExaminationQuery, LaboratoryExaminationQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<LaboratoryTestQuery, LaboratoryTestQueryVariables>(LaboratoryTestDocument, options);
+          return Apollo.useLazyQuery<LaboratoryExaminationQuery, LaboratoryExaminationQueryVariables>(LaboratoryExaminationDocument, options);
         }
-export type LaboratoryTestQueryHookResult = ReturnType<typeof useLaboratoryTestQuery>;
-export type LaboratoryTestLazyQueryHookResult = ReturnType<typeof useLaboratoryTestLazyQuery>;
-export type LaboratoryTestQueryResult = Apollo.QueryResult<LaboratoryTestQuery, LaboratoryTestQueryVariables>;
-export const LaboratoryTestsCountDocument = gql`
-    query LaboratoryTestsCount {
-  laboratoryTestsCount
+export type LaboratoryExaminationQueryHookResult = ReturnType<typeof useLaboratoryExaminationQuery>;
+export type LaboratoryExaminationLazyQueryHookResult = ReturnType<typeof useLaboratoryExaminationLazyQuery>;
+export type LaboratoryExaminationQueryResult = Apollo.QueryResult<LaboratoryExaminationQuery, LaboratoryExaminationQueryVariables>;
+export const LaboratoryExaminationCountDocument = gql`
+    query LaboratoryExaminationCount {
+  laboratoryExaminationCount
 }
     `;
 
 /**
- * __useLaboratoryTestsCountQuery__
+ * __useLaboratoryExaminationCountQuery__
  *
- * To run a query within a React component, call `useLaboratoryTestsCountQuery` and pass it any options that fit your needs.
- * When your component renders, `useLaboratoryTestsCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useLaboratoryExaminationCountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLaboratoryExaminationCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useLaboratoryTestsCountQuery({
+ * const { data, loading, error } = useLaboratoryExaminationCountQuery({
  *   variables: {
  *   },
  * });
  */
-export function useLaboratoryTestsCountQuery(baseOptions?: Apollo.QueryHookOptions<LaboratoryTestsCountQuery, LaboratoryTestsCountQueryVariables>) {
+export function useLaboratoryExaminationCountQuery(baseOptions?: Apollo.QueryHookOptions<LaboratoryExaminationCountQuery, LaboratoryExaminationCountQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<LaboratoryTestsCountQuery, LaboratoryTestsCountQueryVariables>(LaboratoryTestsCountDocument, options);
+        return Apollo.useQuery<LaboratoryExaminationCountQuery, LaboratoryExaminationCountQueryVariables>(LaboratoryExaminationCountDocument, options);
       }
-export function useLaboratoryTestsCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryTestsCountQuery, LaboratoryTestsCountQueryVariables>) {
+export function useLaboratoryExaminationCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryExaminationCountQuery, LaboratoryExaminationCountQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<LaboratoryTestsCountQuery, LaboratoryTestsCountQueryVariables>(LaboratoryTestsCountDocument, options);
+          return Apollo.useLazyQuery<LaboratoryExaminationCountQuery, LaboratoryExaminationCountQueryVariables>(LaboratoryExaminationCountDocument, options);
         }
-export type LaboratoryTestsCountQueryHookResult = ReturnType<typeof useLaboratoryTestsCountQuery>;
-export type LaboratoryTestsCountLazyQueryHookResult = ReturnType<typeof useLaboratoryTestsCountLazyQuery>;
-export type LaboratoryTestsCountQueryResult = Apollo.QueryResult<LaboratoryTestsCountQuery, LaboratoryTestsCountQueryVariables>;
-export const LaboratoryTestsDocument = gql`
-    query LaboratoryTests($skip: Float!, $take: Float!) {
-  laboratoryTests(skip: $skip, take: $take) {
+export type LaboratoryExaminationCountQueryHookResult = ReturnType<typeof useLaboratoryExaminationCountQuery>;
+export type LaboratoryExaminationCountLazyQueryHookResult = ReturnType<typeof useLaboratoryExaminationCountLazyQuery>;
+export type LaboratoryExaminationCountQueryResult = Apollo.QueryResult<LaboratoryExaminationCountQuery, LaboratoryExaminationCountQueryVariables>;
+export const LaboratoryExaminationsDocument = gql`
+    query LaboratoryExaminations($skip: Float!, $take: Float!) {
+  laboratoryExaminations(skip: $skip, take: $take) {
     id
     paid
     price
@@ -3946,38 +4111,37 @@ export const LaboratoryTestsDocument = gql`
     `;
 
 /**
- * __useLaboratoryTestsQuery__
+ * __useLaboratoryExaminationsQuery__
  *
- * To run a query within a React component, call `useLaboratoryTestsQuery` and pass it any options that fit your needs.
- * When your component renders, `useLaboratoryTestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useLaboratoryExaminationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLaboratoryExaminationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useLaboratoryTestsQuery({
+ * const { data, loading, error } = useLaboratoryExaminationsQuery({
  *   variables: {
  *      skip: // value for 'skip'
  *      take: // value for 'take'
  *   },
  * });
  */
-export function useLaboratoryTestsQuery(baseOptions: Apollo.QueryHookOptions<LaboratoryTestsQuery, LaboratoryTestsQueryVariables>) {
+export function useLaboratoryExaminationsQuery(baseOptions: Apollo.QueryHookOptions<LaboratoryExaminationsQuery, LaboratoryExaminationsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<LaboratoryTestsQuery, LaboratoryTestsQueryVariables>(LaboratoryTestsDocument, options);
+        return Apollo.useQuery<LaboratoryExaminationsQuery, LaboratoryExaminationsQueryVariables>(LaboratoryExaminationsDocument, options);
       }
-export function useLaboratoryTestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryTestsQuery, LaboratoryTestsQueryVariables>) {
+export function useLaboratoryExaminationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryExaminationsQuery, LaboratoryExaminationsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<LaboratoryTestsQuery, LaboratoryTestsQueryVariables>(LaboratoryTestsDocument, options);
+          return Apollo.useLazyQuery<LaboratoryExaminationsQuery, LaboratoryExaminationsQueryVariables>(LaboratoryExaminationsDocument, options);
         }
-export type LaboratoryTestsQueryHookResult = ReturnType<typeof useLaboratoryTestsQuery>;
-export type LaboratoryTestsLazyQueryHookResult = ReturnType<typeof useLaboratoryTestsLazyQuery>;
-export type LaboratoryTestsQueryResult = Apollo.QueryResult<LaboratoryTestsQuery, LaboratoryTestsQueryVariables>;
-export const LaboratoryTestsForDashboardDocument = gql`
-    query LaboratoryTestsForDashboard($skip: Float!, $take: Float!) {
-  laboratoryTests(skip: $skip, take: $take) {
+export type LaboratoryExaminationsQueryHookResult = ReturnType<typeof useLaboratoryExaminationsQuery>;
+export type LaboratoryExaminationsLazyQueryHookResult = ReturnType<typeof useLaboratoryExaminationsLazyQuery>;
+export type LaboratoryExaminationsQueryResult = Apollo.QueryResult<LaboratoryExaminationsQuery, LaboratoryExaminationsQueryVariables>;
+export const LaboratoryExaminationsForDashboardDocument = gql`
+    query LaboratoryExaminationsForDashboard($skip: Float!, $take: Float!) {
+  laboratoryExaminations(skip: $skip, take: $take) {
     id
-    result
     price
     paid
     updated_at
@@ -3987,36 +4151,36 @@ export const LaboratoryTestsForDashboardDocument = gql`
     `;
 
 /**
- * __useLaboratoryTestsForDashboardQuery__
+ * __useLaboratoryExaminationsForDashboardQuery__
  *
- * To run a query within a React component, call `useLaboratoryTestsForDashboardQuery` and pass it any options that fit your needs.
- * When your component renders, `useLaboratoryTestsForDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useLaboratoryExaminationsForDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLaboratoryExaminationsForDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useLaboratoryTestsForDashboardQuery({
+ * const { data, loading, error } = useLaboratoryExaminationsForDashboardQuery({
  *   variables: {
  *      skip: // value for 'skip'
  *      take: // value for 'take'
  *   },
  * });
  */
-export function useLaboratoryTestsForDashboardQuery(baseOptions: Apollo.QueryHookOptions<LaboratoryTestsForDashboardQuery, LaboratoryTestsForDashboardQueryVariables>) {
+export function useLaboratoryExaminationsForDashboardQuery(baseOptions: Apollo.QueryHookOptions<LaboratoryExaminationsForDashboardQuery, LaboratoryExaminationsForDashboardQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<LaboratoryTestsForDashboardQuery, LaboratoryTestsForDashboardQueryVariables>(LaboratoryTestsForDashboardDocument, options);
+        return Apollo.useQuery<LaboratoryExaminationsForDashboardQuery, LaboratoryExaminationsForDashboardQueryVariables>(LaboratoryExaminationsForDashboardDocument, options);
       }
-export function useLaboratoryTestsForDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryTestsForDashboardQuery, LaboratoryTestsForDashboardQueryVariables>) {
+export function useLaboratoryExaminationsForDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryExaminationsForDashboardQuery, LaboratoryExaminationsForDashboardQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<LaboratoryTestsForDashboardQuery, LaboratoryTestsForDashboardQueryVariables>(LaboratoryTestsForDashboardDocument, options);
+          return Apollo.useLazyQuery<LaboratoryExaminationsForDashboardQuery, LaboratoryExaminationsForDashboardQueryVariables>(LaboratoryExaminationsForDashboardDocument, options);
         }
-export type LaboratoryTestsForDashboardQueryHookResult = ReturnType<typeof useLaboratoryTestsForDashboardQuery>;
-export type LaboratoryTestsForDashboardLazyQueryHookResult = ReturnType<typeof useLaboratoryTestsForDashboardLazyQuery>;
-export type LaboratoryTestsForDashboardQueryResult = Apollo.QueryResult<LaboratoryTestsForDashboardQuery, LaboratoryTestsForDashboardQueryVariables>;
-export const SearchLaboratoryTestsDocument = gql`
-    query SearchLaboratoryTests($term: String!, $skip: Float!, $take: Float!) {
-  searchLaboratoryTests(term: $term, skip: $skip, take: $take) {
+export type LaboratoryExaminationsForDashboardQueryHookResult = ReturnType<typeof useLaboratoryExaminationsForDashboardQuery>;
+export type LaboratoryExaminationsForDashboardLazyQueryHookResult = ReturnType<typeof useLaboratoryExaminationsForDashboardLazyQuery>;
+export type LaboratoryExaminationsForDashboardQueryResult = Apollo.QueryResult<LaboratoryExaminationsForDashboardQuery, LaboratoryExaminationsForDashboardQueryVariables>;
+export const SearchLaboratoryExaminationDocument = gql`
+    query SearchLaboratoryExamination($term: String!, $skip: Float!, $take: Float!) {
+  searchLaboratoryExamination(term: $term, skip: $skip, take: $take) {
     id
     paid
     price
@@ -4032,16 +4196,16 @@ export const SearchLaboratoryTestsDocument = gql`
     `;
 
 /**
- * __useSearchLaboratoryTestsQuery__
+ * __useSearchLaboratoryExaminationQuery__
  *
- * To run a query within a React component, call `useSearchLaboratoryTestsQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchLaboratoryTestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useSearchLaboratoryExaminationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchLaboratoryExaminationQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useSearchLaboratoryTestsQuery({
+ * const { data, loading, error } = useSearchLaboratoryExaminationQuery({
  *   variables: {
  *      term: // value for 'term'
  *      skip: // value for 'skip'
@@ -4049,17 +4213,17 @@ export const SearchLaboratoryTestsDocument = gql`
  *   },
  * });
  */
-export function useSearchLaboratoryTestsQuery(baseOptions: Apollo.QueryHookOptions<SearchLaboratoryTestsQuery, SearchLaboratoryTestsQueryVariables>) {
+export function useSearchLaboratoryExaminationQuery(baseOptions: Apollo.QueryHookOptions<SearchLaboratoryExaminationQuery, SearchLaboratoryExaminationQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SearchLaboratoryTestsQuery, SearchLaboratoryTestsQueryVariables>(SearchLaboratoryTestsDocument, options);
+        return Apollo.useQuery<SearchLaboratoryExaminationQuery, SearchLaboratoryExaminationQueryVariables>(SearchLaboratoryExaminationDocument, options);
       }
-export function useSearchLaboratoryTestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchLaboratoryTestsQuery, SearchLaboratoryTestsQueryVariables>) {
+export function useSearchLaboratoryExaminationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchLaboratoryExaminationQuery, SearchLaboratoryExaminationQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SearchLaboratoryTestsQuery, SearchLaboratoryTestsQueryVariables>(SearchLaboratoryTestsDocument, options);
+          return Apollo.useLazyQuery<SearchLaboratoryExaminationQuery, SearchLaboratoryExaminationQueryVariables>(SearchLaboratoryExaminationDocument, options);
         }
-export type SearchLaboratoryTestsQueryHookResult = ReturnType<typeof useSearchLaboratoryTestsQuery>;
-export type SearchLaboratoryTestsLazyQueryHookResult = ReturnType<typeof useSearchLaboratoryTestsLazyQuery>;
-export type SearchLaboratoryTestsQueryResult = Apollo.QueryResult<SearchLaboratoryTestsQuery, SearchLaboratoryTestsQueryVariables>;
+export type SearchLaboratoryExaminationQueryHookResult = ReturnType<typeof useSearchLaboratoryExaminationQuery>;
+export type SearchLaboratoryExaminationLazyQueryHookResult = ReturnType<typeof useSearchLaboratoryExaminationLazyQuery>;
+export type SearchLaboratoryExaminationQueryResult = Apollo.QueryResult<SearchLaboratoryExaminationQuery, SearchLaboratoryExaminationQueryVariables>;
 export const MedicationDocument = gql`
     query Medication($id: ID!) {
   medication(id: $id) {
@@ -4954,14 +5118,13 @@ export function useNewCreatedCardSubscription(baseOptions?: Apollo.SubscriptionH
       }
 export type NewCreatedCardSubscriptionHookResult = ReturnType<typeof useNewCreatedCardSubscription>;
 export type NewCreatedCardSubscriptionResult = Apollo.SubscriptionResult<NewCreatedCardSubscription>;
-export const NewCreatedLaboratoryTestDocument = gql`
-    subscription NewCreatedLaboratoryTest {
-  newCreatedLaboratoryTest {
+export const NewCreatedLaboratoryExaminationDocument = gql`
+    subscription NewCreatedLaboratoryExamination {
+  newCreatedLaboratoryExamination {
     id
     paid
     price
     new
-    result
     completed
     card {
       id
@@ -4974,26 +5137,26 @@ export const NewCreatedLaboratoryTestDocument = gql`
     `;
 
 /**
- * __useNewCreatedLaboratoryTestSubscription__
+ * __useNewCreatedLaboratoryExaminationSubscription__
  *
- * To run a query within a React component, call `useNewCreatedLaboratoryTestSubscription` and pass it any options that fit your needs.
- * When your component renders, `useNewCreatedLaboratoryTestSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useNewCreatedLaboratoryExaminationSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewCreatedLaboratoryExaminationSubscription` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useNewCreatedLaboratoryTestSubscription({
+ * const { data, loading, error } = useNewCreatedLaboratoryExaminationSubscription({
  *   variables: {
  *   },
  * });
  */
-export function useNewCreatedLaboratoryTestSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewCreatedLaboratoryTestSubscription, NewCreatedLaboratoryTestSubscriptionVariables>) {
+export function useNewCreatedLaboratoryExaminationSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewCreatedLaboratoryExaminationSubscription, NewCreatedLaboratoryExaminationSubscriptionVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useSubscription<NewCreatedLaboratoryTestSubscription, NewCreatedLaboratoryTestSubscriptionVariables>(NewCreatedLaboratoryTestDocument, options);
+        return Apollo.useSubscription<NewCreatedLaboratoryExaminationSubscription, NewCreatedLaboratoryExaminationSubscriptionVariables>(NewCreatedLaboratoryExaminationDocument, options);
       }
-export type NewCreatedLaboratoryTestSubscriptionHookResult = ReturnType<typeof useNewCreatedLaboratoryTestSubscription>;
-export type NewCreatedLaboratoryTestSubscriptionResult = Apollo.SubscriptionResult<NewCreatedLaboratoryTestSubscription>;
+export type NewCreatedLaboratoryExaminationSubscriptionHookResult = ReturnType<typeof useNewCreatedLaboratoryExaminationSubscription>;
+export type NewCreatedLaboratoryExaminationSubscriptionResult = Apollo.SubscriptionResult<NewCreatedLaboratoryExaminationSubscription>;
 export const DeleteNotificationSubscriptionDocument = gql`
     subscription DeleteNotificationSubscription {
   deleteNotificationSubscription {
@@ -5124,6 +5287,71 @@ export function useNewCreatedPrescriptionSubscription(baseOptions?: Apollo.Subsc
       }
 export type NewCreatedPrescriptionSubscriptionHookResult = ReturnType<typeof useNewCreatedPrescriptionSubscription>;
 export type NewCreatedPrescriptionSubscriptionResult = Apollo.SubscriptionResult<NewCreatedPrescriptionSubscription>;
+export const NewMedicationUpdateDocument = gql`
+    subscription NewMedicationUpdate {
+  newMedicationUpdate {
+    id
+    card {
+      id
+      name
+      age
+      gender
+    }
+    medications {
+      id
+      medicine {
+        id
+        name
+        price
+        inStock
+      }
+      strength
+      perDay
+      forDays
+      checkIn {
+        date
+        price
+        status {
+          isPaid
+          isCompleted
+        }
+      }
+      other
+      created_at
+    }
+    paid
+    inrolled
+    price
+    completed
+    new
+    rx
+    created_at
+    updated_at
+  }
+}
+    `;
+
+/**
+ * __useNewMedicationUpdateSubscription__
+ *
+ * To run a query within a React component, call `useNewMedicationUpdateSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewMedicationUpdateSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewMedicationUpdateSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewMedicationUpdateSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewMedicationUpdateSubscription, NewMedicationUpdateSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<NewMedicationUpdateSubscription, NewMedicationUpdateSubscriptionVariables>(NewMedicationUpdateDocument, options);
+      }
+export type NewMedicationUpdateSubscriptionHookResult = ReturnType<typeof useNewMedicationUpdateSubscription>;
+export type NewMedicationUpdateSubscriptionResult = Apollo.SubscriptionResult<NewMedicationUpdateSubscription>;
 export const NewCreatedQuickLaboratoryTestDocument = gql`
     subscription NewCreatedQuickLaboratoryTest {
   newCreatedQuickLaboratoryTest {

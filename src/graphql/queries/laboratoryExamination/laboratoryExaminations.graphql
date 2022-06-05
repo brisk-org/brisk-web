@@ -1,5 +1,5 @@
-query LaboratoryTests($skip: Float!, $take: Float!) {
-  laboratoryTests(skip: $skip, take: $take) {
+query LaboratoryExaminations($skip: Float!, $take: Float!) {
+  laboratoryExaminations(skip: $skip, take: $take) {
     id
     paid
     price

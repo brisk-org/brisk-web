@@ -1,3 +1,0 @@
-mutation DeleteLaboratoryTest($id: ID!) {
-  deleteLaboratoryTest(id: $id)
-}

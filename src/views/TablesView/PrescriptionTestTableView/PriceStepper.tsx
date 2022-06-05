@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Box,
   Stepper,
@@ -17,6 +17,7 @@ import { makeStyles } from '@mui/styles';
 import { PrescriptionCheckIns } from './ConfirmationDialog';
 import clsx from 'clsx';
 import { CheckIn, PerDay } from '../../../generated/graphql';
+import { AuthContext } from '../../../context/AuthContext';
 
 const useStyles = makeStyles(theme => ({
   stepSuccess: {
@@ -28,13 +29,9 @@ const useStyles = makeStyles(theme => ({
 interface Props {
   prescriptionCheckIn: PrescriptionCheckIns;
   lastCheckIn?: CheckIn[];
-  // checkInPrices?: CheckInPrice[];
   setPrescriptionsCheckIn: React.Dispatch<
     React.SetStateAction<PrescriptionCheckIns[] | undefined>
   >;
-  // setCheckInPrices: React.Dispatch<
-  //   React.SetStateAction<CheckInPrice[] | undefined>
-  // >;
 }
 
 const PriceStepper: React.FC<Props> = ({
@@ -45,10 +42,8 @@ const PriceStepper: React.FC<Props> = ({
   const classes = useStyles();
 
   const [activeStep, setActiveStep] = useState(
-    // medicationsCheckIn.checkIn.findIndex(checkIn => !checkIn.status[0].isPaid)
-    0
+    medicationsCheckIn.checkIn.findIndex(checkIn => !checkIn.status[0].isPaid)
   );
-
   useEffect(() => {
     const paid = medicationsCheckIn.checkIn.reduce(
       (prevValue, currentCheckInEdit) =>
@@ -199,6 +194,7 @@ const PriceStepper: React.FC<Props> = ({
           <Typography variant="caption">
             {/* ({prescriptionCheckIn.checkIn[0].perDay}) */}
           </Typography>
+          {}
           <Typography variant="caption" component="p">
             paid: (
             {

@@ -1,11 +1,10 @@
-query LaboratoryTest($id: ID!) {
-  laboratoryTest(id: $id) {
+query LaboratoryExamination($id: ID!) {
+  laboratoryExamination(id: $id) {
     id
     paid
     completed
     new
     price
-    result
     cardId
     card {
       name

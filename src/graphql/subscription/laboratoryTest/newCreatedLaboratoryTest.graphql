@@ -1,10 +1,9 @@
-subscription NewCreatedLaboratoryTest {
-  newCreatedLaboratoryTest {
+subscription NewCreatedLaboratoryExamination {
+  newCreatedLaboratoryExamination {
     id
     paid
     price
     new
-    result
     completed
     card {
       id

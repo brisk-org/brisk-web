@@ -1,0 +1,3 @@
+mutation DeleteLaboratoryExamination($id: ID!) {
+  deleteLaboratoryExamination(id: $id)
+}

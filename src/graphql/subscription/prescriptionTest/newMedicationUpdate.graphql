@@ -1,0 +1,42 @@
+subscription NewMedicationUpdate {
+  newMedicationUpdate {
+    id
+    card {
+      id
+      name
+      age
+      gender
+    }
+    # result
+    medications {
+      id
+      medicine {
+        id
+        name
+        price
+        inStock
+      }
+      strength
+      perDay
+      forDays
+      checkIn {
+        date
+        price
+        status {
+          isPaid
+          isCompleted
+        }
+      }
+      other
+      created_at
+    }
+    paid
+    inrolled
+    price
+    completed
+    new
+    rx
+    created_at
+    updated_at
+  }
+}

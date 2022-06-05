@@ -1,0 +1,18 @@
+query SearchLaboratoryExamination(
+  $term: String!
+  $skip: Float!
+  $take: Float!
+) {
+  searchLaboratoryExamination(term: $term, skip: $skip, take: $take) {
+    id
+    paid
+    price
+    new
+    completed
+    card {
+      id
+      name
+    }
+    created_at
+  }
+}
