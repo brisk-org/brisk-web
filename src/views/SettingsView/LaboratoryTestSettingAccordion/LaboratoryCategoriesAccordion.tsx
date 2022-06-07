@@ -106,42 +106,25 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
                   </AccordionSummary>
                   <List dense>
                     {subCategory &&
-                      subCategory.laboratoryTests.map(
-                        (laboratoryTest, index) => (
-                          <ListItem>
-                            <ListItemText
-                              primary={laboratoryTest.name}
-                              secondary={
-                                laboratoryTest.normalValue && (
-                                  <Typography
-                                    sx={{ display: 'block' }}
-                                    variant="caption"
-                                  >
-                                    nv: {laboratoryTest.normalValue}
-                                  </Typography>
-                                )
-                              }
-                            />
+                      subCategory.laboratoryTests.map(laboratoryTest => (
+                        <ListItem>
+                          <ListItemText
+                            primary={laboratoryTest.name}
+                            secondary={
+                              laboratoryTest.normalValue && (
+                                <Typography
+                                  sx={{ display: 'block' }}
+                                  variant="caption"
+                                >
+                                  nv: {laboratoryTest.normalValue}
+                                </Typography>
+                              )
+                            }
+                          />
 
-                            <Divider />
-                          </ListItem>
-                          // <AccordionDetails
-                          //   className={clsx({
-
-                          //     [classes.details]: false
-                          //     // category === 'Clinical Chemistry'
-                          //   })}
-                          // >
-                          /* <SingleLabTestRate
-                            key={index}
-                            testDetails={{ ...test }}
-                            categoryName={category.name}
-                            subCategoryName={subCategory.name}
-                            dispatch={dispatch}
-                          /> */
-                          // </AccordionDetails>
-                        )
-                      )}
+                          <Divider />
+                        </ListItem>
+                      ))}
                   </List>
                 </Accordion>
               ))}

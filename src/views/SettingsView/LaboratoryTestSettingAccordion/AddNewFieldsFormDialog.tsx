@@ -10,17 +10,18 @@ import {
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 
-type Field = {
+export type LaboratorySettingEnteryFields = {
   name: string;
   price?: number;
+  inStock?: number;
 };
 interface Props {
   title: string;
   description?: string;
   hasPrice?: boolean;
   onSubmit: () => void;
-  field: Field;
-  setField: React.Dispatch<React.SetStateAction<Field>>;
+  field: LaboratorySettingEnteryFields;
+  setField: React.Dispatch<React.SetStateAction<LaboratorySettingEnteryFields>>;
 }
 const AddNewFieldsFormDialog: React.FC<Props> = ({
   field,
@@ -31,7 +32,6 @@ const AddNewFieldsFormDialog: React.FC<Props> = ({
   description = `insert the name and settings can be edited later`
 }) => {
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState('');
   const onClose = () => {
     setOpen(false);
   };
@@ -39,19 +39,15 @@ const AddNewFieldsFormDialog: React.FC<Props> = ({
     | React.ChangeEventHandler<HTMLInputElement>
     | undefined = e => {
     const name = e.target.name;
-    const value = name === 'price' ? parseInt(e.target.value) : e.target.value;
+    const value = name !== 'name' ? parseInt(e.target.value) : e.target.value;
     setField(prevField => ({ ...prevField, [name]: value }));
   };
 
-  const handleSuccess = () => {
-    if (!field.name) {
-      setError("name can't be empty");
-      return;
-    }
+  const handleSuccess: React.FormEventHandler<HTMLFormElement> = event => {
+    event.preventDefault();
     onSubmit();
-    setField({ name: '', price: undefined });
+    setField({ name: '', price: undefined, inStock: undefined });
     onClose();
-    setError('');
   };
 
   return (
@@ -65,47 +61,54 @@ const AddNewFieldsFormDialog: React.FC<Props> = ({
         {title}
       </Button>
       <Dialog open={open} onClose={onClose}>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{description}</DialogContentText>
-          <TextField
-            error={!!error}
-            helperText={error}
-            required
-            name="name"
-            value={field.name}
-            onChange={handleChange}
-            autoFocus
-            margin="dense"
-            label="Name"
-            variant="standard"
-            fullWidth
-          />
-          {hasPrice && (
+        <form onSubmit={handleSuccess}>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>{description}</DialogContentText>
             <TextField
-              name="price"
-              type="number"
-              value={field.price}
+              required
+              name="name"
+              value={field.name}
               onChange={handleChange}
+              autoFocus
               margin="dense"
-              label="Price"
+              label="Name"
               variant="standard"
               fullWidth
-              required
             />
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ mr: 2 }}
-            onClick={handleSuccess}
-          >
-            Done
-          </Button>
-        </DialogActions>
+            {hasPrice && (
+              <TextField
+                name="price"
+                type="number"
+                value={field.price}
+                onChange={handleChange}
+                margin="dense"
+                label="Price"
+                variant="standard"
+                fullWidth
+                required
+              />
+            )}
+            {
+              <TextField
+                name="inStock"
+                value={field.inStock}
+                onChange={handleChange}
+                margin="dense"
+                label="In Stock"
+                variant="standard"
+                fullWidth
+              />
+            }
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button type="submit" variant="contained" sx={{ mr: 2 }}>
+              Done
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </>
   );

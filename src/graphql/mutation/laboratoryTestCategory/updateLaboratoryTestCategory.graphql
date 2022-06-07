@@ -1,7 +1,7 @@
 mutation UpdateLaboratoryTestCategory(
   $id: ID!
   $name: String!
-  $price: Float!
+  $price: Float
   $inStock: Float
   $trackInStock: Boolean!
 ) {

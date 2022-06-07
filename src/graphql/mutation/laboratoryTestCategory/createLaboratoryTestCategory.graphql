@@ -1,6 +1,6 @@
 mutation CreateLaboratoryTestCategory(
   $name: String!
-  $price: Float!
+  $price: Float
   $inStock: Float
   $trackInStock: Boolean!
 ) {

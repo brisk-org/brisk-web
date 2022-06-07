@@ -1,0 +1,5 @@
+mutation UpdateLaboratoryTest($id: ID!, $content: LaboratoryTestContentInput!) {
+  updateLaboratoryTest(id: $id, content: $content) {
+    id
+  }
+}

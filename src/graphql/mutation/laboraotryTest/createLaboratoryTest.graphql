@@ -1,0 +1,13 @@
+mutation CreateLaboratoryTest(
+  $categoryId: ID!
+  $subCategoryId: ID
+  $content: LaboratoryTestContentInput!
+) {
+  createLaboratoryTest(
+    categoryId: $categoryId
+    subCategoryId: $subCategoryId
+    content: $content
+  ) {
+    id
+  }
+}
