@@ -18,6 +18,8 @@ query LaboratoryTestCategories {
       id
       name
       price
+      inStock
+      trackInStock
       laboratoryTests {
         id
         name

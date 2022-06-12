@@ -1,0 +1,3 @@
+mutation DeleteLaboratoryTestSubCategory($id: ID!) {
+  deleteLaboratoryTestSubCategory(id: $id)
+}

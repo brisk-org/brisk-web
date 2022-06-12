@@ -1,5 +1,4 @@
-import React, { useReducer, useState } from 'react';
-import clsx from 'clsx';
+import React, { useState } from 'react';
 import {
   Box,
   Grid,
@@ -7,7 +6,6 @@ import {
   AccordionSummary,
   Typography,
   IconButton,
-  AccordionDetails,
   List,
   Divider,
   ListItem,
@@ -15,8 +13,6 @@ import {
 } from '@mui/material';
 import { ExpandMore, Settings } from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
-import { LaboratoryTestCatagories } from '../../../data/testsSeed';
-import SingleLabTestRate from './SingleLabTestRate';
 import LaboratoryTestSettingDialog from './LaboratoryTestSettingDialog';
 // import { laboaratoryTestSettingReducer } from '../../../reducer/laboratoryTestSettingReducer';
 import { LaboratoryTestCategoriesQuery } from '../../../generated/graphql';
@@ -89,7 +85,8 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
                 <Typography variant="body2">{category.price}</Typography>
               </Box>
               <IconButton
-                onClick={() => {
+                onClick={e => {
+                  e.stopPropagation();
                   setParentAccordionDialogOpen(true);
                 }}
               >
@@ -105,8 +102,8 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
                     <Typography variant="h6">{subCategory.name}</Typography>
                   </AccordionSummary>
                   <List dense>
-                    {subCategory &&
-                      subCategory.laboratoryTests.map(laboratoryTest => (
+                    {subCategory.laboratoryTests &&
+                      subCategory.laboratoryTests?.map(laboratoryTest => (
                         <ListItem>
                           <ListItemText
                             primary={laboratoryTest.name}

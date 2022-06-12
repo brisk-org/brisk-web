@@ -6,6 +6,21 @@ query LaboratoryExamination($id: ID!) {
     new
     price
     cardId
+    laboratoryTestRequests {
+      id
+      value
+      laboratoryTest {
+        id
+        name
+        normalValue
+        commonValues
+        price
+        hasPrice
+        isInfluencedByCategory
+        inStock
+        trackInStock
+      }
+    }
     card {
       name
       phone

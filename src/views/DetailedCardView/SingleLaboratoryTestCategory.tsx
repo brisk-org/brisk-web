@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   List,
   ListSubheader,
@@ -26,6 +26,15 @@ interface Props {
   componentToBePrinted: React.RefObject<HTMLDivElement>;
   onPrint: boolean;
 }
+type BasicLaboratoryTest = {
+  name: string;
+  value: string;
+  normalValue?: string;
+};
+type BasicCategory = {
+  name: string;
+  laboratoryTest: BasicLaboratoryTest[];
+};
 const SingleLaboratoryTestCategory: React.FC<Props> = ({
   laboratoryExamination,
   componentToBePrinted,
@@ -33,14 +42,51 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
 }) => {
   const classes = useStyle();
   console.log(onPrint);
+  const [categories, setCategories] = useState<BasicCategory[]>();
+
+  useEffect(() => {
+    laboratoryExamination.laboratoryTestRequests?.forEach(laboratoryRequest => {
+      const basicLabTest = {
+        name: laboratoryRequest.laboratoryTest.name,
+        value: laboratoryRequest.value || '',
+        normalValue: laboratoryRequest.laboratoryTest.normalValue
+      };
+      setCategories(prevCategories => {
+        if (!prevCategories) {
+          return [
+            {
+              name: laboratoryRequest.laboratoryTest.category?.name || '',
+              laboratoryTest: [basicLabTest]
+            }
+          ];
+        }
+
+        return prevCategories?.map(category => {
+          if (
+            category.name === laboratoryRequest.laboratoryTest.category?.name
+          ) {
+            return {
+              ...category,
+              laboratoryTest: [...category.laboratoryTest, basicLabTest]
+            };
+          }
+          return {
+            name: laboratoryRequest.laboratoryTest.category?.name || '',
+            laboratoryTest: [basicLabTest]
+          };
+        });
+      });
+    });
+  }, []);
+
   return (
     <div ref={componentToBePrinted}>
       <Box sx={{ width: '100%' }}>{onPrint && <PrintHeader />}</Box>
       <div className={clsx({ [classes.root]: onPrint })}>
-        {/* {laboratoryExamination.map((category, index) => (
+        {categories?.map((category, index) => (
           <List key={index}>
             <ListSubheader sx={{}}>{category.name}</ListSubheader>
-            {category.tests.map((test, index) => (
+            {category.laboratoryTest.map((test, index) => (
               <ListItem key={index}>
                 <ListItemText
                   primary={`${test.name}: ${test.value || 'uncompleted'} `}
@@ -51,7 +97,7 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
               </ListItem>
             ))}
           </List>
-        ))} */}
+        ))}
       </div>
     </div>
   );

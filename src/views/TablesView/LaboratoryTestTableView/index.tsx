@@ -7,7 +7,6 @@ import Page from '../../../components/Page';
 import Toolbar from '../../../components/Toolbar';
 import { Link } from 'react-router-dom';
 import {
-  SearchLaboratoryExaminationQuery,
   LaboratoryExaminationsQuery,
   useSearchLaboratoryExaminationQuery,
   useLaboratoryExaminationsQuery,
@@ -80,27 +79,7 @@ const LaboratoryExaminationTableView = () => {
     },
     onError: err => console.log(err)
   });
-  subscribeToMore({
-    document: NewCreatedLaboratoryExaminationDocument,
-    updateQuery: (prev, { subscriptionData }) => {
-      const newPaidLaboratoryExamination = subscriptionData.data;
-      if (!newPaidLaboratoryExamination) return prev;
-      if (!prev.laboratoryExaminations && newPaidLaboratoryExamination)
-        return { laboratoryExaminations: newPaidLaboratoryExamination as any };
-      const filteredPrevWithoutPaidLaboratoryExamination = prev.laboratoryExaminations.filter(
-        test =>
-          test.id !==
-          (newPaidLaboratoryExamination as any).newCreatedLaboratoryTest.id
-      );
-      return Object.assign({}, prev, {
-        laboratoryExaminations: [
-          newPaidLaboratoryExamination,
-          ...filteredPrevWithoutPaidLaboratoryExamination
-        ]
-      });
-    },
-    onError: err => console.log(err)
-  });
+
   useEffect(() => {
     if (isBeingSearched) {
       setLaboratoryExaminations(

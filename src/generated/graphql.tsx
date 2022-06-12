@@ -87,6 +87,11 @@ export type CheckInStatusInput = {
   isCompleted: Scalars['Boolean'];
 };
 
+export type CompleteLaboratoryExaminationInput = {
+  id: Scalars['ID'];
+  value: Scalars['String'];
+};
+
 export type CompleteQuickLabTestInput = {
   price?: Maybe<Scalars['Float']>;
   other?: Maybe<Scalars['String']>;
@@ -95,12 +100,6 @@ export type CompleteQuickLabTestInput = {
 export type CompleteQuickPrescriptionTestInput = {
   price?: Maybe<Scalars['Float']>;
   other?: Maybe<Scalars['String']>;
-};
-
-export type CreateLaboratoryTestInput = {
-  cardId: Scalars['ID'];
-  price: Scalars['Float'];
-  laboratoryTestRequest: Array<LaboratoryTestRequestInput>;
 };
 
 export type CreateMedicationsInput = {
@@ -150,7 +149,7 @@ export type LaboratoryExamination = {
   cardId: Scalars['Float'];
   card: Card;
   notifications?: Maybe<Array<Notification>>;
-  laboratoryTestRequests: Array<LaboratoryTestRequest>;
+  laboratoryTestRequests?: Maybe<Array<LaboratoryTestRequest>>;
   paid: Scalars['Boolean'];
   price: Scalars['Float'];
   completed: Scalars['Boolean'];
@@ -165,8 +164,8 @@ export type LaboratoryTest = {
   name: Scalars['String'];
   normalValue: Scalars['String'];
   commonValues?: Maybe<Array<Scalars['String']>>;
-  category: LaboratoryTest;
-  subCategory: LaboratoryTestSubCategory;
+  category?: Maybe<LaboratoryTest>;
+  subCategory?: Maybe<LaboratoryTestSubCategory>;
   laboratoryTestRequests: Array<LaboratoryTestRequest>;
   price?: Maybe<Scalars['Float']>;
   hasPrice: Scalars['Boolean'];
@@ -207,13 +206,12 @@ export type LaboratoryTestRequest = {
   laboratoryTestId: Scalars['String'];
   laboratoryTest: LaboratoryTest;
   laboratoryExamination: LaboratoryExamination;
-  value: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
 
 export type LaboratoryTestRequestInput = {
-  value: Scalars['String'];
   laboratoryTestId: Scalars['String'];
 };
 
@@ -221,7 +219,9 @@ export type LaboratoryTestSubCategory = {
   __typename?: 'LaboratoryTestSubCategory';
   id: Scalars['ID'];
   name: Scalars['String'];
-  price?: Maybe<Scalars['Float']>;
+  price: Scalars['Float'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
   laboratoryTests: Array<LaboratoryTest>;
   category: LaboratoryTestCategory;
   created_at: Scalars['String'];
@@ -276,7 +276,7 @@ export type Mutation = {
   createLaboratoryTestCategory: LaboratoryTestCategory;
   updateLaboratoryTestCategory: LaboratoryTestCategory;
   deleteLaboratoryTestCategory: Scalars['Boolean'];
-  createLaboraotryTestSubCategory: LaboratoryTestSubCategory;
+  createLaboratoryTestSubCategory: LaboratoryTestSubCategory;
   updateLaboratoryTestSubCategory: LaboratoryTestSubCategory;
   deleteLaboratoryTestSubCategory: Scalars['Boolean'];
   changeSetting: Settings;
@@ -344,18 +344,20 @@ export type MutationDeleteUserArgs = {
 
 
 export type MutationCreateLaboratoryExaminationArgs = {
-  input: CreateLaboratoryTestInput;
+  cardId: Scalars['ID'];
+  price: Scalars['Float'];
+  laboratoryTestRequest: Array<LaboratoryTestRequestInput>;
 };
 
 
 export type MutationCompleteLaboratoryExaminationArgs = {
-  result: Scalars['String'];
+  content: Array<CompleteLaboratoryExaminationInput>;
   id: Scalars['ID'];
 };
 
 
 export type MutationSaveLaboratoryExaminationArgs = {
-  result: Scalars['String'];
+  content: Array<CompleteLaboratoryExaminationInput>;
   id: Scalars['ID'];
 };
 
@@ -415,9 +417,11 @@ export type MutationDeleteLaboratoryTestCategoryArgs = {
 };
 
 
-export type MutationCreateLaboraotryTestSubCategoryArgs = {
+export type MutationCreateLaboratoryTestSubCategoryArgs = {
   name: Scalars['String'];
   price: Scalars['Float'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
   id: Scalars['ID'];
 };
 
@@ -425,6 +429,8 @@ export type MutationCreateLaboraotryTestSubCategoryArgs = {
 export type MutationUpdateLaboratoryTestSubCategoryArgs = {
   name: Scalars['String'];
   price: Scalars['Float'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
   id: Scalars['ID'];
 };
 
@@ -662,6 +668,7 @@ export type Query = {
   searchLaboratoryExamination: Array<LaboratoryExamination>;
   laboratoryTestCategories: Array<LaboratoryTestCategory>;
   laboratoryTestSubCategories: Array<LaboratoryTestSubCategory>;
+  laboratoryTestRequests: Array<LaboratoryTestRequest>;
   setting: Settings;
   cardsCount: Scalars['Float'];
   cards: Array<Card>;
@@ -1032,32 +1039,14 @@ export type UpdateLaboratoryTestMutation = (
 );
 
 export type CompleteLaboratoryExaminationMutationVariables = Exact<{
-  result: Scalars['String'];
   id: Scalars['ID'];
+  content: Array<CompleteLaboratoryExaminationInput> | CompleteLaboratoryExaminationInput;
 }>;
 
 
 export type CompleteLaboratoryExaminationMutation = (
   { __typename?: 'Mutation' }
   & { completeLaboratoryExamination: (
-    { __typename?: 'LaboratoryExamination' }
-    & Pick<LaboratoryExamination, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'created_at'>
-    & { card: (
-      { __typename?: 'Card' }
-      & Pick<Card, 'name' | 'phone'>
-    ) }
-  ) }
-);
-
-export type SaveLaboratoryExaminationMutationVariables = Exact<{
-  result: Scalars['String'];
-  id: Scalars['ID'];
-}>;
-
-
-export type SaveLaboratoryExaminationMutation = (
-  { __typename?: 'Mutation' }
-  & { saveLaboratoryExamination: (
     { __typename?: 'LaboratoryExamination' }
     & Pick<LaboratoryExamination, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'created_at'>
     & { card: (
@@ -1126,6 +1115,24 @@ export type PayForLaboratoryExaminationMutation = (
   ) }
 );
 
+export type SaveLaboratoryExaminationMutationVariables = Exact<{
+  id: Scalars['ID'];
+  content: Array<CompleteLaboratoryExaminationInput> | CompleteLaboratoryExaminationInput;
+}>;
+
+
+export type SaveLaboratoryExaminationMutation = (
+  { __typename?: 'Mutation' }
+  & { saveLaboratoryExamination: (
+    { __typename?: 'LaboratoryExamination' }
+    & Pick<LaboratoryExamination, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'created_at'>
+    & { card: (
+      { __typename?: 'Card' }
+      & Pick<Card, 'name' | 'phone'>
+    ) }
+  ) }
+);
+
 export type CreateLaboratoryTestCategoryMutationVariables = Exact<{
   name: Scalars['String'];
   price?: Maybe<Scalars['Float']>;
@@ -1166,6 +1173,50 @@ export type UpdateLaboratoryTestCategoryMutation = (
   & { updateLaboratoryTestCategory: (
     { __typename?: 'LaboratoryTestCategory' }
     & Pick<LaboratoryTestCategory, 'id' | 'name' | 'inStock' | 'trackInStock' | 'created_at' | 'updated_at'>
+  ) }
+);
+
+export type CreateLaboratoryTestSubCategoryMutationVariables = Exact<{
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
+}>;
+
+
+export type CreateLaboratoryTestSubCategoryMutation = (
+  { __typename?: 'Mutation' }
+  & { createLaboratoryTestSubCategory: (
+    { __typename?: 'LaboratoryTestSubCategory' }
+    & Pick<LaboratoryTestSubCategory, 'id' | 'name' | 'inStock' | 'trackInStock' | 'created_at'>
+  ) }
+);
+
+export type DeleteLaboratoryTestSubCategoryMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DeleteLaboratoryTestSubCategoryMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteLaboratoryTestSubCategory'>
+);
+
+export type UpdateLaboratoryTestSubCategoryMutationVariables = Exact<{
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  inStock?: Maybe<Scalars['Float']>;
+  trackInStock: Scalars['Boolean'];
+}>;
+
+
+export type UpdateLaboratoryTestSubCategoryMutation = (
+  { __typename?: 'Mutation' }
+  & { updateLaboratoryTestSubCategory: (
+    { __typename?: 'LaboratoryTestSubCategory' }
+    & Pick<LaboratoryTestSubCategory, 'id' | 'name' | 'inStock' | 'trackInStock' | 'created_at'>
   ) }
 );
 
@@ -1573,6 +1624,18 @@ export type CardQuery = (
     )>>, laboratoryExaminations?: Maybe<Array<(
       { __typename?: 'LaboratoryExamination' }
       & Pick<LaboratoryExamination, 'id' | 'cardId' | 'paid' | 'new' | 'completed' | 'price' | 'created_at' | 'updated_at'>
+      & { laboratoryTestRequests?: Maybe<Array<(
+        { __typename?: 'LaboratoryTestRequest' }
+        & Pick<LaboratoryTestRequest, 'id' | 'value'>
+        & { laboratoryTest: (
+          { __typename?: 'LaboratoryTest' }
+          & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue'>
+          & { category?: Maybe<(
+            { __typename?: 'LaboratoryTest' }
+            & Pick<LaboratoryTest, 'id' | 'name'>
+          )> }
+        ) }
+      )>> }
     )>>, history?: Maybe<Array<(
       { __typename?: 'History' }
       & Pick<History, 'id' | 'result' | 'cardId' | 'created_at' | 'updated_at'>
@@ -1689,7 +1752,14 @@ export type LaboratoryExaminationQuery = (
   & { laboratoryExamination: (
     { __typename?: 'LaboratoryExamination' }
     & Pick<LaboratoryExamination, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'cardId' | 'created_at'>
-    & { card: (
+    & { laboratoryTestRequests?: Maybe<Array<(
+      { __typename?: 'LaboratoryTestRequest' }
+      & Pick<LaboratoryTestRequest, 'id' | 'value'>
+      & { laboratoryTest: (
+        { __typename?: 'LaboratoryTest' }
+        & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasPrice' | 'isInfluencedByCategory' | 'inStock' | 'trackInStock'>
+      ) }
+    )>>, card: (
       { __typename?: 'Card' }
       & Pick<Card, 'name' | 'phone' | 'age' | 'gender'>
     ) }
@@ -1768,7 +1838,7 @@ export type LaboratoryTestCategoriesQuery = (
       & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasPrice' | 'isInfluencedByCategory' | 'inStock' | 'trackInStock'>
     )>, subCategories: Array<(
       { __typename?: 'LaboratoryTestSubCategory' }
-      & Pick<LaboratoryTestSubCategory, 'id' | 'name' | 'price' | 'created_at'>
+      & Pick<LaboratoryTestSubCategory, 'id' | 'name' | 'price' | 'inStock' | 'trackInStock' | 'created_at'>
       & { laboratoryTests: Array<(
         { __typename?: 'LaboratoryTest' }
         & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasPrice' | 'isInfluencedByCategory' | 'inStock' | 'trackInStock' | 'created_at'>
@@ -2688,8 +2758,8 @@ export type UpdateLaboratoryTestMutationHookResult = ReturnType<typeof useUpdate
 export type UpdateLaboratoryTestMutationResult = Apollo.MutationResult<UpdateLaboratoryTestMutation>;
 export type UpdateLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<UpdateLaboratoryTestMutation, UpdateLaboratoryTestMutationVariables>;
 export const CompleteLaboratoryExaminationDocument = gql`
-    mutation CompleteLaboratoryExamination($result: String!, $id: ID!) {
-  completeLaboratoryExamination(result: $result, id: $id) {
+    mutation CompleteLaboratoryExamination($id: ID!, $content: [CompleteLaboratoryExaminationInput!]!) {
+  completeLaboratoryExamination(content: $content, id: $id) {
     id
     paid
     completed
@@ -2718,8 +2788,8 @@ export type CompleteLaboratoryExaminationMutationFn = Apollo.MutationFunction<Co
  * @example
  * const [completeLaboratoryExaminationMutation, { data, loading, error }] = useCompleteLaboratoryExaminationMutation({
  *   variables: {
- *      result: // value for 'result'
  *      id: // value for 'id'
+ *      content: // value for 'content'
  *   },
  * });
  */
@@ -2730,53 +2800,12 @@ export function useCompleteLaboratoryExaminationMutation(baseOptions?: Apollo.Mu
 export type CompleteLaboratoryExaminationMutationHookResult = ReturnType<typeof useCompleteLaboratoryExaminationMutation>;
 export type CompleteLaboratoryExaminationMutationResult = Apollo.MutationResult<CompleteLaboratoryExaminationMutation>;
 export type CompleteLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<CompleteLaboratoryExaminationMutation, CompleteLaboratoryExaminationMutationVariables>;
-export const SaveLaboratoryExaminationDocument = gql`
-    mutation SaveLaboratoryExamination($result: String!, $id: ID!) {
-  saveLaboratoryExamination(result: $result, id: $id) {
-    id
-    paid
-    completed
-    new
-    price
-    card {
-      name
-      phone
-    }
-    created_at
-  }
-}
-    `;
-export type SaveLaboratoryExaminationMutationFn = Apollo.MutationFunction<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>;
-
-/**
- * __useSaveLaboratoryExaminationMutation__
- *
- * To run a mutation, you first call `useSaveLaboratoryExaminationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSaveLaboratoryExaminationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [saveLaboratoryExaminationMutation, { data, loading, error }] = useSaveLaboratoryExaminationMutation({
- *   variables: {
- *      result: // value for 'result'
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useSaveLaboratoryExaminationMutation(baseOptions?: Apollo.MutationHookOptions<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>(SaveLaboratoryExaminationDocument, options);
-      }
-export type SaveLaboratoryExaminationMutationHookResult = ReturnType<typeof useSaveLaboratoryExaminationMutation>;
-export type SaveLaboratoryExaminationMutationResult = Apollo.MutationResult<SaveLaboratoryExaminationMutation>;
-export type SaveLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>;
 export const CreateLaboratoryExaminationDocument = gql`
     mutation CreateLaboratoryExamination($cardId: ID!, $laboratoryTestRequest: [LaboratoryTestRequestInput!]!, $price: Float!) {
   createLaboratoryExamination(
-    input: {cardId: $cardId, laboratoryTestRequest: $laboratoryTestRequest, price: $price}
+    cardId: $cardId
+    laboratoryTestRequest: $laboratoryTestRequest
+    price: $price
   ) {
     id
     card {
@@ -2914,6 +2943,49 @@ export function usePayForLaboratoryExaminationMutation(baseOptions?: Apollo.Muta
 export type PayForLaboratoryExaminationMutationHookResult = ReturnType<typeof usePayForLaboratoryExaminationMutation>;
 export type PayForLaboratoryExaminationMutationResult = Apollo.MutationResult<PayForLaboratoryExaminationMutation>;
 export type PayForLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<PayForLaboratoryExaminationMutation, PayForLaboratoryExaminationMutationVariables>;
+export const SaveLaboratoryExaminationDocument = gql`
+    mutation SaveLaboratoryExamination($id: ID!, $content: [CompleteLaboratoryExaminationInput!]!) {
+  saveLaboratoryExamination(content: $content, id: $id) {
+    id
+    paid
+    completed
+    new
+    price
+    card {
+      name
+      phone
+    }
+    created_at
+  }
+}
+    `;
+export type SaveLaboratoryExaminationMutationFn = Apollo.MutationFunction<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>;
+
+/**
+ * __useSaveLaboratoryExaminationMutation__
+ *
+ * To run a mutation, you first call `useSaveLaboratoryExaminationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveLaboratoryExaminationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveLaboratoryExaminationMutation, { data, loading, error }] = useSaveLaboratoryExaminationMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      content: // value for 'content'
+ *   },
+ * });
+ */
+export function useSaveLaboratoryExaminationMutation(baseOptions?: Apollo.MutationHookOptions<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>(SaveLaboratoryExaminationDocument, options);
+      }
+export type SaveLaboratoryExaminationMutationHookResult = ReturnType<typeof useSaveLaboratoryExaminationMutation>;
+export type SaveLaboratoryExaminationMutationResult = Apollo.MutationResult<SaveLaboratoryExaminationMutation>;
+export type SaveLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<SaveLaboratoryExaminationMutation, SaveLaboratoryExaminationMutationVariables>;
 export const CreateLaboratoryTestCategoryDocument = gql`
     mutation CreateLaboratoryTestCategory($name: String!, $price: Float, $inStock: Float, $trackInStock: Boolean!) {
   createLaboratoryTestCategory(
@@ -3039,6 +3111,131 @@ export function useUpdateLaboratoryTestCategoryMutation(baseOptions?: Apollo.Mut
 export type UpdateLaboratoryTestCategoryMutationHookResult = ReturnType<typeof useUpdateLaboratoryTestCategoryMutation>;
 export type UpdateLaboratoryTestCategoryMutationResult = Apollo.MutationResult<UpdateLaboratoryTestCategoryMutation>;
 export type UpdateLaboratoryTestCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateLaboratoryTestCategoryMutation, UpdateLaboratoryTestCategoryMutationVariables>;
+export const CreateLaboratoryTestSubCategoryDocument = gql`
+    mutation CreateLaboratoryTestSubCategory($id: ID!, $name: String!, $price: Float!, $inStock: Float, $trackInStock: Boolean!) {
+  createLaboratoryTestSubCategory(
+    id: $id
+    name: $name
+    price: $price
+    inStock: $inStock
+    trackInStock: $trackInStock
+  ) {
+    id
+    name
+    inStock
+    trackInStock
+    created_at
+  }
+}
+    `;
+export type CreateLaboratoryTestSubCategoryMutationFn = Apollo.MutationFunction<CreateLaboratoryTestSubCategoryMutation, CreateLaboratoryTestSubCategoryMutationVariables>;
+
+/**
+ * __useCreateLaboratoryTestSubCategoryMutation__
+ *
+ * To run a mutation, you first call `useCreateLaboratoryTestSubCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateLaboratoryTestSubCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createLaboratoryTestSubCategoryMutation, { data, loading, error }] = useCreateLaboratoryTestSubCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *      price: // value for 'price'
+ *      inStock: // value for 'inStock'
+ *      trackInStock: // value for 'trackInStock'
+ *   },
+ * });
+ */
+export function useCreateLaboratoryTestSubCategoryMutation(baseOptions?: Apollo.MutationHookOptions<CreateLaboratoryTestSubCategoryMutation, CreateLaboratoryTestSubCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateLaboratoryTestSubCategoryMutation, CreateLaboratoryTestSubCategoryMutationVariables>(CreateLaboratoryTestSubCategoryDocument, options);
+      }
+export type CreateLaboratoryTestSubCategoryMutationHookResult = ReturnType<typeof useCreateLaboratoryTestSubCategoryMutation>;
+export type CreateLaboratoryTestSubCategoryMutationResult = Apollo.MutationResult<CreateLaboratoryTestSubCategoryMutation>;
+export type CreateLaboratoryTestSubCategoryMutationOptions = Apollo.BaseMutationOptions<CreateLaboratoryTestSubCategoryMutation, CreateLaboratoryTestSubCategoryMutationVariables>;
+export const DeleteLaboratoryTestSubCategoryDocument = gql`
+    mutation DeleteLaboratoryTestSubCategory($id: ID!) {
+  deleteLaboratoryTestSubCategory(id: $id)
+}
+    `;
+export type DeleteLaboratoryTestSubCategoryMutationFn = Apollo.MutationFunction<DeleteLaboratoryTestSubCategoryMutation, DeleteLaboratoryTestSubCategoryMutationVariables>;
+
+/**
+ * __useDeleteLaboratoryTestSubCategoryMutation__
+ *
+ * To run a mutation, you first call `useDeleteLaboratoryTestSubCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteLaboratoryTestSubCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteLaboratoryTestSubCategoryMutation, { data, loading, error }] = useDeleteLaboratoryTestSubCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteLaboratoryTestSubCategoryMutation(baseOptions?: Apollo.MutationHookOptions<DeleteLaboratoryTestSubCategoryMutation, DeleteLaboratoryTestSubCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteLaboratoryTestSubCategoryMutation, DeleteLaboratoryTestSubCategoryMutationVariables>(DeleteLaboratoryTestSubCategoryDocument, options);
+      }
+export type DeleteLaboratoryTestSubCategoryMutationHookResult = ReturnType<typeof useDeleteLaboratoryTestSubCategoryMutation>;
+export type DeleteLaboratoryTestSubCategoryMutationResult = Apollo.MutationResult<DeleteLaboratoryTestSubCategoryMutation>;
+export type DeleteLaboratoryTestSubCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteLaboratoryTestSubCategoryMutation, DeleteLaboratoryTestSubCategoryMutationVariables>;
+export const UpdateLaboratoryTestSubCategoryDocument = gql`
+    mutation UpdateLaboratoryTestSubCategory($id: ID!, $name: String!, $price: Float!, $inStock: Float, $trackInStock: Boolean!) {
+  updateLaboratoryTestSubCategory(
+    id: $id
+    name: $name
+    price: $price
+    inStock: $inStock
+    trackInStock: $trackInStock
+  ) {
+    id
+    name
+    inStock
+    trackInStock
+    created_at
+  }
+}
+    `;
+export type UpdateLaboratoryTestSubCategoryMutationFn = Apollo.MutationFunction<UpdateLaboratoryTestSubCategoryMutation, UpdateLaboratoryTestSubCategoryMutationVariables>;
+
+/**
+ * __useUpdateLaboratoryTestSubCategoryMutation__
+ *
+ * To run a mutation, you first call `useUpdateLaboratoryTestSubCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateLaboratoryTestSubCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateLaboratoryTestSubCategoryMutation, { data, loading, error }] = useUpdateLaboratoryTestSubCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *      price: // value for 'price'
+ *      inStock: // value for 'inStock'
+ *      trackInStock: // value for 'trackInStock'
+ *   },
+ * });
+ */
+export function useUpdateLaboratoryTestSubCategoryMutation(baseOptions?: Apollo.MutationHookOptions<UpdateLaboratoryTestSubCategoryMutation, UpdateLaboratoryTestSubCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateLaboratoryTestSubCategoryMutation, UpdateLaboratoryTestSubCategoryMutationVariables>(UpdateLaboratoryTestSubCategoryDocument, options);
+      }
+export type UpdateLaboratoryTestSubCategoryMutationHookResult = ReturnType<typeof useUpdateLaboratoryTestSubCategoryMutation>;
+export type UpdateLaboratoryTestSubCategoryMutationResult = Apollo.MutationResult<UpdateLaboratoryTestSubCategoryMutation>;
+export type UpdateLaboratoryTestSubCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateLaboratoryTestSubCategoryMutation, UpdateLaboratoryTestSubCategoryMutationVariables>;
 export const AddMedicineDocument = gql`
     mutation AddMedicine($name: String!, $price: Float!, $inStock: Float!, $strength: String, $perDay: PerDay, $forDays: Float) {
   addMedicine(
@@ -4036,6 +4233,19 @@ export const CardDocument = gql`
       cardId
       paid
       new
+      laboratoryTestRequests {
+        id
+        value
+        laboratoryTest {
+          id
+          name
+          normalValue
+          category {
+            id
+            name
+          }
+        }
+      }
       completed
       price
       created_at
@@ -4355,6 +4565,21 @@ export const LaboratoryExaminationDocument = gql`
     new
     price
     cardId
+    laboratoryTestRequests {
+      id
+      value
+      laboratoryTest {
+        id
+        name
+        normalValue
+        commonValues
+        price
+        hasPrice
+        isInfluencedByCategory
+        inStock
+        trackInStock
+      }
+    }
     card {
       name
       phone
@@ -4579,6 +4804,8 @@ export const LaboratoryTestCategoriesDocument = gql`
       id
       name
       price
+      inStock
+      trackInStock
       laboratoryTests {
         id
         name

@@ -22,6 +22,7 @@ const useStyles = makeStyles(() => ({
 
 interface SingleAccordionProps {
   category: RequestCategories;
+  // category: RequestCategories;
   validId: boolean;
   setCategories: React.Dispatch<
     React.SetStateAction<RequestCategories[] | undefined>
@@ -47,7 +48,7 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
         if (prevCategory.name !== category.name) {
           return prevCategory;
         }
-        const influenceTest = category.tests.map(test =>
+        const influenceTest = category.laboratoryTests.map(test =>
           test.isInfluencedByCategory
             ? { ...test, selected: checked }
             : { ...test }
@@ -65,11 +66,11 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
         if (prevCategory.name !== category.name) return { ...prevCategory };
         return {
           ...prevCategory,
-          tests: prevCategory.tests.map(test => {
+          laboratoryTests: prevCategory.laboratoryTests.map(test => {
             if (test.name !== event.target.name) return { ...test };
             if (test.isInfluencedByCategory && category.selected)
               return { ...test, selected: true };
-            console.log('yoo', test);
+            console.log('yoo', test, checked);
             return { ...test, selected: checked };
           })
         };
@@ -102,12 +103,12 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
       </AccordionSummary>
       <AccordionDetails className={classes.root}>
         <Grid container spacing={3}>
-          {category.tests.map((test, index) => (
+          {category.laboratoryTests.map((test, index) => (
             <Grid key={index} item md={6} xs={12} sm={4}>
               <FormControlLabel
                 control={
                   <Checkbox
-                    disabled={!test.hasIndividualPrice}
+                    disabled={!test.hasPrice}
                     checked={test.selected}
                     onChange={handleTestChange}
                     name={test.name}

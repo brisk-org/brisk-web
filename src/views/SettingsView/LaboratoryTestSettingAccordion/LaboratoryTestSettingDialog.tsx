@@ -31,10 +31,15 @@ import {
   Delete as DeleteIcon
 } from '@mui/icons-material';
 // import { LaboratorylaboratoryTestSettingReducerAction } from '../../../reducer/laboratoryTestSettingReducer';
-import { LaboratoryTestCategoriesQuery } from '../../../generated/graphql';
+import {
+  LaboratoryTestCategoriesDocument,
+  LaboratoryTestCategoriesQuery,
+  useCreateLaboratoryTestSubCategoryMutation
+} from '../../../generated/graphql';
 import UpdateLaboratoryTestCategoryFields from './UpdateLaboratoryTestCategoryFields';
 import LaboraotryTestSetting from './LaboraotryTestSetting';
 import CreateNewLaboraotryTestDialog from './CreateNewLaboraotryTestDialog';
+import LaboratoryTestSubCategorySetting from './LaboratoryTestSubCategorySetting';
 
 interface Props {
   open: boolean;
@@ -50,10 +55,9 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
   dispatch
   // handleSubmit
 }) => {
-  const [isExaminationExpanded, setIsExaminationExpanded] = useState('');
-  const [isSubCategoryExpanded, setIsSubCategoryExpanded] = useState('');
+  const [expandedLaboratoryTest, setExpandedLaboratoryTest] = useState('');
+  const [expandedSubCategory, setExpandedSubCategory] = useState('');
   const [addLabTestDialogOpen, setAddLabTestDialogOpen] = useState(false);
-  const [addNewSubCategoryDialog, setAddSubCategoryDialog] = useState(false);
 
   const [newAddedField, setNewAddedField] = useState<
     LaboratorySettingEnteryFields
@@ -62,6 +66,21 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
     price: 0
   });
 
+  const [createSubCategory] = useCreateLaboratoryTestSubCategoryMutation({
+    refetchQueries: [{ query: LaboratoryTestCategoriesDocument }]
+  });
+
+  const createSubCategorySubmit = async () => {
+    await createSubCategory({
+      variables: {
+        id: category.id,
+        ...newAddedField,
+        price: newAddedField.price || 0,
+        trackInStock: !!newAddedField.inStock
+      }
+    });
+  };
+
   const preSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     const emptyCategory = category.laboratoryTests.find(
@@ -69,7 +88,7 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
     );
 
     if (emptyCategory) {
-      setIsExaminationExpanded(emptyCategory.name);
+      setExpandedLaboratoryTest(emptyCategory.name);
       return;
     }
     // handleSubmit(event);
@@ -123,8 +142,8 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
               {category.laboratoryTests.map(laboratoryTest => (
                 <LaboraotryTestSetting
                   laboratoryTest={laboratoryTest}
-                  isExpanded={isExaminationExpanded === laboratoryTest.name}
-                  setExpandedLaboraotryTest={setIsExaminationExpanded}
+                  isExpanded={expandedLaboratoryTest === laboratoryTest.name}
+                  setExpandedLaboratoryTest={setExpandedLaboratoryTest}
                 />
               ))}
             </List>
@@ -152,234 +171,29 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
               }
             >
               {category.subCategories.map(subCategory => (
-                <DialogExaminationCollapseListItem
-                  isExpanded={isSubCategoryExpanded === subCategory.name}
-                  listItemPrimaryText={subCategory.name.toUpperCase()}
-                  listItemSecondaryText={`${subCategory.price}`}
-                  handleClick={() =>
-                    setIsSubCategoryExpanded(prevExpanded =>
-                      prevExpanded === subCategory.name ? '' : subCategory.name
-                    )
-                  }
-                  handleDelete={() => {
-                    dispatch({
-                      type: 'deleteSubCategory',
-                      payload: { name: subCategory.name }
-                    });
-                  }}
-                >
-                  <Box sx={{ my: '15px', display: 'flex' }}>
-                    <TextField
-                      required
-                      sx={{ mr: 1 }}
-                      label="Change Name"
-                      variant="outlined"
-                      value={subCategory.name}
-                      onChange={e => {
-                        // avoid collapse from closing
-                        setIsSubCategoryExpanded(e.target.value);
-                        dispatch({
-                          type: 'changeSubCategoryName',
-                          payload: {
-                            subCategoryName: subCategory.name,
-                            newName: e.target.value
-                          }
-                        });
-                      }}
-                    />
-                    <TextField
-                      required
-                      label="Change Price"
-                      variant="outlined"
-                      type="number"
-                      value={subCategory.price}
-                      onChange={e =>
-                        dispatch({
-                          type: 'changeSubCategoryPrice',
-                          payload: {
-                            subCategoryName: subCategory.name,
-                            newPrice: parseInt(e.target.value)
-                          }
-                        })
-                      }
-                    />
-                  </Box>
-
-                  {subCategory.laboratoryTests.map(laboratoryTest => (
-                    <LaboraotryTestSetting
-                      laboratoryTest={laboratoryTest}
-                      isExpanded={isExaminationExpanded === laboratoryTest.name}
-                      setExpandedLaboraotryTest={setIsExaminationExpanded}
-                    />
-                    // <DialogExaminationCollapseListItem
-                    //   isExpanded={isExaminationExpanded === laboratoryTest.name}
-                    //   listItemPrimaryText={laboratoryTest.name}
-                    //   handleClick={() =>
-                    //     setIsExaminationExpanded(prevExpanded =>
-                    //       prevExpanded === laboratoryTest.name ? '' : test.name
-                    //     )
-                    //   }
-                    //   handleDelete={() => {
-                    //     dispatch({
-                    //       type: 'deleteSubCategorylaboratoryTest',
-                    //       payload: {
-                    //         subCategoryName: subCategory.name,
-                    //         name: laboratoryTest.name
-                    //       }
-                    //     });
-                    //   }}
-                    // >
-                    //   <ListItem>
-                    //     {/* <ListItemIcon>
-                    //       <Checkbox
-                    //         color="success"
-                    //         checked={laboratoryTest.hasNormalValue}
-                    //         onChange={(_, checked) => {
-                    //           dispatch({
-                    //             type: 'hasSubCategorylaboratoryTestNormalValue',
-                    //             payload: {
-                    //               laboratoryTestName: test.name,
-                    //               subCategoryName: subCategory.name,
-                    //               hasNormalValue: checked
-                    //             }
-                    //           });
-                    //         }}
-                    //       />
-                    //     </ListItemIcon> */}
-                    //     <Box
-                    //       sx={{
-                    //         display: 'flex',
-                    //         alignItems: 'center',
-                    //         maxWidth: 400
-                    //       }}
-                    //     >
-                    //       <ListItemText
-                    //         primary="has normal value"
-                    //         secondary="a constant reference"
-                    //       />
-                    //       <FormControl variant="standard" sx={{ ml: 6 }}>
-                    //         <InputLabel>
-                    //           {laboratoryTest.name} normal value
-                    //         </InputLabel>
-                    //         <Input
-                    //           autoFocus
-                    //           sx={{ ml: '5px' }}
-                    //           onChange={e =>
-                    //             dispatch({
-                    //               type:
-                    //                 'changeSubCategorylaboratoryTestNormalValue',
-                    //               payload: {
-                    //                 laboratoryTestName: test.name,
-                    //                 subCategoryName: subCategory.name,
-                    //                 normalValue: e.target.value
-                    //               }
-                    //             })
-                    //           }
-                    //           value={laboratoryTest.normalValue}
-                    //         />
-                    //         {!laboratoryTest.normalValue && (
-                    //           <FormHelperText>cannot be empty</FormHelperText>
-                    //         )}
-                    //       </FormControl>
-                    //     </Box>
-                    //   </ListItem>
-
-                    //   <CommonValuesCollapse
-                    //     commonValue={newCommonValue}
-                    //     setCommonValue={setNewCommonValue}
-                    //     onSubmit={() => {
-                    //       dispatch({
-                    //         type:
-                    //           'addNewCommonValueForSubCategorylaboratoryTest',
-                    //         payload: {
-                    //           laboratoryTestName: test.name,
-                    //           subCategoryName: subCategory.name,
-                    //           newCommonValue
-                    //         }
-                    //       });
-                    //     }}
-                    //   >
-                    //     {laboratoryTest.commonValues &&
-                    //       laboratoryTest.commonValues.map(
-                    //         (commonValue, index) => (
-                    //           <>
-                    //             <ListItem
-                    //               secondaryAction={
-                    //                 <IconButton
-                    //                   onClick={() => {
-                    //                     dispatch({
-                    //                       type:
-                    //                         'deleteCommonValueForSubCategorylaboratoryTest',
-                    //                       payload: {
-                    //                         subCategoryName: subCategory.name,
-                    //                         laboratoryTestName: test.name,
-                    //                         commonValueIndex: index
-                    //                       }
-                    //                     });
-                    //                   }}
-                    //                   color="secondary"
-                    //                   size="small"
-                    //                   edge="end"
-                    //                 >
-                    //                   <DeleteIcon fontSize="small" />
-                    //                 </IconButton>
-                    //               }
-                    //             >
-                    //               <ListItemText primary={commonValue} />
-                    //             </ListItem>
-                    //             <Divider />
-                    //           </>
-                    //         )
-                    //       )}
-                    //   </CommonValuesCollapse>
-                    // </DialogExaminationCollapseListItem>
-                  ))}
-                  <AddNewFieldsFormDialog
-                    title={`Add a LaboratorylaboratoryTest under ${subCategory.name}`}
-                    field={newAddedField}
-                    setField={setNewAddedField}
-                    onSubmit={() => {
-                      dispatch({
-                        type: 'addNewSubCategorylaboratoryTest',
-                        payload: {
-                          laboratoryTestName: newAddedField.name,
-                          subCategoryName: subCategory.name
-                        }
-                      });
-                    }}
-                  />
-                </DialogExaminationCollapseListItem>
+                <LaboratoryTestSubCategorySetting
+                  categoryId={category.id}
+                  subCategory={subCategory}
+                  isExpanded={expandedSubCategory === subCategory.name}
+                  setExpandedSubCategory={setExpandedSubCategory}
+                />
               ))}
-              <AddNewFieldsFormDialog
-                title="Add a SubCategory"
-                field={newAddedField}
-                setField={setNewAddedField}
-                hasPrice={true}
-                onSubmit={() => {
-                  dispatch({
-                    type: 'addNewSubCategory',
-                    payload: {
-                      name: newAddedField.name,
-                      price: newAddedField.price || 0
-                    }
-                  });
-                }}
-              />
             </List>
           )}
-          <Button
+          {/* <Button
             sx={{ mt: 2, width: '100%' }}
             onClick={() => setAddSubCategoryDialog(true)}
             variant="contained"
             endIcon={<AddIcon />}
           >
             Add New Sub Category
-          </Button>
+          </Button> */}
           <AddNewFieldsFormDialog
             title="Add a Sub Category"
+            hasPrice={true}
             field={newAddedField}
             setField={setNewAddedField}
-            onSubmit={() => {}}
+            onSubmit={createSubCategorySubmit}
           />
         </DialogContent>
         <DialogActions>

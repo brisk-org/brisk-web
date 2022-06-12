@@ -29,12 +29,12 @@ import { Box } from '@mui/system';
 interface Props {
   laboratoryTest: LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
   isExpanded: boolean;
-  setExpandedLaboraotryTest: React.Dispatch<React.SetStateAction<string>>;
+  setExpandedLaboratoryTest: React.Dispatch<React.SetStateAction<string>>;
 }
 const LaboraotryTestSetting: React.FC<Props> = ({
   laboratoryTest: oldLaboraotryTest,
   isExpanded,
-  setExpandedLaboraotryTest
+  setExpandedLaboratoryTest: setExpandedLaboraotryTest
 }) => {
   const initialState = {
     name: oldLaboraotryTest.name,

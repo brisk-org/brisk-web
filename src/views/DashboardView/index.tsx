@@ -73,7 +73,10 @@ const DashboardView = () => {
         if (!subscriptionData.data) return prev;
         const newCreatedCard = subscriptionData.data;
         return Object.assign({}, prev, {
-          laboratoryTests: [newCreatedCard, ...prev.laboratoryExaminations]
+          laboratoryExaminations: [
+            newCreatedCard,
+            ...prev.laboratoryExaminations
+          ]
         });
       },
       onError: err => console.log(err)

@@ -4,11 +4,9 @@ mutation CreateLaboratoryExamination(
   $price: Float!
 ) {
   createLaboratoryExamination(
-    input: {
-      cardId: $cardId
-      laboratoryTestRequest: $laboratoryTestRequest
-      price: $price
-    }
+    cardId: $cardId
+    laboratoryTestRequest: $laboratoryTestRequest
+    price: $price
   ) {
     id
     card {

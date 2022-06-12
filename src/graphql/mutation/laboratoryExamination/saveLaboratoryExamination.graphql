@@ -1,8 +1,8 @@
-mutation CompleteLaboratoryExamination(
+mutation SaveLaboratoryExamination(
   $id: ID!
   $content: [CompleteLaboratoryExaminationInput!]!
 ) {
-  completeLaboratoryExamination(content: $content, id: $id) {
+  saveLaboratoryExamination(content: $content, id: $id) {
     id
     paid
     completed

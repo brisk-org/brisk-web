@@ -89,17 +89,15 @@ const AddNewFieldsFormDialog: React.FC<Props> = ({
                 required
               />
             )}
-            {
-              <TextField
-                name="inStock"
-                value={field.inStock}
-                onChange={handleChange}
-                margin="dense"
-                label="In Stock"
-                variant="standard"
-                fullWidth
-              />
-            }
+            <TextField
+              name="inStock"
+              value={field.inStock}
+              onChange={handleChange}
+              margin="dense"
+              label="In Stock"
+              variant="standard"
+              fullWidth
+            />
           </DialogContent>
 
           <DialogActions>

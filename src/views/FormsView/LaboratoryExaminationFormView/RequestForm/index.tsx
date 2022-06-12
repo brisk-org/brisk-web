@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
 import {
   Box,
@@ -19,14 +19,18 @@ import Page from '../../../../components/Page';
 //   PlaceholderTestType
 // } from '../../../../data/testsPlaceHolder';
 import SingleAccordion from './SingleAccordion';
-import { useCreateLaboratoryExaminationMutation } from '../../../../generated/graphql';
+import {
+  LaboratoryTestCategoriesQuery,
+  useCreateLaboratoryExaminationMutation,
+  useLaboratoryTestCategoriesQuery
+} from '../../../../generated/graphql';
 // import SnackbarSuccess from '../../../../components/AlertSnackbar';
 import { cardQuery } from '../../../../constants/queries';
 import { SettingsContext } from '../../../../context/SettingContext';
-import {
-  LaboratoryTestCatagories,
-  LaboratoryTestDetails
-} from '../../../../data/testsSeed';
+// import {
+//   LaboratoryTestCatagories,
+//   LaboratoryTestDetails
+// } from '../../../../data/testsSeed';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 
@@ -38,12 +42,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-interface RequestCategoryTest extends LaboratoryTestDetails {
+// export interface RequestCategories extends LaboratoryTestCatagories {
+//   selected: boolean;
+//   tests: RequestCategoryTest[];
+// }
+type LabTestCategory = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0];
+type LabTest = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
+interface RequestLabTest extends LabTest {
   selected: boolean;
 }
-export interface RequestCategories extends LaboratoryTestCatagories {
+export interface RequestCategories extends LabTestCategory {
   selected: boolean;
-  tests: RequestCategoryTest[];
+  laboratoryTests: RequestLabTest[];
 }
 
 const RequestLaboratoryTestFormView = () => {
@@ -60,33 +70,29 @@ const RequestLaboratoryTestFormView = () => {
   });
   // const [tests, setTests] = useState<PlaceholderTestType[]>();
   const { laboratoryTestSettingData } = useContext(SettingsContext);
-  const categoriesInitialState = laboratoryTestSettingData?.map(category => ({
-    ...category,
-    selected: false,
-    tests: [...category.tests.map(test => ({ ...test, selected: false }))]
-  }));
+  const { data, loading } = useLaboratoryTestCategoriesQuery();
+
+  const categoriesInitialState = data?.laboratoryTestCategories.map(
+    category => ({
+      ...category,
+      selected: false,
+      laboratoryTests: [
+        ...category.laboratoryTests.map(test => ({ ...test, selected: false }))
+      ]
+    })
+  );
 
   const [categories, setCategories] = useState<RequestCategories[] | undefined>(
     categoriesInitialState
   );
-
   const [createLaboratoryExamination] = useCreateLaboratoryExaminationMutation({
     onError: err => console.log(err)
   });
 
-  // useEffect(() => {
-  //   if (!laboratoryTestSettingData) return;
-  //   const testsWithRates = laboratoryTestSettingData.map((test) => {
-  //     return {
-  //       ...testsPlaceHolder.find(
-  //         tplaceholder => tplaceholder.name === test.name
-  //       ),
-  //       price: test.price,
-  //       normalValue: test.normalValue
-  //     };
-  //   });
-  //   setTests(testsWithRates as PlaceholderTestType[]);
-  // }, [laboratoryTestSettingData]);
+  useEffect(() => {
+    if (!data) return;
+    setCategories(categoriesInitialState);
+  }, [data, loading]);
 
   const handleCloseSnackbar = (
     event?: Event | React.SyntheticEvent,
@@ -109,8 +115,9 @@ const RequestLaboratoryTestFormView = () => {
       let price = 0;
       const selectedCategories = categories
         ?.map(category => {
-          const selectedTests = category.tests.filter(test => test.selected);
-          console.log(selectedTests);
+          const selectedTests = category.laboratoryTests.filter(
+            test => test.selected
+          );
           if (!selectedTests[0]) {
             return;
           }
@@ -127,12 +134,12 @@ const RequestLaboratoryTestFormView = () => {
           selectedTests.forEach(test => {
             if (!test.selected) return;
             if (
-              !test.hasIndividualPrice ||
+              !test.hasPrice ||
               (category.selected && test.isInfluencedByCategory)
             ) {
               return;
             }
-            if (!test.individualPrice) {
+            if (!test.hasPrice) {
               setFaitalError(true);
               enqueueSnackbar(
                 `${test.name} in ${category.name} must have a price to be selected individually`,
@@ -140,7 +147,7 @@ const RequestLaboratoryTestFormView = () => {
               );
               return;
             }
-            price += test.individualPrice;
+            price += test.price || 0;
           });
           return {
             ...category,
@@ -152,12 +159,31 @@ const RequestLaboratoryTestFormView = () => {
         return;
       }
 
-      console.log('result', selectedCategories, price);
+      const selectedLaboratoryTestId = selectedCategories
+        ?.map(category =>
+          category?.laboratoryTests
+            .filter(test => test.selected)
+            .map(test => test.id)
+        )
+        .flat()
+        .flat();
+
+      if (!selectedLaboratoryTestId) return;
+      console.log(
+        'result',
+        selectedCategories,
+        price,
+        selectedLaboratoryTestId
+      );
       const test = await createLaboratoryExamination({
         variables: {
           cardId: fromQuery.id,
           price,
-          laboratoryTestRequest: [{ laboratoryTestId: '1', value: 'ksdf' }]
+          laboratoryTestRequest: [
+            ...selectedLaboratoryTestId.map(id => ({
+              laboratoryTestId: id || ''
+            }))
+          ]
 
           // result: JSON.stringify(selectedCategories)
         }
@@ -239,9 +265,7 @@ const RequestLaboratoryTestFormView = () => {
                 </Grid>
               ))
             ) : (
-              <Typography>
-                Go to the settings and add some laboratory tests
-              </Typography>
+              <Typography>No Laboratory Tests Found</Typography>
             )}
           </Grid>
 

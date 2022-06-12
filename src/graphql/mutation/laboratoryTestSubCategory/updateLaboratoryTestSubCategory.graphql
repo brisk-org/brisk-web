@@ -1,0 +1,21 @@
+mutation UpdateLaboratoryTestSubCategory(
+  $id: ID!
+  $name: String!
+  $price: Float!
+  $inStock: Float
+  $trackInStock: Boolean!
+) {
+  updateLaboratoryTestSubCategory(
+    id: $id
+    name: $name
+    price: $price
+    inStock: $inStock
+    trackInStock: $trackInStock
+  ) {
+    id
+    name
+    inStock
+    trackInStock
+    created_at
+  }
+}

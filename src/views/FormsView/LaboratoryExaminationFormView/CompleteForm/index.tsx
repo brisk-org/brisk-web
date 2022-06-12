@@ -26,10 +26,23 @@ import {
   useLaboratoryExaminationQuery,
   CardDocument,
   useSaveLaboratoryExaminationMutation,
-  LaboratoryTestCategory
+  useLaboratoryTestCategoriesQuery,
+  LaboratoryTestCategoriesQuery,
+  LaboratoryExaminationDocument
 } from '../../../../generated/graphql';
 import { ExpandMore } from '@mui/icons-material';
 // import { LaboratoryExaminationCatagories } from '../../../../data/testsSeed';
+
+type OriginalLaboratoryTest = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
+type OriginalLaboratoryCategory = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0];
+export interface LaboratoryTestWithValue extends OriginalLaboratoryTest {
+  value: string;
+  laboratoryRequestId: string;
+}
+export interface LaboratoryCategoriesWithTestValue
+  extends Omit<OriginalLaboratoryCategory, 'laboratoryTests'> {
+  laboratoryTests: LaboratoryTestWithValue[];
+}
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -47,16 +60,18 @@ const CompleteLaboratoryExaminationFormView = () => {
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
   const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false);
   const [labCategories, setLabCategories] = useState<
-    LaboratoryTestCategory[]
+    LaboratoryCategoriesWithTestValue[]
   >();
   const queryId = query.get('id') || '';
 
+  const { data: categoryData } = useLaboratoryTestCategoriesQuery();
   const { data, loading } = useLaboratoryExaminationQuery({
     variables: {
       id: queryId
     },
     onError: err => console.error
   });
+
   const [
     completeLaboratoryExamination
   ] = useCompleteLaboratoryExaminationMutation({
@@ -64,15 +79,49 @@ const CompleteLaboratoryExaminationFormView = () => {
   });
   const [
     completeLaboratoryExaminationLater
-  ] = useSaveLaboratoryExaminationMutation({
-    onError: err => console.error
-  });
+  ] = useSaveLaboratoryExaminationMutation({ onError: err => console.error });
 
   useEffect(() => {
+    if (!categoryData) return;
+    setLabCategories(
+      categoryData.laboratoryTestCategories.map(category => ({
+        ...category,
+        laboratoryTests: []
+      }))
+    );
     if (!data) return;
-    // setLabCategories(
-    //   JSON.parse(data.laboratoryExamination.result) as LaboratoryTestCatagories[]
-    // );
+    data.laboratoryExamination.laboratoryTestRequests?.forEach(
+      laboratoryTestRequest => {
+        setLabCategories(prevCateogries =>
+          prevCateogries
+            ?.map((prevLabCategory, index) => {
+              if (
+                categoryData.laboratoryTestCategories[
+                  index
+                ].laboratoryTests.find(
+                  ({ id }) => id === laboratoryTestRequest.laboratoryTest.id
+                )
+              ) {
+                console.log(laboratoryTestRequest.value, laboratoryTestRequest);
+                return {
+                  ...prevLabCategory,
+                  laboratoryTests: [
+                    ...prevLabCategory.laboratoryTests,
+                    {
+                      ...laboratoryTestRequest.laboratoryTest,
+                      value: laboratoryTestRequest.value || '',
+                      laboratoryRequestId: laboratoryTestRequest.id
+                    }
+                  ]
+                };
+              }
+              return { ...prevLabCategory };
+            })
+            .filter(category => category.laboratoryTests[0])
+        );
+        console.log(labCategories);
+      }
+    );
     console.log(labCategories);
   }, [data, loading]);
 
@@ -81,8 +130,15 @@ const CompleteLaboratoryExaminationFormView = () => {
     | undefined = event => {
     if (!labCategories) return;
     event.preventDefault();
+    const labTests = labCategories
+      .map(category => category.laboratoryTests)
+      .flat()
+      .map(({ laboratoryRequestId, value }) => ({
+        id: laboratoryRequestId,
+        value
+      }));
     completeLaboratoryExamination({
-      variables: { id: queryId, result: JSON.stringify(labCategories) },
+      variables: { id: queryId, content: labTests },
       refetchQueries: [
         {
           query: CardDocument,
@@ -96,17 +152,24 @@ const CompleteLaboratoryExaminationFormView = () => {
     history.push('/app/data/laboratory-test');
   };
 
-  const handleComplete:
+  const handleSave:
     | React.MouseEventHandler<HTMLButtonElement>
     | undefined = event => {
     if (!labCategories) return;
+    const labTests = labCategories
+      .map(category => category.laboratoryTests)
+      .flat()
+      .map(({ laboratoryRequestId, value }) => ({
+        id: laboratoryRequestId,
+        value
+      }));
     completeLaboratoryExaminationLater({
-      variables: { id: queryId, result: JSON.stringify(labCategories) },
+      variables: { id: queryId, content: labTests },
       refetchQueries: [
         {
-          query: CardDocument,
+          query: LaboratoryExaminationDocument,
           variables: {
-            id: data?.laboratoryExamination.cardId || ''
+            id: queryId
           }
         }
       ]
@@ -172,11 +235,10 @@ const CompleteLaboratoryExaminationFormView = () => {
                     <AccordionDetails sx={{ borderRadius: 'none' }}>
                       <Grid container spacing={3}>
                         {category.laboratoryTests.map((test, index) => (
-                          // <SingleAccordion
-                          //   test={test}
-                          //   setLabCategories={setLabCategories}
-                          // />
-                          <div></div>
+                          <SingleAccordion
+                            laboratoryTest={test}
+                            setLabCategories={setLabCategories}
+                          />
                         ))}
                       </Grid>
                     </AccordionDetails>
@@ -211,7 +273,7 @@ const CompleteLaboratoryExaminationFormView = () => {
           <Divider />
           <Box display="flex" justifyContent="flex-end" p={2}>
             <ButtonGroup variant="contained" disabled={!queryId}>
-              <Button onClick={handleComplete} name="now" color="secondary">
+              <Button onClick={handleSave} name="now" color="secondary">
                 Save
               </Button>
               <Button type="submit" name="later" color="primary">
