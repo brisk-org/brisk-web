@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { Container, Grid } from '@mui/material';
 import Page from '../../components/Page';
