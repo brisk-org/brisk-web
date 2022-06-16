@@ -13,17 +13,12 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { AttachMoney, Close } from '@mui/icons-material';
 // import { useMarkPrescriptionTestAsPaidMutation } from '../../../generated/graphql';
-import { PrescriptionTest } from '.';
 import PriceStepper from './PriceStepper';
-import { PrescriptionCheckIn } from '../../../context/SettingContext';
-import AlertDialog from '../../../components/AlertDialog';
 import {
-  CheckIn,
   CheckInInput,
   Occupation,
   PerDay,
   PrescriptionsQuery,
-  useMarkPrescriptionAsPaidMutation,
   useUpdatePrescriptionCheckInMutation
 } from '../../../generated/graphql';
 import { AuthContext } from '../../../context/AuthContext';
@@ -102,6 +97,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             price: checkIn.price,
             status: checkIn.status.map(status => ({
               isPaid: status.isPaid,
+              paidAt: status.paidAt,
               isCompleted: status.isCompleted
             }))
           };
@@ -129,11 +125,18 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     await updatePrescriptionCheckIn({
       variables: {
         id: prescription.id,
-        checkIn: medicationsCheckIn.map(
-          medicationsCheckIn => medicationsCheckIn.checkIn
-        )
+        medicationsCheckIn: medicationsCheckIn.map(medicationsCheckIn => ({
+          name: medicationsCheckIn.name,
+          checkIn: medicationsCheckIn.checkIn
+        }))
       }
     });
+    console.log(
+      medicationsCheckIn.map(medicationsCheckIn => ({
+        name: medicationsCheckIn.name,
+        checkIn: medicationsCheckIn.checkIn
+      }))
+    );
     setOpen(false);
   };
 
@@ -170,22 +173,22 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             </Typography>
           </Box>
           <Typography variant="body1">
-            Costs a total of {prescription.price} birr
+            Total amount of {prescription.price} birr
           </Typography>
           <Typography variant="body2">
-            Paid(
+            Completed(
             {medicationsCheckIn?.reduce(
               (prevPrice, currentCheckInPrices) =>
-                prevPrice + currentCheckInPrices.paid,
+                prevPrice + currentCheckInPrices.completed,
               0
-            )}
-            etb) Remaining: (
+            )}{' '}
+            medicine) Remaining: (
             {medicationsCheckIn?.reduce(
               (prevPrice, currentCheckInPrices) =>
                 prevPrice + currentCheckInPrices.remaining,
               0
-            )}
-            etb)
+            )}{' '}
+            medicine)
           </Typography>
           <Typography variant="body2" gutterBottom>
             Paid Today: (
@@ -198,7 +201,6 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           </Typography>
           {medicationsCheckIn &&
             medicationsCheckIn.map(medicationCheckIn => {
-              console.log(medicationCheckIn, prescription.medications);
               return occupation === Occupation['Reception'] ? (
                 <PriceStepper
                   prescriptionCheckIn={medicationCheckIn}
@@ -212,6 +214,12 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
                 />
               ) : (
                 <MedicationStepper
+                  perDay={
+                    prescription.medications!.find(
+                      medication =>
+                        medication.medicine.name === medicationCheckIn.name
+                    )!.perDay
+                  }
                   prescriptionCheckIn={medicationCheckIn}
                   lastCheckIn={
                     prescription.medications?.find(

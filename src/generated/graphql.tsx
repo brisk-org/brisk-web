@@ -79,11 +79,13 @@ export type CheckInInput = {
 export type CheckInStatus = {
   __typename?: 'CheckInStatus';
   isPaid: Scalars['Boolean'];
+  paidAt: Scalars['String'];
   isCompleted: Scalars['Boolean'];
 };
 
 export type CheckInStatusInput = {
   isPaid: Scalars['Boolean'];
+  paidAt: Scalars['String'];
   isCompleted: Scalars['Boolean'];
 };
 
@@ -243,6 +245,11 @@ export type Medication = {
   updated_at: Scalars['String'];
 };
 
+export type MedicationsCheckInInput = {
+  name: Scalars['String'];
+  checkIn: Array<CheckInInput>;
+};
+
 export type Medicine = {
   __typename?: 'Medicine';
   id: Scalars['ID'];
@@ -298,7 +305,6 @@ export type Mutation = {
   markPrescriptionAsPaid: Prescription;
   deletePrescription: Scalars['Boolean'];
   markPrescriptionAsSeen: Prescription;
-  createMedication: Medication;
   deleteMedication: Scalars['Boolean'];
   createQuickPrescriptionTest: QuickPrescriptionTest;
   completeQuickPrescriptionTest: QuickPrescriptionTest;
@@ -534,7 +540,7 @@ export type MutationMarkPrescriptionAsCompletedArgs = {
 
 
 export type MutationUpdatePrescriptionCheckInArgs = {
-  checkIn: Array<Array<CheckInInput>>;
+  medicationsCheckIn: Array<MedicationsCheckInInput>;
   id: Scalars['ID'];
 };
 
@@ -1309,7 +1315,7 @@ export type CreatePrescriptionMutation = (
         & Pick<CheckIn, 'date' | 'price'>
         & { status: Array<(
           { __typename?: 'CheckInStatus' }
-          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+          & Pick<CheckInStatus, 'isPaid' | 'paidAt' | 'isCompleted'>
         )> }
       )> }
     )>> }
@@ -1369,7 +1375,7 @@ export type MarkPrescriptionAsSeenMutation = (
 
 export type UpdatePrescriptionCheckInMutationVariables = Exact<{
   id: Scalars['ID'];
-  checkIn: Array<Array<CheckInInput> | CheckInInput> | Array<CheckInInput> | CheckInInput;
+  medicationsCheckIn: Array<MedicationsCheckInInput> | MedicationsCheckInInput;
 }>;
 
 
@@ -1385,7 +1391,7 @@ export type UpdatePrescriptionCheckInMutation = (
         & Pick<CheckIn, 'date' | 'price'>
         & { status: Array<(
           { __typename?: 'CheckInStatus' }
-          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+          & Pick<CheckInStatus, 'isPaid' | 'paidAt' | 'isCompleted'>
         )> }
       )> }
     )>> }
@@ -1865,7 +1871,7 @@ export type MedicationQuery = (
       & Pick<CheckIn, 'date' | 'price'>
       & { status: Array<(
         { __typename?: 'CheckInStatus' }
-        & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+        & Pick<CheckInStatus, 'isPaid' | 'paidAt' | 'isCompleted'>
       )> }
     )> }
   ) }
@@ -1887,7 +1893,7 @@ export type MedicationsQuery = (
       & Pick<CheckIn, 'date' | 'price'>
       & { status: Array<(
         { __typename?: 'CheckInStatus' }
-        & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+        & Pick<CheckInStatus, 'isPaid' | 'paidAt' | 'isCompleted'>
       )> }
     )> }
   )> }
@@ -2023,7 +2029,7 @@ export type PrescriptionsQuery = (
         & Pick<CheckIn, 'date' | 'price'>
         & { status: Array<(
           { __typename?: 'CheckInStatus' }
-          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+          & Pick<CheckInStatus, 'isPaid' | 'paidAt' | 'isCompleted'>
         )> }
       )> }
     )>> }
@@ -2056,7 +2062,7 @@ export type SearchPrescriptionsQuery = (
         & Pick<CheckIn, 'date' | 'price'>
         & { status: Array<(
           { __typename?: 'CheckInStatus' }
-          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+          & Pick<CheckInStatus, 'isPaid' | 'paidAt' | 'isCompleted'>
         )> }
       )> }
     )>> }
@@ -2273,7 +2279,7 @@ export type NewMedicationUpdateSubscription = (
         & Pick<CheckIn, 'date' | 'price'>
         & { status: Array<(
           { __typename?: 'CheckInStatus' }
-          & Pick<CheckInStatus, 'isPaid' | 'isCompleted'>
+          & Pick<CheckInStatus, 'isPaid' | 'paidAt' | 'isCompleted'>
         )> }
       )> }
     )>> }
@@ -3458,6 +3464,7 @@ export const CreatePrescriptionDocument = gql`
         price
         status {
           isPaid
+          paidAt
           isCompleted
         }
       }
@@ -3633,8 +3640,8 @@ export type MarkPrescriptionAsSeenMutationHookResult = ReturnType<typeof useMark
 export type MarkPrescriptionAsSeenMutationResult = Apollo.MutationResult<MarkPrescriptionAsSeenMutation>;
 export type MarkPrescriptionAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkPrescriptionAsSeenMutation, MarkPrescriptionAsSeenMutationVariables>;
 export const UpdatePrescriptionCheckInDocument = gql`
-    mutation UpdatePrescriptionCheckIn($id: ID!, $checkIn: [[CheckInInput!]!]!) {
-  updatePrescriptionCheckIn(id: $id, checkIn: $checkIn) {
+    mutation UpdatePrescriptionCheckIn($id: ID!, $medicationsCheckIn: [MedicationsCheckInInput!]!) {
+  updatePrescriptionCheckIn(id: $id, medicationsCheckIn: $medicationsCheckIn) {
     id
     medications {
       checkIn {
@@ -3642,6 +3649,7 @@ export const UpdatePrescriptionCheckInDocument = gql`
         price
         status {
           isPaid
+          paidAt
           isCompleted
         }
       }
@@ -3665,7 +3673,7 @@ export type UpdatePrescriptionCheckInMutationFn = Apollo.MutationFunction<Update
  * const [updatePrescriptionCheckInMutation, { data, loading, error }] = useUpdatePrescriptionCheckInMutation({
  *   variables: {
  *      id: // value for 'id'
- *      checkIn: // value for 'checkIn'
+ *      medicationsCheckIn: // value for 'medicationsCheckIn'
  *   },
  * });
  */
@@ -4871,6 +4879,7 @@ export const MedicationDocument = gql`
       price
       status {
         isPaid
+        paidAt
         isCompleted
       }
     }
@@ -4926,6 +4935,7 @@ export const MedicationsDocument = gql`
       price
       status {
         isPaid
+        paidAt
         isCompleted
       }
     }
@@ -5272,6 +5282,7 @@ export const PrescriptionsDocument = gql`
         price
         status {
           isPaid
+          paidAt
           isCompleted
         }
       }
@@ -5344,6 +5355,7 @@ export const SearchPrescriptionsDocument = gql`
         price
         status {
           isPaid
+          paidAt
           isCompleted
         }
       }
@@ -5943,6 +5955,7 @@ export const NewMedicationUpdateDocument = gql`
         price
         status {
           isPaid
+          paidAt
           isCompleted
         }
       }

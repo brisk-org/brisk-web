@@ -24,6 +24,7 @@ query Prescriptions($skip: Float!, $take: Float!) {
         price
         status {
           isPaid
+          paidAt
           isCompleted
         }
       }

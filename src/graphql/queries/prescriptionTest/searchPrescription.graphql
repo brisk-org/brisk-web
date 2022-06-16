@@ -24,6 +24,7 @@ query SearchPrescriptions($term: String!, $skip: Float!, $take: Float!) {
         price
         status {
           isPaid
+          paidAt
           isCompleted
         }
       }

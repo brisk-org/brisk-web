@@ -1,5 +1,8 @@
-mutation UpdatePrescriptionCheckIn($id: ID!, $checkIn: [[CheckInInput!]!]!) {
-  updatePrescriptionCheckIn(id: $id, checkIn: $checkIn) {
+mutation UpdatePrescriptionCheckIn(
+  $id: ID!
+  $medicationsCheckIn: [MedicationsCheckInInput!]!
+) {
+  updatePrescriptionCheckIn(id: $id, medicationsCheckIn: $medicationsCheckIn) {
     id
     medications {
       checkIn {
@@ -7,6 +10,7 @@ mutation UpdatePrescriptionCheckIn($id: ID!, $checkIn: [[CheckInInput!]!]!) {
         price
         status {
           isPaid
+          paidAt
           isCompleted
         }
       }

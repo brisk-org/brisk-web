@@ -24,6 +24,7 @@ subscription NewMedicationUpdate {
         price
         status {
           isPaid
+          paidAt
           isCompleted
         }
       }

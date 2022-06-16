@@ -14,6 +14,7 @@ query Medications {
       price
       status {
         isPaid
+        paidAt
         isCompleted
       }
     }

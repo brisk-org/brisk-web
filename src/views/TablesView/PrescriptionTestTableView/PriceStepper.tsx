@@ -6,12 +6,14 @@ import {
   Typography,
   Step,
   StepLabel,
-  Chip
+  Chip,
+  StepIcon
 } from '@mui/material';
 import { format, isBefore, isToday, sub } from 'date-fns';
 import {
   ArrowForward as ArrowForwardIcon,
-  ArrowBack as ArrowBackIcon
+  ArrowBack as ArrowBackIcon,
+  Star
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { PrescriptionCheckIns } from './ConfirmationDialog';
@@ -79,6 +81,7 @@ const PriceStepper: React.FC<Props> = ({
         return { ...prevCheckInPrice };
       })
     );
+    console.log(lastCheckIn, 'lastCheckIn');
   }, [activeStep]);
 
   const handleStepperClick = (index: number) => {
@@ -93,7 +96,10 @@ const PriceStepper: React.FC<Props> = ({
                   ...checkIn,
                   status: checkIn.status.map(status => ({
                     ...status,
-                    isPaid: index >= checkInIndex
+                    isPaid: index >= checkInIndex,
+                    paidAt: !status.paidAt
+                      ? new Date().toISOString()
+                      : status.paidAt
                   }))
                 })
               )
@@ -116,17 +122,16 @@ const PriceStepper: React.FC<Props> = ({
         return {
           ...prevPrescriptionCheckIn,
           checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) => {
-            if (index === activeStep) {
-              setActiveStep(prevActiveStep => prevActiveStep + 1);
-              return {
-                ...checkIn,
-                status: checkIn.status.map(status => ({
-                  ...status,
-                  isPaid: true
-                }))
-              };
-            }
-            return { ...checkIn };
+            if (index !== activeStep) return { ...checkIn };
+            setActiveStep(prevActiveStep => prevActiveStep + 1);
+            return {
+              ...checkIn,
+              status: checkIn.status.map(status => ({
+                ...status,
+                isPaid: true,
+                paidAt: new Date().toISOString()
+              }))
+            };
           })
         };
       })
@@ -148,16 +153,17 @@ const PriceStepper: React.FC<Props> = ({
           ...prevPrescriptionCheckIn,
           checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) => {
             if (index === activeStep - 1) {
-              setActiveStep(prevActiveStep => prevActiveStep - 1);
-              return {
-                ...checkIn,
-                status: checkIn.status.map(status => ({
-                  ...status,
-                  isPaid: false
-                }))
-              };
+              return { ...checkIn };
             }
-            return { ...checkIn };
+            setActiveStep(prevActiveStep => prevActiveStep - 1);
+            return {
+              ...checkIn,
+              status: checkIn.status.map(status => ({
+                ...status,
+                isPaid: false,
+                paidAt: ''
+              }))
+            };
           })
         };
       })
@@ -242,7 +248,9 @@ const PriceStepper: React.FC<Props> = ({
               }
               className={clsx({
                 [classes.stepSuccess]:
-                  lastCheckIn && !lastCheckIn[index].status[0].isPaid
+                  lastCheckIn &&
+                  lastCheckIn[index] &&
+                  !lastCheckIn[index].status[0].isPaid
               })}
               optional={
                 isToday(new Date(checkIn.date)) && (

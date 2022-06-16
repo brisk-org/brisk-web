@@ -12,19 +12,14 @@ import {
   PrescriptionsQuery,
   usePrescriptionCountQuery,
   usePrescriptionsQuery,
-  useNewMedicationUpdateSubscription,
   useSearchPrescriptionsQuery,
   NewMedicationUpdateSubscription
 } from '../../../generated/graphql';
 import { SearchTermsType } from '../../../@types';
 import MainContainerTable from '../../../components/MainContainerTable';
-import { defaultTableHeads } from '../../../constants/tableHeads';
 import SinglePrescriptionRow from './SinglePrescriptionRow';
 import { AuthContext } from '../../../context/AuthContext';
-import {
-  PrescriptionCheckIn,
-  PrescriptionSettingDataType
-} from '../../../context/SettingContext';
+import { PrescriptionSettingDataType } from '../../../context/SettingContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -84,30 +79,6 @@ const PrescriptionTestTableView = () => {
     fetchPolicy: firstRender.current ? 'cache-first' : 'network-only',
     onError: err => console.log(err)
   });
-  // const {
-  //   data: newMedicationUpdateData,
-  //   loading: newMedicationUpdateLoading
-  // } = useNewMedicationUpdateSubscription();
-
-  // useEffect(() => {
-  //   console.log('render');
-  //   if (!newMedicationUpdateData) return;
-  //   console.log(newMedicationUpdateData, 'hi');
-  //   setPrescriptions(prescriptions =>
-  //     prescriptions?.map(prescription => {
-  //       if (
-  //         newMedicationUpdateData.newMedicationUpdate[0].prescription.id !==
-  //         prescription.id
-  //       ) {
-  //         return { ...prescription };
-  //       }
-  //       return {
-  //         ...prescription,
-  //         medications: newMedicationUpdateData.newMedicationUpdate
-  //       };
-  //     })
-  //   );
-  // }, [newMedicationUpdateData, newMedicationUpdateLoading]);
 
   subscribeToMore({
     document: NewCreatedPrescriptionDocument,
@@ -144,27 +115,6 @@ const PrescriptionTestTableView = () => {
     },
     onError: err => console.log(err, 'Hioo')
   });
-  // subscribeToMore({
-  //   document: NewCreatedPrescriptionDocument,
-  //   updateQuery: (prev, { subscriptionData }) => {
-  //     const newPaidPrescriptionTest = subscriptionData.data;
-  //     if (!newPaidPrescriptionTest) return prev;
-  //     if (!prev && newPaidPrescriptionTest)
-  //       return { prescriptions: newPaidPrescriptionTest as any };
-  //     const filteredPrevWithoutPaidLaboratoryTest = prev.prescriptions.filter(
-  //       prescription =>
-  //         prescription.id !==
-  //         (newPaidPrescriptionTest as any).newCreatedPrescriptionTest.id
-  //     );
-  //     return Object.assign({}, prev, {
-  //       prescriptions: [
-  //         newPaidPrescriptionTest,
-  //         ...filteredPrevWithoutPaidLaboratoryTest
-  //       ]
-  //     });
-  //   },
-  //   onError: err => console.log(err)
-  // });
 
   useEffect(() => {
     if (isBeingSearched) {

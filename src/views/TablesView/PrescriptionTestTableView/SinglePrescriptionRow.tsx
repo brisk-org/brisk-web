@@ -21,13 +21,11 @@ import clsx from 'clsx';
 import { useHistory } from 'react-router';
 import { cardQuery } from '../../../constants/queries';
 import ConfirmationDialog from './ConfirmationDialog';
-import CompletePrescDialog from './CompletePrescDialog';
 import {
   Occupation,
   PrescriptionsQuery,
   useMarkPrescriptionAsSeenMutation
 } from '../../../generated/graphql';
-import { PrescriptionTest } from '.';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -70,7 +68,6 @@ const SinglePrescriptionRow: React.FC<{
     indicator: <BallTriangle />
   });
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
-  const [completePrescDialogOpen, setCompletePrescDialogOpen] = useState(false);
   const [markPrescriptionAsSeen] = useMarkPrescriptionAsSeenMutation();
 
   const history = useHistory();
@@ -158,11 +155,6 @@ const SinglePrescriptionRow: React.FC<{
       <ConfirmationDialog
         open={paymentDialogOpen}
         setOpen={setPaymentDialogOpen}
-        prescription={prescription}
-      />
-      <CompletePrescDialog
-        open={completePrescDialogOpen}
-        setOpen={setCompletePrescDialogOpen}
         prescription={prescription}
       />
     </>

@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Stepper,
-  IconButton,
-  Typography,
-  Step,
-  StepLabel,
-  Chip
-} from '@mui/material';
-import { PrescriptionCheckIn } from '../../../context/SettingContext';
+import { Box, Stepper, Typography, Step, StepLabel, Chip } from '@mui/material';
 import { format, isBefore, isToday, sub } from 'date-fns';
 import {
   ArrowForward as ArrowForwardIcon,
@@ -17,8 +8,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import { PrescriptionCheckIns } from './ConfirmationDialog';
 import clsx from 'clsx';
-import { PrescriptionsCheckIn } from './CompletePrescDialog';
-import { CheckIn } from '../../../generated/graphql';
+import { CheckIn, PerDay } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   stepSuccess: {
@@ -28,6 +18,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 interface Props {
+  perDay: PerDay;
   prescriptionCheckIn: PrescriptionCheckIns;
   lastCheckIn?: CheckIn[];
   setPrescriptionsCheckIn: React.Dispatch<
@@ -36,6 +27,7 @@ interface Props {
 }
 
 const MedicationStepper: React.FC<Props> = ({
+  perDay,
   prescriptionCheckIn: medicationsCheckIn,
   lastCheckIn,
   setPrescriptionsCheckIn
@@ -67,15 +59,18 @@ const MedicationStepper: React.FC<Props> = ({
           ? {
               ...prevCheckInPrice,
               completed,
-              remaining: medicationsCheckIn.checkIn.length - completed
+              remaining:
+                medicationsCheckIn.checkIn.length *
+                  (perDay === PerDay['Bid'] ? 2 : 1) -
+                completed
             }
           : { ...prevCheckInPrice }
       )
     );
+    console.log(completed, medicationsCheckIn, 'thisss[jk');
   }, [activeStep]);
 
   const handleStepperClick = (index: number, statusIndex: number) => {
-    console.log(index, lastCheckIn);
     if (lastCheckIn && lastCheckIn[index].status[statusIndex].isCompleted)
       return;
     setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
@@ -101,7 +96,10 @@ const MedicationStepper: React.FC<Props> = ({
           : { ...prevPrescriptionCheckIn }
       )
     );
-    setActiveStep(index + 1);
+    setActiveStep(prevActiveStep =>
+      prevActiveStep === index + 1 ? index : index + 1
+    );
+    console.log(activeStep);
   };
 
   const handleNext = () => {
@@ -165,7 +163,6 @@ const MedicationStepper: React.FC<Props> = ({
     );
   };
 
-  console.log(lastCheckIn);
   return (
     <Box
       sx={{
@@ -175,10 +172,19 @@ const MedicationStepper: React.FC<Props> = ({
         border: '1px solid lightgrey'
       }}
     >
-      {medicationsCheckIn.checkIn.length === activeStep && (
+      {medicationsCheckIn.remaining === 0 && (
         <Chip
           size="small"
           label="All completed"
+          sx={{ borderRadius: '7px', mr: 1 }}
+          color="success"
+          variant="outlined"
+        />
+      )}
+      {medicationsCheckIn.checkIn.every(({ status }) => status[0].isPaid) && (
+        <Chip
+          size="small"
+          label="All Paid Up"
           sx={{ borderRadius: '7px' }}
           color="success"
           variant="outlined"
@@ -197,7 +203,7 @@ const MedicationStepper: React.FC<Props> = ({
             {/* ({prescriptionCheckIn.checkIn[0].perDay}) */}
           </Typography>
           <Typography variant="caption" component="p">
-            paid: ({medicationsCheckIn.completed}) remaining: (
+            completed: ({medicationsCheckIn.completed}) remaining: (
             {medicationsCheckIn.remaining})
           </Typography>
         </Typography>
@@ -210,9 +216,12 @@ const MedicationStepper: React.FC<Props> = ({
           </IconButton>
         </div> */}
       </Box>
-      <Typography variant="body1" color="GrayText">
-        Morning
-      </Typography>
+
+      {perDay === PerDay['Bid'] && (
+        <Typography variant="body1" color="GrayText">
+          Morning
+        </Typography>
+      )}
       <Stepper
         sx={{
           maxWidth: '400px',
@@ -263,59 +272,59 @@ const MedicationStepper: React.FC<Props> = ({
           </Step>
         ))}
       </Stepper>
-      <Typography variant="body1" color="GrayText">
-        Evening
-      </Typography>
-      {medicationsCheckIn.checkIn.some(checkIn =>
-        checkIn.status.some((checkIn, index) => index === 1)
-      ) && (
-        <Stepper
-          sx={{
-            maxWidth: '400px',
-            mt: 2,
-            overflowX: 'scroll',
-            width: '100%',
-            mx: 'auto'
-          }}
-          alternativeLabel
-        >
-          {medicationsCheckIn.checkIn.map((checkIn, index) => (
-            <Step
-              onClick={() => handleStepperClick(index, 1)}
-              sx={{ cursor: 'pointer', mx: 1, display: 'block' }}
-              key={index}
-              completed={checkIn.status[1].isCompleted}
-              disabled
-            >
-              <StepLabel
-                sx={{ cursor: 'pointer' }}
-                error={
-                  !checkIn.status[0].isPaid ||
-                  (isBefore(
-                    new Date(checkIn.date),
-                    sub(new Date(), { hours: 1 })
-                  ) &&
-                    !checkIn.status[0].isCompleted)
-                }
-                className={clsx({
-                  [classes.stepSuccess]:
-                    lastCheckIn && !lastCheckIn[index].status[1].isCompleted
-                })}
-                optional={
-                  isToday(new Date(checkIn.date)) && (
-                    <Box textAlign="center">
-                      <Typography variant="caption">(today)</Typography>
-                    </Box>
-                  )
-                }
+      {perDay === PerDay['Bid'] && (
+        <>
+          <Typography variant="body1" color="GrayText">
+            Evening
+          </Typography>
+          <Stepper
+            sx={{
+              maxWidth: '400px',
+              mt: 2,
+              overflowX: 'scroll',
+              width: '100%',
+              mx: 'auto'
+            }}
+            alternativeLabel
+          >
+            {medicationsCheckIn.checkIn.map((checkIn, index) => (
+              <Step
+                onClick={() => handleStepperClick(index, 1)}
+                sx={{ cursor: 'pointer', mx: 1, display: 'block' }}
+                key={index}
+                completed={checkIn.status[1].isCompleted}
+                disabled
               >
-                <Typography variant="body2" color="gray">
-                  {format(new Date(checkIn.date), 'iii')}
-                </Typography>
-              </StepLabel>
-            </Step>
-          ))}
-        </Stepper>
+                <StepLabel
+                  sx={{ cursor: 'pointer' }}
+                  error={
+                    !checkIn.status[0].isPaid ||
+                    (isBefore(
+                      new Date(checkIn.date),
+                      sub(new Date(), { hours: 1 })
+                    ) &&
+                      !checkIn.status[0].isCompleted)
+                  }
+                  className={clsx({
+                    [classes.stepSuccess]:
+                      lastCheckIn && !lastCheckIn[index].status[1].isCompleted
+                  })}
+                  optional={
+                    isToday(new Date(checkIn.date)) && (
+                      <Box textAlign="center">
+                        <Typography variant="caption">(today)</Typography>
+                      </Box>
+                    )
+                  }
+                >
+                  <Typography variant="body2" color="gray">
+                    {format(new Date(checkIn.date), 'iii')}
+                  </Typography>
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </>
       )}
     </Box>
   );

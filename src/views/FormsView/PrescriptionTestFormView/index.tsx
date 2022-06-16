@@ -136,10 +136,12 @@ const PrescriptionTestFormView = () => {
           const checkInStatus = [
             {
               isPaid: false,
+              paidAt: '',
               isCompleted: false
             },
             {
               isPaid: false,
+              paidAt: '',
               isCompleted: false
             }
           ];
@@ -169,7 +171,6 @@ const PrescriptionTestFormView = () => {
       enqueueSnackbar('Select atleast One medicine', { variant: 'warning' });
       return;
     }
-    console.log(1, selectedMedicines);
     const price = selectedMedicines.reduce(
       (prevPrice, currentMedicine) =>
         prevPrice +
