@@ -20,8 +20,11 @@ import {
   NewCreatedQuickLaboratoryTestDocument,
   NewCreatedQuickPrescriptionTestDocument,
   useLaboratoryExaminationsForDashboardQuery,
-  NewCreatedLaboratoryExaminationDocument
+  NewCreatedLaboratoryExaminationDocument,
+  NewMedicationUpdateDocument,
+  NewMedicationUpdateSubscription
 } from '../../generated/graphql';
+import { getTime } from 'date-fns';
 
 const DashboardView = () => {
   const {
@@ -82,12 +85,13 @@ const DashboardView = () => {
       onError: err => console.log(err)
     });
     subscribeToMoreprescription({
-      document: NewCreatedPrescriptionDocument,
+      document: NewMedicationUpdateDocument,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const newCreatedCard = subscriptionData.data;
+        const newMedication = (subscriptionData.data as unknown) as NewMedicationUpdateSubscription['newMedicationUpdate'];
+        console.log(newMedication, 'subData');
         return Object.assign({}, prev, {
-          prescription: [newCreatedCard, ...prev.prescriptions]
+          prescriptions: [newMedication, ...prev.prescriptions]
         });
       },
       onError: err => console.log(err)
@@ -128,6 +132,29 @@ const DashboardView = () => {
       }))
     )
     .flat();
+  const prescriptionSales = prescriptionData?.prescriptions
+    .map(
+      prescription =>
+        prescription.medications
+          ?.map(medication =>
+            medication.checkIn.map(
+              ({ price, status }) =>
+                status
+                  .map(({ isPaid, paidAt }) => {
+                    if (!isPaid) return { price: 0, updated_at: '' };
+                    return {
+                      price,
+                      updated_at: String(getTime(new Date(paidAt)))
+                    };
+                  })
+                  .filter(({ price }) => price !== 0)!
+            )
+          )
+          .filter(medication => medication)!
+    )
+    .flat()
+    .flat()
+    .flat();
 
   return (
     <Page title="Dashboard">
@@ -137,7 +164,7 @@ const DashboardView = () => {
             <SalesContainer
               cardSales={cardSales}
               laboratoryTestSales={laboratoryTestsData?.laboratoryExaminations}
-              prescriptionSales={prescriptionData?.prescriptions}
+              prescriptionSales={prescriptionSales}
               quickLaboratoryTestSales={
                 quickLaboratoryTestData?.quickLaboratoryTests
               }

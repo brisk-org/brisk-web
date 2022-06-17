@@ -53,34 +53,44 @@ const IndividualSales: React.FC<IndividualSalesProps> = ({
 }) => {
   const classes = useStyles();
 
+  const icons = [
+    {
+      name: 'card',
+      icon: <BarChart fontSize="large" />,
+      color: colors.indigo['400']
+    },
+    {
+      name: 'test',
+      icon: <AllOut fontSize="large" />,
+      color: colors.green['300']
+    },
+    {
+      name: 'prescription',
+      icon: <AirlineSeatFlatAngled fontSize="large" />,
+      color: colors.orange['500']
+    },
+    {
+      name: 'quickPrescription',
+      icon: <NewReleases fontSize="large" />,
+      color: colors.teal['200']
+    },
+    {
+      name: 'quickLabTest',
+      icon: <AcUnit fontSize="large" />,
+      color: colors.deepPurple['200']
+    }
+  ];
+
   return (
     <Grid item md={3} xs={12}>
       <Box className={classes.balanceItems}>
-        {name === 'card' && (
-          <IconButton style={{ color: colors.indigo['400'] }} size="large">
-            <BarChart fontSize="large" />
-          </IconButton>
-        )}
-        {name === 'test' && (
-          <IconButton style={{ color: colors.green['300'] }} size="large">
-            <AllOut fontSize="large" />
-          </IconButton>
-        )}
-        {name === 'prescription' && (
-          <IconButton style={{ color: colors.orange['500'] }} size="large">
-            <AirlineSeatFlatAngled fontSize="large" />
-          </IconButton>
-        )}
-        {name === 'quickPrescription' && (
-          <IconButton style={{ color: colors.teal['200'] }} size="large">
-            <NewReleases fontSize="large" />
-          </IconButton>
-        )}
-        {name === 'quickLabTest' && (
-          <IconButton style={{ color: colors.deepPurple['200'] }} size="large">
-            <AcUnit fontSize="large" />
-          </IconButton>
-        )}
+        {icons
+          .filter(icon => icon.name === name)
+          .map(({ color, icon }) => (
+            <IconButton style={{ color }} size="large">
+              {icon}
+            </IconButton>
+          ))}
         <Typography variant="body2" className={classes.mainTypos}>
           {label}
           <Typography variant="h4" color="textSecondary">

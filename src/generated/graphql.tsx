@@ -2001,6 +2001,17 @@ export type PrescriptionsForDashboardQuery = (
   & { prescriptions: Array<(
     { __typename?: 'Prescription' }
     & Pick<Prescription, 'id' | 'paid' | 'price' | 'updated_at'>
+    & { medications?: Maybe<Array<(
+      { __typename?: 'Medication' }
+      & { checkIn: Array<(
+        { __typename?: 'CheckIn' }
+        & Pick<CheckIn, 'date' | 'price'>
+        & { status: Array<(
+          { __typename?: 'CheckInStatus' }
+          & Pick<CheckInStatus, 'isPaid' | 'paidAt' | 'isCompleted'>
+        )> }
+      )> }
+    )>> }
   )> }
 );
 
@@ -5222,6 +5233,17 @@ export const PrescriptionsForDashboardDocument = gql`
   prescriptions(skip: $skip, take: $take) {
     id
     paid
+    medications {
+      checkIn {
+        date
+        price
+        status {
+          isPaid
+          paidAt
+          isCompleted
+        }
+      }
+    }
     price
     updated_at
   }

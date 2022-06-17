@@ -1,16 +1,4 @@
-import {
-  isThisWeek,
-  isMonday,
-  isTuesday,
-  isWednesday,
-  isThursday,
-  isFriday,
-  isSaturday,
-  isSunday,
-  format,
-  getTime
-} from 'date-fns';
-import add from 'date-fns/add';
+import { isThisWeek, format } from 'date-fns';
 
 type salesDataType = { price: number; updated_at: string }[];
 export const salesCalc = function(

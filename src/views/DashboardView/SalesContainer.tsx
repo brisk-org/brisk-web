@@ -79,64 +79,26 @@ export type SalesType = {
 type SalesValue =
   | { price: number; updated_at: string; paid?: boolean }[]
   | undefined;
-type ActionType = {
-  type: SalesNameType;
-  payload: {
-    data: SalesValue;
-    selectGeneralDuration: SelectDropdownType<SelectGeneralDuration>;
-    selectDailyDuration?: SelectDropdownType<SelectDailyDuration>;
-  };
-};
+
 interface Props {
-  cardSales: { price: number; updated_at: string }[] | undefined;
+  cardSales: SalesValue;
   prescriptionSales: SalesValue;
   laboratoryTestSales: SalesValue;
   quickLaboratoryTestSales: SalesValue;
   quickprescriptionales: SalesValue;
 }
 
-const salesReducer = function(
-  sales: SalesType[],
-  action: ActionType
-): SalesType[] {
-  const timeTillSelectedDay = getTimeSubbedFromSelectedDay(
-    action.payload.selectGeneralDuration
-  );
-  const timeInterval =
-    action.payload.selectDailyDuration &&
-    getTimeSubbedFromSelectedHour(action.payload.selectDailyDuration);
-  const miniData = action.payload.data!.map(({ price, updated_at }) => ({
-    price,
-    updated_at
-  }));
-  const { amount, inWeek } = salesCalc(
-    miniData,
-    timeTillSelectedDay,
-    timeInterval
-  );
-  const exceptDispatchedSales = sales.filter(
-    sales => sales.name !== action.type
-  );
-  const dispatchedSales = sales.find(sales => sales.name === action.type);
-  switch (action.type) {
-    default:
-      return [
-        ...exceptDispatchedSales,
-        { ...dispatchedSales!, amount, inWeek }
-      ];
-  }
-};
-
 const SalesContainer: React.FC<Props> = ({
   cardSales,
   prescriptionSales,
   laboratoryTestSales,
   quickLaboratoryTestSales,
-  quickprescriptionales
+  quickprescriptionales: quickPrescriptionSales
 }) => {
   const classes = useStyles();
   const [totalAmount, setTotalAmount] = useState(0);
-  const [sales, dispatch] = useReducer(salesReducer, initialSalesState);
+  // const [sales, dispatch] = useReducer(salesReducer, initialSalesState);
+  const [sales, setSales] = useState(initialSalesState);
 
   const [selectGeneralDuration, setSelectGeneralDuration] = useState<
     SelectDropdownType<SelectGeneralDuration>
@@ -146,6 +108,36 @@ const SalesContainer: React.FC<Props> = ({
   >(initialSelectDailyDurationState);
 
   const { cardPrice, cardExpirationDate } = useContext(SettingsContext);
+
+  const setSalesFunc = (
+    prevSales: SalesType[],
+    data: SalesValue,
+    name: SalesNameType
+  ) => {
+    const timeTillSelectedDay = getTimeSubbedFromSelectedDay(
+      selectGeneralDuration
+    );
+    const timeInterval =
+      selectDailyDuration && getTimeSubbedFromSelectedHour(selectDailyDuration);
+    const miniData = data!.map(({ price, updated_at }) => ({
+      price,
+      updated_at
+    }));
+    const { amount, inWeek } = salesCalc(
+      miniData,
+      timeTillSelectedDay,
+      timeInterval
+    );
+    const exceptDispatchedSales = prevSales.filter(
+      sales => sales.name !== name
+    );
+    const dispatchedSales = prevSales.find(sales => sales.name === name);
+    const a = [
+      ...exceptDispatchedSales,
+      { ...dispatchedSales!, amount, inWeek }
+    ];
+    return a;
+  };
 
   useEffect(() => {
     let amount = 0;
@@ -159,54 +151,67 @@ const SalesContainer: React.FC<Props> = ({
 
   useEffect(() => {
     if (!cardSales) return;
-    dispatch({
-      type: 'card',
-      payload: { data: cardSales, selectGeneralDuration, selectDailyDuration }
-    });
+    // dispatch({
+    //   type: 'card',
+    //   payload: { data: cardSales, selectGeneralDuration, selectDailyDuration }
+    // });
+    setSales(prevSales => setSalesFunc(prevSales, cardSales, 'card'));
   }, [cardSales, selectGeneralDuration, selectDailyDuration]);
 
   useEffect(() => {
     if (!laboratoryTestSales) return;
-    dispatch({
-      type: 'test',
-      payload: {
-        data: laboratoryTestSales,
-        selectGeneralDuration: selectGeneralDuration
-      }
-    });
+    // dispatch({
+    //   type: 'test',
+    //   payload: {
+    //     data: laboratoryTestSales,
+    //     selectGeneralDuration: selectGeneralDuration
+    //   }
+    // });
+    console.log(laboratoryTestSales, 'tesssss');
+    setSales(prevSales => setSalesFunc(prevSales, laboratoryTestSales, 'test'));
   }, [laboratoryTestSales, selectGeneralDuration]);
 
   useEffect(() => {
     if (!prescriptionSales) return;
-    dispatch({
-      type: 'prescription',
-      payload: {
-        data: prescriptionSales,
-        selectGeneralDuration: selectGeneralDuration
-      }
-    });
+    // dispatch({
+    //   type: 'prescription',
+    //   payload: {
+    //     data: prescriptionSales,
+    //     selectGeneralDuration: selectGeneralDuration
+    //   }
+    // });
+    setSales(prevSales =>
+      setSalesFunc(prevSales, prescriptionSales, 'prescription')
+    );
+    console.log(prescriptionSales, 'presription');
   }, [prescriptionSales, selectGeneralDuration]);
 
   useEffect(() => {
-    if (!quickprescriptionales) return;
-    dispatch({
-      type: 'quickPrescription',
-      payload: {
-        data: quickprescriptionales,
-        selectGeneralDuration: selectGeneralDuration
-      }
-    });
-  }, [quickprescriptionales, selectGeneralDuration]);
+    if (!quickPrescriptionSales) return;
+    // dispatch({
+    //   type: 'quickPrescription',
+    //   payload: {
+    //     data: quickprescriptionales,
+    //     selectGeneralDuration: selectGeneralDuration
+    //   }
+    // });
+    setSales(prevSales =>
+      setSalesFunc(prevSales, quickPrescriptionSales, 'quickPrescription')
+    );
+  }, [quickPrescriptionSales, selectGeneralDuration]);
 
   useEffect(() => {
     if (!quickLaboratoryTestSales) return;
-    dispatch({
-      type: 'quickLabTest',
-      payload: {
-        data: quickLaboratoryTestSales,
-        selectGeneralDuration: selectGeneralDuration
-      }
-    });
+    // dispatch({
+    //   type: 'quickLabTest',
+    //   payload: {
+    //     data: quickLaboratoryTestSales,
+    //     selectGeneralDuration: selectGeneralDuration
+    //   }
+    // });
+    setSales(prevSales =>
+      setSalesFunc(prevSales, quickLaboratoryTestSales, 'quickLabTest')
+    );
   }, [quickLaboratoryTestSales, selectGeneralDuration]);
 
   return (
@@ -214,7 +219,7 @@ const SalesContainer: React.FC<Props> = ({
       <CardHeader
         action={
           <>
-            {/* {selectGeneralDuration.find(({ active }) => active)?.label ===
+            {selectGeneralDuration.find(({ active }) => active)?.label ===
               'today' && (
               <Dropdown
                 selectDropdownState={{
@@ -222,7 +227,7 @@ const SalesContainer: React.FC<Props> = ({
                   setSelectDropdown: setSelectDailyDuration
                 }}
               />
-            )} */}
+            )}
             <Dropdown
               selectDropdownState={{
                 selectDropdown: selectGeneralDuration,

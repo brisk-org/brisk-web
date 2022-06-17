@@ -2,6 +2,17 @@ query prescriptionsForDashboard($skip: Float!, $take: Float!) {
   prescriptions(skip: $skip, take: $take) {
     id
     paid
+    medications {
+      checkIn {
+        date
+        price
+        status {
+          isPaid
+          paidAt
+          isCompleted
+        }
+      }
+    }
     price
     updated_at
   }
