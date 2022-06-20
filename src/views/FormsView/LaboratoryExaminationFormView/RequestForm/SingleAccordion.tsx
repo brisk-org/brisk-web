@@ -22,7 +22,6 @@ const useStyles = makeStyles(() => ({
 
 interface SingleAccordionProps {
   category: RequestCategories;
-  // category: RequestCategories;
   validId: boolean;
   setCategories: React.Dispatch<
     React.SetStateAction<RequestCategories[] | undefined>
@@ -53,7 +52,11 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
             ? { ...test, selected: checked }
             : { ...test }
         );
-        return { ...prevCategory, selected: checked, tests: influenceTest };
+        return {
+          ...prevCategory,
+          selected: checked,
+          laboratoryTests: influenceTest
+        };
       })
     );
   };
@@ -70,7 +73,6 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
             if (test.name !== event.target.name) return { ...test };
             if (test.isInfluencedByCategory && category.selected)
               return { ...test, selected: true };
-            console.log('yoo', test, checked);
             return { ...test, selected: checked };
           })
         };

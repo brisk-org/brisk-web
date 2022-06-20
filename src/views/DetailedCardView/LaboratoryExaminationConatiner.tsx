@@ -61,6 +61,7 @@ const LaboratoryExaminationConatiner: React.FC<Props> = ({
 
   // Helps while Sorting
   const mutableTests = [...laboratoryExaminations];
+  console.log(mutableTests, 'soo');
   return (
     <Card className={classes.root}>
       <CardHeader

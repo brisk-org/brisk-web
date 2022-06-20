@@ -60,7 +60,19 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
             }
           ];
         }
-
+        const newCategory = prevCategories?.find(
+          category =>
+            category.name === laboratoryRequest.laboratoryTest.category?.name
+        );
+        if (!newCategory) {
+          return [
+            ...prevCategories,
+            {
+              name: laboratoryRequest.laboratoryTest.category?.name || '',
+              laboratoryTest: [basicLabTest]
+            }
+          ];
+        }
         return prevCategories?.map(category => {
           if (
             category.name === laboratoryRequest.laboratoryTest.category?.name
