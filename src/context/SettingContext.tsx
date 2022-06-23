@@ -33,20 +33,12 @@ export type PrescriptionSettingDataType = {
 type ContextType = {
   cardPrice?: number;
   cardExpirationDate?: number;
-  laboratoryTestSettingData?: LaboratoryTestCatagories[];
-  prescriptionettingData?: PrescriptionSettingDataType[];
 };
 const SettingsContext = createContext<ContextType>({});
 
 const SettingsProvider: React.FC = ({ children }) => {
   const [cardPrice, setCardPrice] = useState<number>();
   const [cardExpirationDate, setCardExpirationDate] = useState<number>();
-  const [laboratoryTestSettingData, setLaboratoryTestSettingData] = useState<
-    LaboratoryTestCatagories[]
-  >();
-  const [prescriptionettingData, setprescriptionettingData] = useState<
-    PrescriptionSettingDataType[]
-  >(prescriptionPlaceholder);
 
   const { data, loading } = useSettingQuery({
     onError: err => console.error(err)
@@ -55,26 +47,13 @@ const SettingsProvider: React.FC = ({ children }) => {
     if (!data) return;
     setCardPrice(data.setting.card_price);
     setCardExpirationDate(data.setting.card_expiration_date);
-    // const testRateData = JSON.parse(
-    //   data.setting.laboratory_tests_data
-    // ) as LaboratoryTestCatagories[];
-    const testRateData = defaultLaboratoryTestSeed;
-    console.log(data.setting, testRateData[0].name, 'Hi');
-    const prescriptionRateData = JSON.parse(
-      data.setting.prescription_data
-    ) as PrescriptionSettingDataType[];
-
-    setLaboratoryTestSettingData(testRateData);
-    setprescriptionettingData(prescriptionRateData);
   }, [data, loading]);
 
   return (
     <SettingsContext.Provider
       value={{
         cardPrice,
-        cardExpirationDate,
-        laboratoryTestSettingData,
-        prescriptionettingData
+        cardExpirationDate
       }}
     >
       {children}

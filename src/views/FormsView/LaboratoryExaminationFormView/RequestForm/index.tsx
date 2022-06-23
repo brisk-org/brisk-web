@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
   Box,
@@ -8,7 +8,8 @@ import {
   Container,
   Divider,
   Grid,
-  Typography
+  Typography,
+  Snackbar
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Link, useHistory, useLocation } from 'react-router-dom';
@@ -26,7 +27,6 @@ import {
 } from '../../../../generated/graphql';
 // import SnackbarSuccess from '../../../../components/AlertSnackbar';
 import { cardQuery } from '../../../../constants/queries';
-import { SettingsContext } from '../../../../context/SettingContext';
 // import {
 //   LaboratoryTestCatagories,
 //   LaboratoryTestDetails
@@ -69,7 +69,6 @@ const RequestLaboratoryTestFormView = () => {
     cardName: query.get('name')
   });
   // const [tests, setTests] = useState<PlaceholderTestType[]>();
-  const { laboratoryTestSettingData } = useContext(SettingsContext);
   const { data, loading } = useLaboratoryTestCategoriesQuery();
 
   const categoriesInitialState = data?.laboratoryTestCategories.map(
@@ -179,9 +178,9 @@ const RequestLaboratoryTestFormView = () => {
         variables: {
           cardId: fromQuery.id,
           price,
-          laboratoryTestRequest: [
+          laboratoryTest: [
             ...selectedLaboratoryTestId.map(id => ({
-              laboratoryTestId: id || ''
+              id: id || ''
             }))
           ]
 
@@ -281,11 +280,11 @@ const RequestLaboratoryTestFormView = () => {
             </Button>
           </Box>
         </form>
-        {/* <SnackbarSuccess
+        <Snackbar
           open={successSnackbarOpen}
-          handleClose={handleCloseSnackbar}
-          text="You have Successfully Send A Lab Request"
-        /> */}
+          onClose={handleCloseSnackbar}
+          message="You have Successfully Send A Lab Request"
+        />
       </Container>
     </Page>
   );

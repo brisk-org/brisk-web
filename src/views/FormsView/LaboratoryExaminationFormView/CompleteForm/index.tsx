@@ -35,9 +35,9 @@ import { ExpandMore } from '@mui/icons-material';
 
 type OriginalLaboratoryTest = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
 type OriginalLaboratoryCategory = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0];
-export interface LaboratoryTestWithValue extends OriginalLaboratoryTest {
+export interface LaboratoryTestWithValue
+  extends Omit<OriginalLaboratoryTest, 'created_at'> {
   value: string;
-  laboratoryRequestId: string;
 }
 export interface LaboratoryCategoriesWithTestValue
   extends Omit<OriginalLaboratoryCategory, 'laboratoryTests'> {
@@ -83,46 +83,60 @@ const CompleteLaboratoryExaminationFormView = () => {
 
   useEffect(() => {
     if (!categoryData) return;
-    setLabCategories(
-      categoryData.laboratoryTestCategories.map(category => ({
+    const y: LaboratoryCategoriesWithTestValue[] = categoryData.laboratoryTestCategories.map(
+      category => ({
         ...category,
         laboratoryTests: []
+      })
+    );
+    console.log(y, 'y');
+    setLabCategories(y);
+    console.log(labCategories, categoryData);
+  }, [categoryData]);
+  useEffect(() => {
+    if (!data) return;
+    console.log(data, 'dataa');
+    // data.laboratoryExamination.laboratoryTestRequests?.forEach(
+    //   laboratoryTestRequest => {
+    //     setLabCategories(prevCateogries =>
+    //       prevCateogries?.map((prevLabCategory, index) => {
+    //         console.log(prevCateogries, 'perv category');
+    //         if (
+    //           categoryData?.laboratoryTestCategories
+    //             .find(({ name }) => name === prevLabCategory.name)
+    //             ?.laboratoryTests.find(
+    //               ({ id }) => id === laboratoryTestRequest.laboratoryTest.id
+    //             )
+    //         ) {
+    //           return {
+    //             ...prevLabCategory,
+
+    //             laboratoryTests: [
+    //               ...prevLabCategory.laboratoryTests,
+    //               {
+    //                 ...laboratoryTestRequest.laboratoryTest,
+    //                 value: laboratoryTestRequest.value || '',
+    //                 laboratoryRequestId: laboratoryTestRequest.id
+    //               }
+    //             ]
+    //           };
+    //         }
+    //         return { ...prevLabCategory };
+    //       })
+    //     );
+    //   }
+    // );
+    setLabCategories(prevLabCategories =>
+      prevLabCategories?.map(category => ({
+        ...category,
+        laboratoryTests: data.laboratoryExamination.laboratoryTests.map(
+          test => ({ ...test, value: '' })
+        )
       }))
     );
-    if (!data) return;
-    data.laboratoryExamination.laboratoryTestRequests?.forEach(
-      laboratoryTestRequest => {
-        setLabCategories(prevCateogries =>
-          prevCateogries
-            ?.map((prevLabCategory, index) => {
-              if (
-                categoryData.laboratoryTestCategories[
-                  index
-                ].laboratoryTests.find(
-                  ({ id }) => id === laboratoryTestRequest.laboratoryTest.id
-                )
-              ) {
-                console.log(laboratoryTestRequest.value, laboratoryTestRequest);
-                return {
-                  ...prevLabCategory,
-                  laboratoryTests: [
-                    ...prevLabCategory.laboratoryTests,
-                    {
-                      ...laboratoryTestRequest.laboratoryTest,
-                      value: laboratoryTestRequest.value || '',
-                      laboratoryRequestId: laboratoryTestRequest.id
-                    }
-                  ]
-                };
-              }
-              return { ...prevLabCategory };
-            })
-            .filter(category => category.laboratoryTests[0])
-        );
-        console.log(labCategories);
-      }
+    setLabCategories(prevLabCategories =>
+      prevLabCategories?.filter(category => category.laboratoryTests.length > 0)
     );
-    console.log(labCategories);
   }, [data, loading]);
 
   const handleSubmit:
@@ -133,8 +147,8 @@ const CompleteLaboratoryExaminationFormView = () => {
     const labTests = labCategories
       .map(category => category.laboratoryTests)
       .flat()
-      .map(({ laboratoryRequestId, value }) => ({
-        id: laboratoryRequestId,
+      .map(({ id, value }) => ({
+        id,
         value
       }));
     completeLaboratoryExamination({
@@ -159,8 +173,8 @@ const CompleteLaboratoryExaminationFormView = () => {
     const labTests = labCategories
       .map(category => category.laboratoryTests)
       .flat()
-      .map(({ laboratoryRequestId, value }) => ({
-        id: laboratoryRequestId,
+      .map(({ id, value }) => ({
+        id,
         value
       }));
     completeLaboratoryExaminationLater({
@@ -217,13 +231,7 @@ const CompleteLaboratoryExaminationFormView = () => {
           <Grid container>
             {labCategories &&
               labCategories.map((category, index) => (
-                <Grid
-                  key={index}
-                  item
-                  // md={category.name === 'Clinical Chemistry' ? 12 : 6}
-                  md={6}
-                  xs={12}
-                >
+                <Grid key={index} item md={6} xs={12}>
                   <Accordion disabled={!category} sx={{ borderRadius: 'none' }}>
                     <AccordionSummary
                       expandIcon={<ExpandMore />}
@@ -234,8 +242,9 @@ const CompleteLaboratoryExaminationFormView = () => {
                     </AccordionSummary>
                     <AccordionDetails sx={{ borderRadius: 'none' }}>
                       <Grid container spacing={3}>
-                        {category.laboratoryTests.map((test, index) => (
+                        {category.laboratoryTests.map(test => (
                           <SingleAccordion
+                            categoryName={category.name}
                             laboratoryTest={test}
                             setLabCategories={setLabCategories}
                           />

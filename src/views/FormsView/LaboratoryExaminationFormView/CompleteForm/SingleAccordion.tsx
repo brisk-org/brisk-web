@@ -5,6 +5,7 @@ import { Grid, TextField } from '@mui/material';
 import { LaboratoryCategoriesWithTestValue, LaboratoryTestWithValue } from '.';
 
 interface Props {
+  categoryName: string;
   laboratoryTest: LaboratoryTestWithValue;
   setLabCategories: React.Dispatch<
     React.SetStateAction<LaboratoryCategoriesWithTestValue[] | undefined>
@@ -12,19 +13,24 @@ interface Props {
 }
 
 const SingleAccordion: React.FC<Props> = ({
+  categoryName,
   laboratoryTest,
   setLabCategories
 }) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLabCategories(prevCategories =>
-      prevCategories?.map(category => ({
-        ...category,
-        laboratoryTests: category.laboratoryTests.map(test =>
-          test.name === event.target.name
-            ? { ...test, value: event.target.value }
-            : { ...test }
-        )
-      }))
+      prevCategories?.map(category =>
+        categoryName === category.name
+          ? {
+              ...category,
+              laboratoryTests: category.laboratoryTests.map(test =>
+                test.name === event.target.name
+                  ? { ...test, value: event.target.value }
+                  : { ...test }
+              )
+            }
+          : { ...category }
+      )
     );
   };
   return (

@@ -20,7 +20,6 @@ import AddNewFieldsFormDialog, {
 } from './AddNewFieldsFormDialog';
 
 const LaboratoryTestSettingMainAccordion = () => {
-  const [open, setOpen] = useState(false);
   const [newCategoryField, setNewCategoryField] = useState<
     LaboratorySettingEnteryFields
   >({ name: '' });
@@ -63,14 +62,6 @@ const LaboratoryTestSettingMainAccordion = () => {
         </AccordionDetails>
         <AccordionSummary>
           <Box sx={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
-            {/* <Button
-              variant="contained"
-              size="small"
-              onClick={() => setOpen(true)}
-              endIcon={<AddIcon />}
-            >
-              Add Laboraotry Test Category
-            </Button> */}
             <AddNewFieldsFormDialog
               field={newCategoryField}
               setField={setNewCategoryField}

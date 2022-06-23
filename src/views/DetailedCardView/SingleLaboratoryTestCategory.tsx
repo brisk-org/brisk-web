@@ -45,50 +45,62 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
   const [categories, setCategories] = useState<BasicCategory[]>();
 
   useEffect(() => {
-    laboratoryExamination.laboratoryTestRequests?.forEach(laboratoryRequest => {
-      const basicLabTest = {
-        name: laboratoryRequest.laboratoryTest.name,
-        value: laboratoryRequest.value || '',
-        normalValue: laboratoryRequest.laboratoryTest.normalValue
-      };
-      setCategories(prevCategories => {
-        if (!prevCategories) {
-          return [
-            {
-              name: laboratoryRequest.laboratoryTest.category?.name || '',
-              laboratoryTest: [basicLabTest]
-            }
-          ];
-        }
-        const newCategory = prevCategories?.find(
-          category =>
-            category.name === laboratoryRequest.laboratoryTest.category?.name
-        );
-        if (!newCategory) {
-          return [
-            ...prevCategories,
-            {
-              name: laboratoryRequest.laboratoryTest.category?.name || '',
-              laboratoryTest: [basicLabTest]
-            }
-          ];
-        }
-        return prevCategories?.map(category => {
-          if (
-            category.name === laboratoryRequest.laboratoryTest.category?.name
-          ) {
-            return {
-              ...category,
-              laboratoryTest: [...category.laboratoryTest, basicLabTest]
-            };
-          }
-          return {
-            name: laboratoryRequest.laboratoryTest.category?.name || '',
-            laboratoryTest: [basicLabTest]
-          };
-        });
-      });
-    });
+    // laboratoryExamination.laboratoryTestRequests?.forEach(laboratoryRequest => {
+    //   const basicLabTest = {
+    //     name: laboratoryRequest.laboratoryTest.name,
+    //     value: laboratoryRequest.value || '',
+    //     normalValue: laboratoryRequest.laboratoryTest.normalValue
+    //   };
+    //   setCategories(prevCategories => {
+    //     if (!prevCategories) {
+    //       return [
+    //         {
+    //           name: laboratoryRequest.laboratoryTest.category?.name || '',
+    //           laboratoryTest: [basicLabTest]
+    //         }
+    //       ];
+    //     }
+    //     const newCategory = prevCategories?.find(
+    //       category =>
+    //         category.name === laboratoryRequest.laboratoryTest.category?.name
+    //     );
+    //     if (!newCategory) {
+    //       return [
+    //         ...prevCategories,
+    //         {
+    //           name: laboratoryRequest.laboratoryTest.category?.name || '',
+    //           laboratoryTest: [basicLabTest]
+    //         }
+    //       ];
+    //     }
+    //     return prevCategories?.map(category => {
+    //       if (
+    //         category.name === laboratoryRequest.laboratoryTest.category?.name
+    //       ) {
+    //         return {
+    //           ...category,
+    //           laboratoryTest: [...category.laboratoryTest, basicLabTest]
+    //         };
+    //       }
+    //       return {
+    //         name: laboratoryRequest.laboratoryTest.category?.name || '',
+    //         laboratoryTest: [basicLabTest]
+    //       };
+    //     });
+    //   });
+    // });
+    setCategories(prevCategories =>
+      prevCategories?.map(category => ({
+        name: category.name,
+        laboratoryTest: laboratoryExamination.laboratoryTests.map(test => ({
+          name: test.name,
+          normalValue: test.normalValue,
+          value:
+            laboratoryExamination.values.find(({ id }) => test.id === id)
+              ?.value || ''
+        }))
+      }))
+    );
   }, []);
 
   return (

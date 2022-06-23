@@ -170,6 +170,7 @@ const LaboratoryTestSubCategorySetting: React.FC<Props> = ({
 
             {oldSubCategory.laboratoryTests?.map(laboratoryTest => (
               <LaboraotryTestSetting
+                categoryTracksStock={true}
                 laboratoryTest={laboratoryTest}
                 isExpanded={expandedLaboratoryTest === laboratoryTest.name}
                 setExpandedLaboratoryTest={setExpandedLaboratoryTest}
@@ -184,6 +185,7 @@ const LaboratoryTestSubCategorySetting: React.FC<Props> = ({
               Add Test
             </Button>
             <CreateNewLaboraotryTestDialog
+              categoryTracksStock={true}
               categoryId={categoryId}
               subCategoryId={oldSubCategory.id}
               open={createLabTestDialogOpen}

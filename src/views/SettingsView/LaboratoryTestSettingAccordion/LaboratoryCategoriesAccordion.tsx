@@ -37,35 +37,13 @@ interface Props {
 }
 const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
   const classes = useStyles();
-  // const [singleCategoryEdit, dispatch] = useReducer(
-  //   laboaratoryTestSettingReducer,
-  //   {
-  //     ...category,
-  //     index
-  //   }
-  // );
+
   const [parentAccordionDialogOpen, setParentAccordionDialogOpen] = useState(
     false
   );
   const handleParentAccordionDialogClose = () => {
     setParentAccordionDialogOpen(false);
   };
-
-  // const handleDuplicateCategoryToMain: React.FormEventHandler<HTMLFormElement> = event => {
-  //   event.preventDefault();
-  //   setCategory(prevCategories => {
-  //     if (!prevCategories) return;
-  //     return [
-  //       ...prevCategories.map((prevCategory, prevCategoryIndex) => {
-  //         if (prevCategoryIndex !== index) {
-  //           return { ...prevCategory };
-  //         }
-  //         return { ...singleCategoryEdit };
-  //       })
-  //     ];
-  //   });
-  //   setParentAccordionDialogOpen(false);
-  // };
 
   return (
     <Grid item md={4} sm={6} xs={12}>
@@ -108,14 +86,24 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
                           <ListItemText
                             primary={laboratoryTest.name}
                             secondary={
-                              laboratoryTest.normalValue && (
-                                <Typography
-                                  sx={{ display: 'block' }}
-                                  variant="caption"
-                                >
-                                  nv: {laboratoryTest.normalValue}
-                                </Typography>
-                              )
+                              <>
+                                {laboratoryTest.hasPrice && (
+                                  <Typography
+                                    sx={{ display: 'block' }}
+                                    variant="caption"
+                                  >
+                                    {laboratoryTest.price}
+                                  </Typography>
+                                )}
+                                {laboratoryTest.normalValue && (
+                                  <Typography
+                                    sx={{ display: 'block' }}
+                                    variant="caption"
+                                  >
+                                    nv: {laboratoryTest.normalValue}
+                                  </Typography>
+                                )}
+                              </>
                             }
                           />
 
@@ -125,45 +113,46 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
                   </List>
                 </Accordion>
               ))}
+            {console.log(category.laboratoryTests, 'tests')}
             {category.laboratoryTests &&
-              category.laboratoryTests.map(laboratoryTest => (
-                <>
-                  <Divider />
-                  <ListItem sx={{ mt: 1 }}>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body1">
-                          {laboratoryTest.name}{' '}
-                          {laboratoryTest.hasPrice && (
-                            <Typography variant="caption">
-                              ({laboratoryTest.price}birr)
-                            </Typography>
-                          )}
-                        </Typography>
-                      }
-                      secondary={
-                        laboratoryTest.normalValue && (
-                          <Typography
-                            sx={{ display: 'block' }}
-                            variant="caption"
-                          >
-                            nv: {laboratoryTest.normalValue}
+              [...category.laboratoryTests]
+                .sort((a, b) => parseInt(a.created_at) - parseInt(b.created_at))
+                .map(laboratoryTest => (
+                  <>
+                    <Divider />
+                    <ListItem sx={{ mt: 1 }}>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body1">
+                            {laboratoryTest.name}{' '}
+                            {laboratoryTest.hasPrice && (
+                              <Typography variant="caption">
+                                ({laboratoryTest.price}birr)
+                              </Typography>
+                            )}
                           </Typography>
-                        )
-                      }
-                    />
-                  </ListItem>
-                </>
-              ))}
+                        }
+                        secondary={
+                          laboratoryTest.normalValue && (
+                            <Typography
+                              sx={{ display: 'block' }}
+                              variant="caption"
+                            >
+                              normal value: {laboratoryTest.normalValue}
+                            </Typography>
+                          )
+                        }
+                      />
+                    </ListItem>
+                  </>
+                ))}
           </List>
         </Accordion>
       </Box>
       <LaboratoryTestSettingDialog
         open={parentAccordionDialogOpen}
         handleClose={handleParentAccordionDialogClose}
-        // handleSubmit={handleDuplicateCategoryToMain}
         category={category}
-        dispatch={() => ''}
       />
     </Grid>
   );

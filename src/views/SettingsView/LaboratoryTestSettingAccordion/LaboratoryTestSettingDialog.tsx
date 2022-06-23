@@ -1,30 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Box,
   Dialog,
   DialogTitle,
   Typography,
   DialogContent,
-  TextField,
   DialogActions,
   Button,
   List,
-  ListItem,
-  ListItemText,
   ListSubheader,
-  Divider,
-  FormControl,
-  FormHelperText,
-  Input,
-  InputLabel,
   IconButton
 } from '@mui/material';
 // import { LaboratorylaboratoryTestCatagories } from '../../../data/testsSeed';
-import DialogExaminationCollapseListItem from './DialogExaminationCollapseListItem';
 import AddNewFieldsFormDialog, {
   LaboratorySettingEnteryFields
 } from './AddNewFieldsFormDialog';
-import CommonValuesCollapse from './CommonValuesCollapse';
 import {
   Add as AddIcon,
   Close as CloseIcon,
@@ -34,30 +23,39 @@ import {
 import {
   LaboratoryTestCategoriesDocument,
   LaboratoryTestCategoriesQuery,
-  useCreateLaboratoryTestSubCategoryMutation
+  useCreateLaboratoryTestSubCategoryMutation,
+  useDeleteLaboratoryTestCategoryMutation
 } from '../../../generated/graphql';
 import UpdateLaboratoryTestCategoryFields from './UpdateLaboratoryTestCategoryFields';
 import LaboraotryTestSetting from './LaboraotryTestSetting';
 import CreateNewLaboraotryTestDialog from './CreateNewLaboraotryTestDialog';
 import LaboratoryTestSubCategorySetting from './LaboratoryTestSubCategorySetting';
+import AlertDialog from '../../../components/AlertDialog';
 
 interface Props {
   open: boolean;
   handleClose: () => void;
   category: LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0];
-  dispatch: (i: any) => any;
-  // handleSubmit: React.FormEventHandler<HTMLFormElement>;
 }
 const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
   open,
   handleClose,
-  category,
-  dispatch
-  // handleSubmit
+  category
 }) => {
   const [expandedLaboratoryTest, setExpandedLaboratoryTest] = useState('');
   const [expandedSubCategory, setExpandedSubCategory] = useState('');
   const [addLabTestDialogOpen, setAddLabTestDialogOpen] = useState(false);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  useEffect(() => {
+    if (confirmDelete) {
+      (async function() {
+        await deleteCategory();
+      })();
+    }
+  }, [confirmDelete]);
 
   const [newAddedField, setNewAddedField] = useState<
     LaboratorySettingEnteryFields
@@ -67,6 +65,10 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
   });
 
   const [createSubCategory] = useCreateLaboratoryTestSubCategoryMutation({
+    refetchQueries: [{ query: LaboratoryTestCategoriesDocument }]
+  });
+  const [deleteCategory] = useDeleteLaboratoryTestCategoryMutation({
+    variables: { id: category.id },
     refetchQueries: [{ query: LaboratoryTestCategoriesDocument }]
   });
 
@@ -81,18 +83,18 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
     });
   };
 
-  const preSubmit: React.FormEventHandler<HTMLFormElement> = event => {
-    event.preventDefault();
-    const emptyCategory = category.laboratoryTests.find(
-      laboratoryTest => laboratoryTest.hasPrice && !laboratoryTest.price
-    );
+  // const preSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+  //   event.preventDefault();
+  //   const emptyCategory = category.laboratoryTests.find(
+  //     laboratoryTest => laboratoryTest.hasPrice && !laboratoryTest.price
+  //   );
 
-    if (emptyCategory) {
-      setExpandedLaboratoryTest(emptyCategory.name);
-      return;
-    }
-    // handleSubmit(event);
-  };
+  //   if (emptyCategory) {
+  //     setExpandedLaboratoryTest(emptyCategory.name);
+  //     return;
+  //   }
+  //   // handleSubmit(event);
+  // };
   return (
     <>
       <Dialog
@@ -141,6 +143,7 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
             >
               {category.laboratoryTests.map(laboratoryTest => (
                 <LaboraotryTestSetting
+                  categoryTracksStock={category.trackInStock}
                   laboratoryTest={laboratoryTest}
                   isExpanded={expandedLaboratoryTest === laboratoryTest.name}
                   setExpandedLaboratoryTest={setExpandedLaboratoryTest}
@@ -156,7 +159,9 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
           >
             Add New Laboratory Test
           </Button>
+
           <CreateNewLaboraotryTestDialog
+            categoryTracksStock={category.trackInStock}
             open={addLabTestDialogOpen}
             onClose={() => setAddLabTestDialogOpen(false)}
             categoryId={category.id}
@@ -180,14 +185,6 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
               ))}
             </List>
           )}
-          {/* <Button
-            sx={{ mt: 2, width: '100%' }}
-            onClick={() => setAddSubCategoryDialog(true)}
-            variant="contained"
-            endIcon={<AddIcon />}
-          >
-            Add New Sub Category
-          </Button> */}
           <AddNewFieldsFormDialog
             title="Add a Sub Category"
             hasPrice={true}
@@ -195,16 +192,33 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
             setField={setNewAddedField}
             onSubmit={createSubCategorySubmit}
           />
+          <Button
+            sx={{ mt: 2, width: '100%' }}
+            onClick={() => setDeleteDialogOpen(true)}
+            variant="contained"
+            color="error"
+            endIcon={<DeleteIcon />}
+          >
+            Delete Category
+          </Button>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button type="submit" color="primary" autoFocus>
+          <Button type="submit" color="primary" autoFocus onClick={handleClose}>
             Continue
           </Button>
         </DialogActions>
       </Dialog>
+      <AlertDialog
+        dialogText={`Delete ${category.name}`}
+        state={{
+          dialogToggle: deleteDialogOpen,
+          setDialogToggle: setDeleteDialogOpen,
+          setProceedToAction: setConfirmDelete
+        }}
+      />
     </>
   );
 };

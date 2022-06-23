@@ -17,7 +17,10 @@ import {
 } from '../../context/SettingContext';
 import MedicineAccordion from './MedicineAccordion';
 import { useHistory } from 'react-router-dom';
-import { LaboratoryTestCatagories } from '../../data/testsSeed';
+import {
+  defaultLaboratoryTestSeed,
+  LaboratoryTestCatagories
+} from '../../data/testsSeed';
 
 const useStyles = makeStyles(theme => ({
   root: {}
@@ -28,9 +31,7 @@ const ChangeRates = () => {
 
   const {
     cardPrice: oldCardPrice,
-    cardExpirationDate: oldCardExpirationDate,
-    laboratoryTestSettingData,
-    prescriptionettingData: prescriptionRateData
+    cardExpirationDate: oldCardExpirationDate
   } = useContext(SettingsContext);
   const history = useHistory();
 
@@ -41,24 +42,11 @@ const ChangeRates = () => {
   const [cardExpirationDate, setCardExpirationDate] = useState(
     oldCardExpirationDate
   );
-  const [laboratoryTestCategories, setLaboratoryTestCategories] = useState(
-    laboratoryTestSettingData
-  );
-  const [prescriptionettingData, setPrescriptionSettingData] = useState(
-    prescriptionRateData
-  );
 
   useEffect(() => {
     setCardRate(oldCardPrice);
     setCardExpirationDate(oldCardExpirationDate);
-    setLaboratoryTestCategories(laboratoryTestSettingData);
-    setPrescriptionSettingData(prescriptionettingData);
-  }, [
-    laboratoryTestSettingData,
-    prescriptionettingData,
-    oldCardPrice,
-    oldCardExpirationDate
-  ]);
+  }, [oldCardPrice, oldCardExpirationDate]);
 
   const handleCloseSnackbar = (
     event?: Event | React.SyntheticEvent,
@@ -81,8 +69,8 @@ const ChangeRates = () => {
     onError: err => console.log(err)
   });
   const handleSubmit = async () => {
-    if (!laboratoryTestSettingData) return;
-    if (!prescriptionettingData) return;
+    // if (!laboratoryTestSettingData) return;
+    // if (!prescriptionettingData) return;
     if (!cardPrice || !cardExpirationDate) {
       setErrorSnackbarOpen(true);
       return;
@@ -95,7 +83,6 @@ const ChangeRates = () => {
     //     !perDay ||
     //     (typeof quantity === 'string' && !quantity)
     // );
-    console.log(laboratoryTestSettingData);
     // if (
     //   emptyTestsField ||
     //   !cardPrice ||
@@ -109,7 +96,7 @@ const ChangeRates = () => {
       variables: {
         card_price: cardPrice,
         card_expiration_date: cardExpirationDate,
-        laboratory_tests_data: JSON.stringify(laboratoryTestCategories),
+        laboratory_tests_data: '',
         prescription_data: ''
         // prescription_tests_data: prescriptionettingData.map(
         //   prescription => ({

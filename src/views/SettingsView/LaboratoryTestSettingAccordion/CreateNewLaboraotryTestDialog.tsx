@@ -16,12 +16,13 @@ import {
   LaboratoryTestContentInput,
   useCreateLaboratoryTestMutation
 } from '../../../generated/graphql';
-import LaboraotryTestSettingContent from './LaboraotryTestSettingContent';
+import LaboraotryTestSettingContent from './LaboraotryTestSettingItems';
 import { Box } from '@mui/system';
 import { Close as CloseIcon } from '@mui/icons-material';
 
 interface Props {
   open: boolean;
+  categoryTracksStock: boolean;
   onClose: () => void;
   categoryId: string;
   subCategoryId?: string;
@@ -35,6 +36,7 @@ const initialState = {
 };
 
 const CreateNewLaboraotryTestDialog: React.FC<Props> = ({
+  categoryTracksStock,
   open,
   onClose,
   categoryId,
@@ -72,6 +74,7 @@ const CreateNewLaboraotryTestDialog: React.FC<Props> = ({
         <DialogContent sx={{ width: '500px' }}>
           <List>
             <LaboraotryTestSettingContent
+              categoryTracksStock={categoryTracksStock}
               laboratoryTest={newLaboratoryTest}
               setLaboratoryTest={setNewLaboratoryTest}
             />

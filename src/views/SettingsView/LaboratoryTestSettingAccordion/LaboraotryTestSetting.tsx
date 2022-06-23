@@ -7,7 +7,8 @@ import {
   ListItemButton,
   Collapse,
   List,
-  Button
+  Button,
+  Typography
 } from '@mui/material';
 import CommonValuesCollapse from './CommonValuesCollapse';
 import {
@@ -23,15 +24,17 @@ import {
   ExpandLess,
   ExpandMore
 } from '@mui/icons-material';
-import LaboraotryTestSettingContent from './LaboraotryTestSettingContent';
+import LaboraotryTestSettingContent from './LaboraotryTestSettingItems';
 import { Box } from '@mui/system';
 
 interface Props {
+  categoryTracksStock: boolean;
   laboratoryTest: LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
   isExpanded: boolean;
   setExpandedLaboratoryTest: React.Dispatch<React.SetStateAction<string>>;
 }
 const LaboraotryTestSetting: React.FC<Props> = ({
+  categoryTracksStock,
   laboratoryTest: oldLaboraotryTest,
   isExpanded,
   setExpandedLaboratoryTest: setExpandedLaboraotryTest
@@ -94,7 +97,20 @@ const LaboraotryTestSetting: React.FC<Props> = ({
       >
         <ListItemText
           primary={oldLaboraotryTest.name}
-          secondary={`${oldLaboraotryTest.price}`}
+          secondary={
+            <>
+              {oldLaboraotryTest.hasPrice && (
+                <Typography variant="caption">
+                  {oldLaboraotryTest.price} birr
+                </Typography>
+              )}
+              {oldLaboraotryTest.trackInStock && (
+                <Typography variant="caption" sx={{ display: 'block' }}>
+                  {oldLaboraotryTest.inStock} in stock
+                </Typography>
+              )}
+            </>
+          }
         />
         <IconButton
           onClick={e => {
@@ -115,6 +131,7 @@ const LaboraotryTestSetting: React.FC<Props> = ({
             disablePadding
           >
             <LaboraotryTestSettingContent
+              categoryTracksStock={categoryTracksStock}
               laboratoryTest={laboratoryTest}
               setLaboratoryTest={setLaboraotryTest}
             />

@@ -11,25 +11,38 @@ import {
   Divider,
   TextField
 } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { LaboratoryTestContentInput } from '../../../generated/graphql';
 
 interface Props {
+  categoryTracksStock: boolean;
   laboratoryTest: LaboratoryTestContentInput;
   setLaboratoryTest: React.Dispatch<
     React.SetStateAction<LaboratoryTestContentInput>
   >;
 }
 const LaboraotryTestSettingContent: React.FC<Props> = ({
+  categoryTracksStock,
   laboratoryTest,
   setLaboratoryTest
 }) => {
+  useEffect(() => {
+    setLaboratoryTest(prevLabTest => ({
+      ...prevLabTest,
+      trackInStock:
+        categoryTracksStock && laboratoryTest.isInfluencedByCategory
+          ? false
+          : prevLabTest.trackInStock
+    }));
+  }, [categoryTracksStock, laboratoryTest.isInfluencedByCategory]);
+
   return (
     <>
       <ListItem>
         <Box sx={{ my: '15px', display: 'flex' }}>
           <TextField
             required
+            autoFocus
             sx={{ mr: 1 }}
             label="Laboraotry Test Name"
             variant="outlined"
@@ -109,7 +122,14 @@ const LaboraotryTestSettingContent: React.FC<Props> = ({
         <ListItemIcon>
           <Checkbox
             color="success"
-            checked={laboratoryTest.trackInStock}
+            checked={
+              categoryTracksStock && laboratoryTest.isInfluencedByCategory
+                ? false
+                : laboratoryTest.trackInStock
+            }
+            disabled={
+              laboratoryTest.isInfluencedByCategory && categoryTracksStock
+            }
             onChange={(_, checked) => {
               setLaboratoryTest(prevLabTest => ({
                 ...prevLabTest,

@@ -42,18 +42,18 @@ query Card($id: ID!) {
       cardId
       paid
       new
-      laboratoryTestRequests {
+      laboratoryTests {
         id
-        value
-        laboratoryTest {
+        name
+        normalValue
+        category {
           id
           name
-          normalValue
-          category {
-            id
-            name
-          }
         }
+      }
+      values {
+        id
+        value
       }
       completed
       price
