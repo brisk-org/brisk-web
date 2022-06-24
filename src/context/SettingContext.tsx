@@ -1,10 +1,10 @@
 import React, { useState, createContext, useEffect } from 'react';
-import { prescriptionPlaceholder } from '../data/perscriptionPlaceholder';
-import { useSettingQuery } from '../generated/graphql';
+
 import {
-  defaultLaboratoryTestSeed,
-  LaboratoryTestCatagories
-} from '../data/testsSeed';
+  LaboratoryTestCategoriesQuery,
+  useLaboratoryTestCategoriesQuery,
+  useSettingQuery
+} from '../generated/graphql';
 export type PrescriptionPerDay = 'BID' | 'STAT';
 export type PrescriptionCheckIn = {
   perDay: PrescriptionPerDay;
@@ -13,47 +13,45 @@ export type PrescriptionCheckIn = {
   isPaid: boolean;
   completed: boolean;
 };
-export type LaboratorySettingDataType = {
-  name: string;
-  price: number;
-  category: string;
-  normalValue?: string;
-};
-export type PrescriptionSettingDataType = {
-  name: string;
-  strength?: string;
-  inStock: number;
-  price: number;
-  perDay: PrescriptionPerDay;
-  forDays: number;
-  checkIn: PrescriptionCheckIn[];
-  other?: string;
-};
 
 type ContextType = {
   cardPrice?: number;
   cardExpirationDate?: number;
+  categories?: LaboratoryTestCategoriesQuery['laboratoryTestCategories'];
 };
 const SettingsContext = createContext<ContextType>({});
 
 const SettingsProvider: React.FC = ({ children }) => {
   const [cardPrice, setCardPrice] = useState<number>();
   const [cardExpirationDate, setCardExpirationDate] = useState<number>();
+  const [categories, setCategories] = useState<
+    LaboratoryTestCategoriesQuery['laboratoryTestCategories']
+  >();
 
   const { data, loading } = useSettingQuery({
     onError: err => console.error(err)
   });
+  const {
+    data: laboratoryCategoriesData,
+    loading: laboraotryCategoryLoading
+  } = useLaboratoryTestCategoriesQuery();
   useEffect(() => {
     if (!data) return;
     setCardPrice(data.setting.card_price);
     setCardExpirationDate(data.setting.card_expiration_date);
   }, [data, loading]);
+  useEffect(() => {
+    if (!laboratoryCategoriesData) return;
+
+    setCategories(laboratoryCategoriesData.laboratoryTestCategories);
+  }, [laboratoryCategoriesData, laboraotryCategoryLoading]);
 
   return (
     <SettingsContext.Provider
       value={{
         cardPrice,
-        cardExpirationDate
+        cardExpirationDate,
+        categories
       }}
     >
       {children}

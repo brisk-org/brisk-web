@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   List,
   ListSubheader,
@@ -11,6 +11,7 @@ import { CardQuery } from '../../generated/graphql';
 import { createStyles, makeStyles } from '@mui/styles';
 import clsx from 'clsx';
 import PrintHeader from '../../components/PrintHeader';
+import { SettingsContext } from '../../context/SettingContext';
 const useStyle = makeStyles(theme =>
   createStyles({
     root: {
@@ -33,7 +34,7 @@ type BasicLaboratoryTest = {
 };
 type BasicCategory = {
   name: string;
-  laboratoryTest: BasicLaboratoryTest[];
+  laboratoryTests: BasicLaboratoryTest[];
 };
 const SingleLaboratoryTestCategory: React.FC<Props> = ({
   laboratoryExamination,
@@ -42,61 +43,27 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
 }) => {
   const classes = useStyle();
   console.log(onPrint);
-  const [categories, setCategories] = useState<BasicCategory[]>();
+  const { categories: categoriesContext } = useContext(SettingsContext);
+  const [categories, setCategories] = useState<BasicCategory[] | undefined>(
+    categoriesContext?.map(category => ({
+      name: category.name,
+      laboratoryTests: category.laboratoryTests.map(test => ({
+        name: test.name,
+        value: '',
+        normalValue: test.normalValue
+      }))
+    }))
+  );
 
   useEffect(() => {
-    // laboratoryExamination.laboratoryTestRequests?.forEach(laboratoryRequest => {
-    //   const basicLabTest = {
-    //     name: laboratoryRequest.laboratoryTest.name,
-    //     value: laboratoryRequest.value || '',
-    //     normalValue: laboratoryRequest.laboratoryTest.normalValue
-    //   };
-    //   setCategories(prevCategories => {
-    //     if (!prevCategories) {
-    //       return [
-    //         {
-    //           name: laboratoryRequest.laboratoryTest.category?.name || '',
-    //           laboratoryTest: [basicLabTest]
-    //         }
-    //       ];
-    //     }
-    //     const newCategory = prevCategories?.find(
-    //       category =>
-    //         category.name === laboratoryRequest.laboratoryTest.category?.name
-    //     );
-    //     if (!newCategory) {
-    //       return [
-    //         ...prevCategories,
-    //         {
-    //           name: laboratoryRequest.laboratoryTest.category?.name || '',
-    //           laboratoryTest: [basicLabTest]
-    //         }
-    //       ];
-    //     }
-    //     return prevCategories?.map(category => {
-    //       if (
-    //         category.name === laboratoryRequest.laboratoryTest.category?.name
-    //       ) {
-    //         return {
-    //           ...category,
-    //           laboratoryTest: [...category.laboratoryTest, basicLabTest]
-    //         };
-    //       }
-    //       return {
-    //         name: laboratoryRequest.laboratoryTest.category?.name || '',
-    //         laboratoryTest: [basicLabTest]
-    //       };
-    //     });
-    //   });
-    // });
     setCategories(prevCategories =>
       prevCategories?.map(category => ({
         name: category.name,
-        laboratoryTest: laboratoryExamination.laboratoryTests.map(test => ({
+        laboratoryTests: laboratoryExamination.laboratoryTests.map(test => ({
           name: test.name,
           normalValue: test.normalValue,
           value:
-            laboratoryExamination.values.find(({ id }) => test.id === id)
+            laboratoryExamination.values?.find(({ id }) => test.id === id)
               ?.value || ''
         }))
       }))
@@ -110,7 +77,7 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
         {categories?.map((category, index) => (
           <List key={index}>
             <ListSubheader sx={{}}>{category.name}</ListSubheader>
-            {category.laboratoryTest.map((test, index) => (
+            {category.laboratoryTests.map((test, index) => (
               <ListItem key={index}>
                 <ListItemText
                   primary={`${test.name}: ${test.value || 'uncompleted'} `}

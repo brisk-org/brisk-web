@@ -19,7 +19,6 @@ import { SearchTermsType } from '../../../@types';
 import MainContainerTable from '../../../components/MainContainerTable';
 import SinglePrescriptionRow from './SinglePrescriptionRow';
 import { AuthContext } from '../../../context/AuthContext';
-import { PrescriptionSettingDataType } from '../../../context/SettingContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -29,19 +28,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export type PrescriptionTest = {
-  id: string;
-  card: { id: string; name: string; age: string; gender: string };
-  rx: string;
-  result: PrescriptionSettingDataType[];
-  paid: boolean;
-  started: boolean;
-  price: number;
-  completed: boolean;
-  new: boolean;
-  created_at: string;
-  updated_at: string;
-};
 const PrescriptionTestTableView = () => {
   const classes = useStyles();
 

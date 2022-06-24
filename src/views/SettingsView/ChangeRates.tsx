@@ -10,11 +10,7 @@ import {
 // import SnackbarSuccess from '../../components/AlertSnackbar';
 import CardRate from './CardRate';
 import SnackbarError from '../../components/SnackbarError';
-import {
-  PrescriptionSettingDataType,
-  SettingsContext,
-  LaboratorySettingDataType
-} from '../../context/SettingContext';
+import { SettingsContext } from '../../context/SettingContext';
 import MedicineAccordion from './MedicineAccordion';
 import { useHistory } from 'react-router-dom';
 import {
