@@ -357,6 +357,7 @@ export type MutationCreateLaboratoryExaminationArgs = {
   cardId: Scalars['ID'];
   price: Scalars['Float'];
   laboratoryTest: Array<LaboratoryTestIdInput>;
+  selectedCategories?: Maybe<Array<Scalars['ID']>>;
 };
 
 
@@ -538,7 +539,6 @@ export type MutationCreatePrescriptionArgs = {
 
 
 export type MutationMarkPrescriptionAsCompletedArgs = {
-  completed: Scalars['Boolean'];
   id: Scalars['ID'];
 };
 
@@ -1069,6 +1069,7 @@ export type CompleteLaboratoryExaminationMutation = (
 export type CreateLaboratoryExaminationMutationVariables = Exact<{
   cardId: Scalars['ID'];
   laboratoryTest: Array<LaboratoryTestIdInput> | LaboratoryTestIdInput;
+  selectedCategories?: Maybe<Array<Scalars['ID']> | Scalars['ID']>;
   price: Scalars['Float'];
 }>;
 
@@ -1338,7 +1339,6 @@ export type DeletePrescriptionMutation = (
 
 export type MarkPrescriptionAsCompletedMutationVariables = Exact<{
   id: Scalars['ID'];
-  completed: Scalars['Boolean'];
 }>;
 
 
@@ -1346,7 +1346,7 @@ export type MarkPrescriptionAsCompletedMutation = (
   { __typename?: 'Mutation' }
   & { markPrescriptionAsCompleted: (
     { __typename?: 'Prescription' }
-    & Pick<Prescription, 'id' | 'new' | 'inrolled'>
+    & Pick<Prescription, 'id' | 'completed' | 'new' | 'inrolled'>
   ) }
 );
 
@@ -1764,6 +1764,10 @@ export type LaboratoryExaminationQuery = (
     & { laboratoryTests: Array<(
       { __typename?: 'LaboratoryTest' }
       & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasPrice' | 'isInfluencedByCategory' | 'inStock' | 'trackInStock'>
+      & { category?: Maybe<(
+        { __typename?: 'LaboratoryTest' }
+        & Pick<LaboratoryTest, 'name'>
+      )> }
     )>, values?: Maybe<Array<(
       { __typename?: 'LaboratoryExaminationValue' }
       & Pick<LaboratoryExaminationValue, 'id' | 'value'>
@@ -2820,10 +2824,11 @@ export type CompleteLaboratoryExaminationMutationHookResult = ReturnType<typeof 
 export type CompleteLaboratoryExaminationMutationResult = Apollo.MutationResult<CompleteLaboratoryExaminationMutation>;
 export type CompleteLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<CompleteLaboratoryExaminationMutation, CompleteLaboratoryExaminationMutationVariables>;
 export const CreateLaboratoryExaminationDocument = gql`
-    mutation CreateLaboratoryExamination($cardId: ID!, $laboratoryTest: [LaboratoryTestIdInput!]!, $price: Float!) {
+    mutation CreateLaboratoryExamination($cardId: ID!, $laboratoryTest: [LaboratoryTestIdInput!]!, $selectedCategories: [ID!], $price: Float!) {
   createLaboratoryExamination(
     cardId: $cardId
     laboratoryTest: $laboratoryTest
+    selectedCategories: $selectedCategories
     price: $price
   ) {
     id
@@ -2851,6 +2856,7 @@ export type CreateLaboratoryExaminationMutationFn = Apollo.MutationFunction<Crea
  *   variables: {
  *      cardId: // value for 'cardId'
  *      laboratoryTest: // value for 'laboratoryTest'
+ *      selectedCategories: // value for 'selectedCategories'
  *      price: // value for 'price'
  *   },
  * });
@@ -3547,9 +3553,10 @@ export type DeletePrescriptionMutationHookResult = ReturnType<typeof useDeletePr
 export type DeletePrescriptionMutationResult = Apollo.MutationResult<DeletePrescriptionMutation>;
 export type DeletePrescriptionMutationOptions = Apollo.BaseMutationOptions<DeletePrescriptionMutation, DeletePrescriptionMutationVariables>;
 export const MarkPrescriptionAsCompletedDocument = gql`
-    mutation MarkPrescriptionAsCompleted($id: ID!, $completed: Boolean!) {
-  markPrescriptionAsCompleted(id: $id, completed: $completed) {
+    mutation MarkPrescriptionAsCompleted($id: ID!) {
+  markPrescriptionAsCompleted(id: $id) {
     id
+    completed
     new
     inrolled
   }
@@ -3571,7 +3578,6 @@ export type MarkPrescriptionAsCompletedMutationFn = Apollo.MutationFunction<Mark
  * const [markPrescriptionAsCompletedMutation, { data, loading, error }] = useMarkPrescriptionAsCompletedMutation({
  *   variables: {
  *      id: // value for 'id'
- *      completed: // value for 'completed'
  *   },
  * });
  */
@@ -4590,6 +4596,9 @@ export const LaboratoryExaminationDocument = gql`
       id
       name
       normalValue
+      category {
+        name
+      }
       commonValues
       price
       hasPrice

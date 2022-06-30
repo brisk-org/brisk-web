@@ -1,6 +1,7 @@
-mutation MarkPrescriptionAsCompleted($id: ID!, $completed: Boolean!) {
-  markPrescriptionAsCompleted(id: $id, completed: $completed) {
+mutation MarkPrescriptionAsCompleted($id: ID!) {
+  markPrescriptionAsCompleted(id: $id) {
     id
+    completed
     new
     inrolled
   }

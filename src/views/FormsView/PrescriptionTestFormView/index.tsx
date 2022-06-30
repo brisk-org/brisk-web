@@ -259,13 +259,18 @@ const PrescriptionTestFormView = () => {
               ) : (
                 medications && (
                   <List sx={{ width: '100%' }}>
-                    {medications.map((medication, index) => (
-                      <PrescriptionBox
-                        key={index}
-                        medication={medication}
-                        setMedications={setMedications}
-                      />
-                    ))}
+                    {[...medications]
+                      .sort(
+                        (a, b) =>
+                          parseInt(a.medicine.id) - parseInt(b.medicine.id)
+                      )
+                      .map((medication, index) => (
+                        <PrescriptionBox
+                          key={index}
+                          medication={medication}
+                          setMedications={setMedications}
+                        />
+                      ))}
                   </List>
                 )
               )}

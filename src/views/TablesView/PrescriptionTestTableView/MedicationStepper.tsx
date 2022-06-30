@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Stepper, Typography, Step, StepLabel, Chip } from '@mui/material';
+import {
+  Box,
+  Stepper,
+  Typography,
+  Step,
+  StepLabel,
+  Chip,
+  Button
+} from '@mui/material';
 import { format, isBefore, isToday, sub } from 'date-fns';
 import {
   ArrowForward as ArrowForwardIcon,
-  ArrowBack as ArrowBackIcon
+  ArrowBack as ArrowBackIcon,
+  Add as AddIcon
 } from '@mui/icons-material';
 import { makeStyles } from '@mui/styles';
 import { PrescriptionCheckIns } from './ConfirmationDialog';
@@ -34,12 +43,7 @@ const MedicationStepper: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const [activeStep, setActiveStep] = useState(
-    // medicationsCheckIn.checkIn.findIndex(
-    //   checkIn => !checkIn.status[0].isCompleted
-    // )
-    0
-  );
+  const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
     const completed = medicationsCheckIn.checkIn.reduce((count, checkIn) => {
@@ -71,6 +75,7 @@ const MedicationStepper: React.FC<Props> = ({
   }, [activeStep]);
 
   const handleStepperClick = (index: number, statusIndex: number) => {
+    if (!medicationsCheckIn.checkIn[index].status[statusIndex].isPaid) return;
     if (lastCheckIn && lastCheckIn[index].status[statusIndex].isCompleted)
       return;
     setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
@@ -102,66 +107,66 @@ const MedicationStepper: React.FC<Props> = ({
     console.log(activeStep);
   };
 
-  const handleNext = () => {
-    if (activeStep > medicationsCheckIn.checkIn.length - 1) return;
-    setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
-      prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn => {
-        if (prevPrescriptionCheckIn.name !== medicationsCheckIn.name) {
-          return {
-            ...prevPrescriptionCheckIn
-          };
-        }
-        return {
-          ...prevPrescriptionCheckIn,
-          checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) => {
-            if (index === activeStep) {
-              setActiveStep(prevActiveStep => prevActiveStep + 1);
-              return {
-                ...checkIn,
-                status: checkIn.status.map(status => ({
-                  ...status,
-                  isCompleted: true
-                }))
-              };
-            }
-            return { ...checkIn };
-          })
-        };
-      })
-    );
-  };
+  // const handleNext = () => {
+  //   if (activeStep > medicationsCheckIn.checkIn.length - 1) return;
+  //   setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
+  //     prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn => {
+  //       if (prevPrescriptionCheckIn.name !== medicationsCheckIn.name) {
+  //         return {
+  //           ...prevPrescriptionCheckIn
+  //         };
+  //       }
+  //       return {
+  //         ...prevPrescriptionCheckIn,
+  //         checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) => {
+  //           if (index === activeStep) {
+  //             setActiveStep(prevActiveStep => prevActiveStep + 1);
+  //             return {
+  //               ...checkIn,
+  //               status: checkIn.status.map(status => ({
+  //                 ...status,
+  //                 isCompleted: true
+  //               }))
+  //             };
+  //           }
+  //           return { ...checkIn };
+  //         })
+  //       };
+  //     })
+  //   );
+  // };
 
-  const handleBack = () => {
-    if (activeStep < 1) return;
-    if (lastCheckIn && lastCheckIn[activeStep - 1].status[0].isCompleted)
-      return;
-    setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
-      prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn => {
-        if (prevPrescriptionCheckIn.name !== medicationsCheckIn.name) {
-          return {
-            ...prevPrescriptionCheckIn
-          };
-        }
+  // const handleBack = () => {
+  //   if (activeStep < 1) return;
+  //   if (lastCheckIn && lastCheckIn[activeStep - 1].status[0].isCompleted)
+  //     return;
+  //   setPrescriptionsCheckIn(prevPrescriptionsCheckIn =>
+  //     prevPrescriptionsCheckIn?.map(prevPrescriptionCheckIn => {
+  //       if (prevPrescriptionCheckIn.name !== medicationsCheckIn.name) {
+  //         return {
+  //           ...prevPrescriptionCheckIn
+  //         };
+  //       }
 
-        return {
-          ...prevPrescriptionCheckIn,
-          checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) => {
-            if (index === activeStep - 1) {
-              setActiveStep(prevActiveStep => prevActiveStep - 1);
-              return {
-                ...checkIn,
-                status: checkIn.status.map(status => ({
-                  ...status,
-                  isCompleted: false
-                }))
-              };
-            }
-            return { ...checkIn };
-          })
-        };
-      })
-    );
-  };
+  //       return {
+  //         ...prevPrescriptionCheckIn,
+  //         checkIn: prevPrescriptionCheckIn.checkIn.map((checkIn, index) => {
+  //           if (index === activeStep - 1) {
+  //             setActiveStep(prevActiveStep => prevActiveStep - 1);
+  //             return {
+  //               ...checkIn,
+  //               status: checkIn.status.map(status => ({
+  //                 ...status,
+  //                 isCompleted: false
+  //               }))
+  //             };
+  //           }
+  //           return { ...checkIn };
+  //         })
+  //       };
+  //     })
+  //   );
+  // };
 
   return (
     <Box
@@ -235,7 +240,6 @@ const MedicationStepper: React.FC<Props> = ({
         {medicationsCheckIn.checkIn.map((checkIn, index) => (
           <Step
             index={index}
-            disabled
             onClick={() => handleStepperClick(index, 0)}
             sx={{ cursor: 'pointer', display: 'block' }}
             key={index}
@@ -243,14 +247,7 @@ const MedicationStepper: React.FC<Props> = ({
           >
             <StepLabel
               sx={{ cursor: 'pointer' }}
-              error={
-                !checkIn.status[0].isPaid ||
-                (isBefore(
-                  new Date(checkIn.date),
-                  sub(new Date(), { hours: 1 })
-                ) &&
-                  !checkIn.status[0].isCompleted)
-              }
+              error={!checkIn.status[0].isPaid}
               className={clsx({
                 [classes.stepSuccess]:
                   lastCheckIn &&
@@ -258,11 +255,18 @@ const MedicationStepper: React.FC<Props> = ({
                   !lastCheckIn[index].status[0].isCompleted
               })}
               optional={
-                isToday(new Date(checkIn.date)) && (
-                  <Box textAlign="center">
+                <Box textAlign="center">
+                  {isBefore(
+                    new Date(checkIn.date),
+                    sub(new Date(), { days: -2 })
+                  ) &&
+                    !checkIn.status[0].isCompleted && (
+                      <Typography variant="caption">(Missed)</Typography>
+                    )}
+                  {isToday(new Date(checkIn.date)) && (
                     <Typography variant="caption">(today)</Typography>
-                  </Box>
-                )
+                  )}
+                </Box>
               }
             >
               <Typography variant="body2" color="gray">

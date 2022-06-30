@@ -7,7 +7,9 @@ import {
   CardHeader,
   Divider,
   Grid,
-  TextField,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   Typography
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
@@ -45,21 +47,6 @@ const useStyles = makeStyles(theme => ({
       borderColor: theme.palette.grey[300]
     },
     '& :nth-child(1)': {
-      border: 'none'
-    }
-  },
-  select: {
-    fontFamily: theme.typography.body1.fontFamily,
-    margin: '3px 0',
-    '& .MuiInput-underline::before': {
-      transition: 'none',
-      border: 'none'
-    },
-    '& .MuiInput-underline::after': {
-      transition: 'none',
-      border: 'none'
-    },
-    '& .MuiInput-underline:hover::before': {
       border: 'none'
     }
   }
@@ -116,9 +103,7 @@ const HistoryContainer: React.FC<HistoryContainerProps> = ({ history }) => {
     setProceedToAction(false);
   }, [proceedToAction]);
 
-  const handleChange:
-    | React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
-    | undefined = event => {
+  const handleChange = (event: SelectChangeEvent<string>) => {
     const selectedHistory = history.find(
       history => history.created_at === event.target.value
     );
@@ -142,25 +127,22 @@ const HistoryContainer: React.FC<HistoryContainerProps> = ({ history }) => {
         avatar={<GraphicEq fontSize="small" />}
         title={<Typography>Patient History</Typography>}
         action={
-          <TextField
-            className={classes.select}
-            select
+          <Select
             fullWidth
             onChange={handleChange}
-            required
             value={history[viewedHistoryIndex].created_at}
             color="secondary"
           >
             {history.map((history, index) => (
-              <option
+              <MenuItem
                 className={classes.option}
                 key={index}
                 value={history.created_at}
               >
                 {format(Number(history.created_at), 'MM/dd/yyyy')}
-              </option>
+              </MenuItem>
             ))}
-          </TextField>
+          </Select>
         }
       />
       <CardContent>

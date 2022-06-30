@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Accordion,
   AccordionSummary,
   Typography,
   AccordionDetails,
   Box,
-  Button
+  Grid
 } from '@mui/material';
-import { Add as AddIcon, ExpandMore } from '@mui/icons-material';
+import { ExpandMore } from '@mui/icons-material';
 import LaboratoryCategoriesAccordion from './LaboratoryCategoriesAccordion';
 // import { LaboratoryTestCatagories } from '../../../data/testsSeed';
 import {
@@ -25,11 +25,16 @@ const LaboratoryTestSettingMainAccordion = () => {
   >({ name: '' });
   // const [laboratoryTestCategories, setLaboratoryTestCategories] = useState<LaboraotryTestCategoriesQuery['laboratoryTestCategories']>(
   //   );
-  const { data, loading } = useLaboratoryTestCategoriesQuery();
+  const { data, loading } = useLaboratoryTestCategoriesQuery({
+    fetchPolicy: 'network-only'
+  });
 
   const [addLaboratoryTestCategory] = useCreateLaboratoryTestCategoryMutation({
     refetchQueries: [{ query: LaboratoryTestCategoriesDocument }]
   });
+  useEffect(() => {
+    console.log(data, 'herer');
+  }, [data]);
 
   const onSubmit = async () => {
     await addLaboratoryTestCategory({
@@ -55,10 +60,12 @@ const LaboratoryTestSettingMainAccordion = () => {
               !data.laboratoryTestCategories &&
               'No Categories Found'}
           </Typography>
-          {data &&
-            data.laboratoryTestCategories?.map(category => (
-              <LaboratoryCategoriesAccordion category={category} />
-            ))}
+          <Grid container>
+            {data &&
+              data.laboratoryTestCategories?.map(category => (
+                <LaboratoryCategoriesAccordion category={category} />
+              ))}
+          </Grid>
         </AccordionDetails>
         <AccordionSummary>
           <Box sx={{ width: '100%', display: 'flex', justifyContent: 'end' }}>

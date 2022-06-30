@@ -32,17 +32,17 @@ const AttendanceDialog: React.FC<Props> = ({ open, setOpen }) => {
       console.error(error);
     }
   };
-  useEffect(() => {
-    Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-      faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-      faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-      faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
-    ]).then(startVideo);
-    return () => {
-      console.log('unmounted');
-    };
-  }, [videoDom]);
+  // useEffect(() => {
+  //   Promise.all([
+  //     faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+  //     faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+  //     faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+  //     faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
+  //   ]).then(startVideo);
+  //   return () => {
+  //     console.log('unmounted');
+  //   };
+  // }, [videoDom]);
   const handlePlay:
     | React.ReactEventHandler<HTMLVideoElement>
     | undefined = async event => {

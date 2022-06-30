@@ -11,7 +11,7 @@ import {
   colors
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { AttachMoney, Close } from '@mui/icons-material';
+import { AttachMoney, Close, Delete as DeleteIcon } from '@mui/icons-material';
 // import { useMarkPrescriptionTestAsPaidMutation } from '../../../generated/graphql';
 import PriceStepper from './PriceStepper';
 import {
@@ -19,10 +19,12 @@ import {
   Occupation,
   PerDay,
   PrescriptionsQuery,
+  useMarkPrescriptionAsCompletedMutation,
   useUpdatePrescriptionCheckInMutation
 } from '../../../generated/graphql';
 import { AuthContext } from '../../../context/AuthContext';
 import MedicationStepper from './MedicationStepper';
+import AlertDialog from '../../../components/AlertDialog';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -63,6 +65,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   prescription
 }) => {
   const classes = useStyles();
+
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
+  const [confirmComplete, setConfirmComplete] = useState(false);
 
   const { occupation } = useContext(AuthContext);
   const [medicationsCheckIn, setMedicationsCheckIn] = useState<
@@ -110,10 +115,18 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     updatePrescriptionCheckIn,
     { loading }
   ] = useUpdatePrescriptionCheckInMutation();
-  // const [
-  //   markPrescriptionAsPaid,
-  //   { loading }
-  // ] = useMarkPrescriptionAsPaidMutation();
+
+  const [markPrescriptionAsComplete] = useMarkPrescriptionAsCompletedMutation({
+    variables: { id: prescription.id }
+  });
+  useEffect(() => {
+    if (confirmComplete) {
+      (async function() {
+        await markPrescriptionAsComplete();
+      })();
+      handleClose();
+    }
+  }, [confirmComplete]);
 
   const handleClose = () => {
     setOpen(false);
@@ -131,12 +144,6 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         }))
       }
     });
-    console.log(
-      medicationsCheckIn.map(medicationsCheckIn => ({
-        name: medicationsCheckIn.name,
-        checkIn: medicationsCheckIn.checkIn
-      }))
-    );
     setOpen(false);
   };
 
@@ -233,17 +240,38 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             })}
         </DialogContent>
         <DialogActions>
+          {occupation === Occupation['Nurse'] && (
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={() => setCompleteDialogOpen(true)}
+              startIcon={<DeleteIcon />}
+            >
+              Mark As Completed
+            </Button>
+          )}
+          <Button onClick={handleClose}>Cancel</Button>
+
           <Button
-            // disabled={loadinag}
-            disabled={false}
+            variant="outlined"
+            disabled={loading}
             autoFocus
             onClick={handleSuccess}
             color="primary"
           >
-            {!loading ? 'Payment Successful' : 'Submitting...'}
+            {!loading ? 'Confirm' : 'Submitting...'}
           </Button>
         </DialogActions>
       </Dialog>
+      <AlertDialog
+        dialogText={`This Prescription Will Now Be Completed`}
+        state={{
+          dialogToggle: completeDialogOpen,
+          setDialogToggle: setCompleteDialogOpen,
+          setProceedToAction: setConfirmComplete
+        }}
+      />
     </>
   );
 };

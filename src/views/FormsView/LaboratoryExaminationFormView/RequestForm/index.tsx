@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import {
   Box,
@@ -33,6 +33,7 @@ import { cardQuery } from '../../../../constants/queries';
 // } from '../../../../data/testsSeed';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
+import { SettingsContext } from '../../../../context/SettingContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -69,17 +70,15 @@ const RequestLaboratoryTestFormView = () => {
     cardName: query.get('name')
   });
   // const [tests, setTests] = useState<PlaceholderTestType[]>();
-  const { data, loading } = useLaboratoryTestCategoriesQuery();
+  const { categories: categoriesContext } = useContext(SettingsContext);
 
-  const categoriesInitialState = data?.laboratoryTestCategories.map(
-    category => ({
-      ...category,
-      selected: false,
-      laboratoryTests: [
-        ...category.laboratoryTests.map(test => ({ ...test, selected: false }))
-      ]
-    })
-  );
+  const categoriesInitialState = categoriesContext?.map(category => ({
+    ...category,
+    selected: false,
+    laboratoryTests: [
+      ...category.laboratoryTests.map(test => ({ ...test, selected: false }))
+    ]
+  }));
 
   const [categories, setCategories] = useState<RequestCategories[] | undefined>(
     categoriesInitialState
@@ -89,9 +88,9 @@ const RequestLaboratoryTestFormView = () => {
   });
 
   useEffect(() => {
-    if (!data) return;
+    if (!categoriesContext) return;
     setCategories(categoriesInitialState);
-  }, [data, loading]);
+  }, [categoriesContext]);
 
   const handleCloseSnackbar = (
     event?: Event | React.SyntheticEvent,
@@ -168,12 +167,7 @@ const RequestLaboratoryTestFormView = () => {
         .flat();
 
       if (!selectedLaboratoryTestId) return;
-      console.log(
-        'result',
-        selectedCategories,
-        price,
-        selectedLaboratoryTestId
-      );
+      console.log('result', price, selectedLaboratoryTestId);
       const test = await createLaboratoryExamination({
         variables: {
           cardId: fromQuery.id,
@@ -182,7 +176,10 @@ const RequestLaboratoryTestFormView = () => {
             ...selectedLaboratoryTestId.map(id => ({
               id: id || ''
             }))
-          ]
+          ],
+          selectedCategories: selectedCategories
+            ?.filter(category => category && category.trackInStock)
+            .map(category => category?.id || '')
 
           // result: JSON.stringify(selectedCategories)
         }

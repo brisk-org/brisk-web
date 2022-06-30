@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import {
   Box,
@@ -31,6 +31,7 @@ import {
   LaboratoryExaminationDocument
 } from '../../../../generated/graphql';
 import { ExpandMore } from '@mui/icons-material';
+import { SettingsContext } from '../../../../context/SettingContext';
 // import { LaboratoryExaminationCatagories } from '../../../../data/testsSeed';
 
 type OriginalLaboratoryTest = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
@@ -59,12 +60,13 @@ const CompleteLaboratoryExaminationFormView = () => {
 
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
   const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false);
-  const [labCategories, setLabCategories] = useState<
+  const [categories, setCategories] = useState<
     LaboratoryCategoriesWithTestValue[]
   >();
   const queryId = query.get('id') || '';
 
-  const { data: categoryData } = useLaboratoryTestCategoriesQuery();
+  // const { data: categoryData } = useLaboratoryTestCategoriesQuery();
+  const { categories: categoriesContext } = useContext(SettingsContext);
   const { data, loading } = useLaboratoryExaminationQuery({
     variables: {
       id: queryId
@@ -82,59 +84,27 @@ const CompleteLaboratoryExaminationFormView = () => {
   ] = useSaveLaboratoryExaminationMutation({ onError: err => console.error });
 
   useEffect(() => {
-    if (!categoryData) return;
-    const y: LaboratoryCategoriesWithTestValue[] = categoryData.laboratoryTestCategories.map(
-      category => ({
+    if (!categoriesContext) return;
+    setCategories(
+      categoriesContext.map(category => ({
         ...category,
         laboratoryTests: []
-      })
-    );
-    console.log(y, 'y');
-    setLabCategories(y);
-    console.log(labCategories, categoryData);
-  }, [categoryData]);
-  useEffect(() => {
-    if (!data) return;
-    console.log(data, 'dataa');
-    // data.laboratoryExamination.laboratoryTestRequests?.forEach(
-    //   laboratoryTestRequest => {
-    //     setLabCategories(prevCateogries =>
-    //       prevCateogries?.map((prevLabCategory, index) => {
-    //         console.log(prevCateogries, 'perv category');
-    //         if (
-    //           categoryData?.laboratoryTestCategories
-    //             .find(({ name }) => name === prevLabCategory.name)
-    //             ?.laboratoryTests.find(
-    //               ({ id }) => id === laboratoryTestRequest.laboratoryTest.id
-    //             )
-    //         ) {
-    //           return {
-    //             ...prevLabCategory,
-
-    //             laboratoryTests: [
-    //               ...prevLabCategory.laboratoryTests,
-    //               {
-    //                 ...laboratoryTestRequest.laboratoryTest,
-    //                 value: laboratoryTestRequest.value || '',
-    //                 laboratoryRequestId: laboratoryTestRequest.id
-    //               }
-    //             ]
-    //           };
-    //         }
-    //         return { ...prevLabCategory };
-    //       })
-    //     );
-    //   }
-    // );
-    setLabCategories(prevLabCategories =>
-      prevLabCategories?.map(category => ({
-        ...category,
-        laboratoryTests: data.laboratoryExamination.laboratoryTests.map(
-          test => ({ ...test, value: '' })
-        )
       }))
     );
-    setLabCategories(prevLabCategories =>
+  }, [categoriesContext]);
+
+  useEffect(() => {
+    console.log(data);
+    if (!data) return;
+    setCategories(prevLabCategories =>
+      prevLabCategories?.map(category => ({
+        ...category,
+        laboratoryTests: data.laboratoryExamination.laboratoryTests
+          .filter(test => test.category?.name === category.name)
+          .map(test => ({ ...test, value: '' }))
+      }))
+    );
+    setCategories(prevLabCategories =>
       prevLabCategories?.filter(category => category.laboratoryTests.length > 0)
     );
   }, [data, loading]);
@@ -142,9 +112,9 @@ const CompleteLaboratoryExaminationFormView = () => {
   const handleSubmit:
     | React.FormEventHandler<HTMLFormElement>
     | undefined = event => {
-    if (!labCategories) return;
+    if (!categories) return;
     event.preventDefault();
-    const labTests = labCategories
+    const labTests = categories
       .map(category => category.laboratoryTests)
       .flat()
       .map(({ id, value }) => ({
@@ -162,15 +132,13 @@ const CompleteLaboratoryExaminationFormView = () => {
         }
       ]
     });
-    setLabCategories(undefined);
+    setCategories(undefined);
     history.push('/app/data/laboratory-test');
   };
 
-  const handleSave:
-    | React.MouseEventHandler<HTMLButtonElement>
-    | undefined = event => {
-    if (!labCategories) return;
-    const labTests = labCategories
+  const handleSave = () => {
+    if (!categories) return;
+    const labTests = categories
       .map(category => category.laboratoryTests)
       .flat()
       .map(({ id, value }) => ({
@@ -188,7 +156,7 @@ const CompleteLaboratoryExaminationFormView = () => {
         }
       ]
     });
-    setLabCategories(undefined);
+    setCategories(undefined);
     history.push('/app/data/laboratory-test');
   };
 
@@ -229,8 +197,8 @@ const CompleteLaboratoryExaminationFormView = () => {
             <Divider />
           </Card>
           <Grid container>
-            {labCategories &&
-              labCategories.map((category, index) => (
+            {categories &&
+              categories.map((category, index) => (
                 <Grid key={index} item md={6} xs={12}>
                   <Accordion disabled={!category} sx={{ borderRadius: 'none' }}>
                     <AccordionSummary
@@ -246,7 +214,7 @@ const CompleteLaboratoryExaminationFormView = () => {
                           <SingleAccordion
                             categoryName={category.name}
                             laboratoryTest={test}
-                            setLabCategories={setLabCategories}
+                            setLabCategories={setCategories}
                           />
                         ))}
                       </Grid>
@@ -254,29 +222,6 @@ const CompleteLaboratoryExaminationFormView = () => {
                   </Accordion>
                 </Grid>
               ))}
-            {/* {Object.keys(categories).map((category, index) => {
-            const categorySelected = tests?.filter(
-              field => field.category === category && field.name
-            );
-            return (
-              categorySelected &&
-              categorySelected[0] && (
-                <Grid
-                  key={index}
-                  item
-                  md={category === 'Clinical Chemistry' ? 12 : 6}
-                  xs={12}
-                >
-                  <form onSubmit={e => e.preventDefault()}>
-                    <SingleAccordion
-                      category={category}
-                      testsState={{ tests, setExaminations }}
-                    />
-                  </form>
-                </Grid>
-              )
-            );
-          })} */}
           </Grid>
 
           <Divider />

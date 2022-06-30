@@ -76,12 +76,16 @@ const MedicineAccordion = () => {
             {loading && '...Loading'}
             {!data?.medicines
               ? 'No results Add New Medicines'
-              : data.medicines.map((medicine, index) => (
-                  <SinglePrescriptionRate
-                    key={index}
-                    medicine={{ ...medicine }}
-                  />
-                ))}
+              : [...data.medicines]
+                  .sort(
+                    (a, b) => parseInt(a.created_at) - parseInt(b.created_at)
+                  )
+                  .map((medicine, index) => (
+                    <SinglePrescriptionRate
+                      key={index}
+                      medicine={{ ...medicine }}
+                    />
+                  ))}
           </List>
         </AccordionDetails>
         <AccordionSummary>

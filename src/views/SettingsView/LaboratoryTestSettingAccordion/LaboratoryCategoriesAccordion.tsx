@@ -52,6 +52,7 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Box
               width="100%"
+              height="60px"
               sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -60,7 +61,14 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
             >
               <Box>
                 <Typography variant="h6">{category.name}</Typography>
-                <Typography variant="body2">{category.price}</Typography>
+                {category.price && (
+                  <Typography variant="body2">{category.price}birr</Typography>
+                )}
+                {category.trackInStock && (
+                  <Typography variant="body2">
+                    {category.inStock} in stock
+                  </Typography>
+                )}
               </Box>
               <IconButton
                 onClick={e => {

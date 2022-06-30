@@ -10,6 +10,9 @@ query LaboratoryExamination($id: ID!) {
       id
       name
       normalValue
+      category {
+        name
+      }
       commonValues
       price
       hasPrice
