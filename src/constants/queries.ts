@@ -58,20 +58,8 @@ export const medicalCertificateQuery = (
 ) =>
   `/app/form/medical/certificate?id=${id}&name=${name}&gender=${gender}&age=${age}`;
 
-export const quickPrescribeQuery = (props: {
-  id: string;
-  name: string;
-  bp: boolean;
-  dressing: boolean;
-  injection: boolean;
-  tat: boolean;
-  depo: boolean;
-}) => `/app/form/quick-prescription-test?${joinQueryies(props)}`;
+export const quickPrescribeQuery = ({ id }: { id: string }) =>
+  `/app/form/quick-prescription-test?id=${id}`;
 
-export const quickLabTest = (props: {
-  id: string;
-  name: string;
-  fbs: boolean;
-  hcg: boolean;
-  rbs: boolean;
-}) => `/app/form/quick-laboratory-test?${joinQueryies(props)}`;
+export const quickLabTest = ({ id }: { id: string }) =>
+  `/app/form/quick-laboratory-test?id=${id}`;

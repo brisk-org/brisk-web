@@ -8,12 +8,14 @@ import {
   Dialog,
   Button,
   Box,
-  colors,
+  colors
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { AttachMoney, Close } from '@mui/icons-material';
-import { useMarkQuickLaboratoryTestAsPaidMutation } from '../../../generated/graphql';
-import { QuickLabTestType } from '../../../@types/QuickLaboratoryTests';
+import {
+  QuickLaboratoryExaminationsQuery,
+  useMarkQuickLaboratoryExaminationAsPaidMutation
+} from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -35,7 +37,7 @@ const useStyles = makeStyles(theme => ({
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  labTest: QuickLabTestType;
+  labTest: QuickLaboratoryExaminationsQuery['quickLaboratoryExaminations'][0];
 }
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,
@@ -44,7 +46,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   const classes = useStyles();
 
-  const [markQuickLabTestAsPaid] = useMarkQuickLaboratoryTestAsPaidMutation({
+  const [
+    markQuickLabTestAsPaid
+  ] = useMarkQuickLaboratoryExaminationAsPaidMutation({
     onError: err => console.log(err)
   });
 

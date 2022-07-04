@@ -1,17 +1,24 @@
-mutation CompleteQuickPrescriptionTest(
+mutation CompleteQuickLaboratoryExamination(
   $id: String!
   $price: Float
   $other: String
 ) {
-  completeQuickPrescriptionTest(
+  completeQuickLaboratoryExamination(
     id: $id
     input: { price: $price, other: $other }
   ) {
     id
     name
     price
+    paid
+    completed
+    new
     result
-    other
+    tests {
+      id
+      name
+    }
     created_at
+    updated_at
   }
 }

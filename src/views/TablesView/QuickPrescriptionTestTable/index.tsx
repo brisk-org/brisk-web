@@ -4,11 +4,10 @@ import { Box, Container } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../../components/Page';
 import {
-  NewCreatedQuickPrescriptionTestDocument,
+  NewCreatedQuickPrescriptionDocument,
   Occupation,
-  QuickPrescriptionTestsQuery,
-  useQuickPrescriptionTestsCountQuery,
-  useQuickPrescriptionTestsQuery
+  useQuickPrescriptionCountQuery,
+  useQuickPrescriptionsQuery
 } from '../../../generated/graphql';
 import MainContainerTable from '../../../components/MainContainerTable';
 import SingleQuickPrescriptionTestRow from './SingleQuickPrescriptionTestRow';
@@ -30,69 +29,67 @@ const QuickPrescriptionTestTableView = () => {
 
   const [skip, setSkip] = useState(0);
   const [take, setTake] = useState(10);
-  const [quickPrescriptions, setQuickPrescriptions] = useState<
-    QuickPrescriptionTestsQuery
-  >();
+  // const [quickPrescriptions, setQuickPrescriptions] = useState<
+  //   QuickPrescriptionTestsQuery
+  // >();
 
-  const { data: countData } = useQuickPrescriptionTestsCountQuery();
+  const { data: countData } = useQuickPrescriptionCountQuery();
 
   const {
-    data: quickPrescriptionsData,
+    data,
     loading: quickPrescriptionsLoading,
     subscribeToMore
-  } = useQuickPrescriptionTestsQuery({
+  } = useQuickPrescriptionsQuery({
     variables: { skip, take },
     fetchPolicy: firstRender.current ? 'cache-first' : 'network-only'
   });
 
   subscribeToMore({
-    document: NewCreatedQuickPrescriptionTestDocument,
+    document: NewCreatedQuickPrescriptionDocument,
     updateQuery: (prev, { subscriptionData }) => {
       const newQuickPrescriptionTest = subscriptionData.data;
       if (!newQuickPrescriptionTest) return prev;
 
       return Object.assign({}, prev, {
-        quickPrescriptionTests: prev.quickPrescriptionTests
-          ? [newQuickPrescriptionTest, ...prev.quickPrescriptionTests]
+        quickPrescriptionTests: prev.quickPrescriptions
+          ? [newQuickPrescriptionTest, ...prev.quickPrescriptions]
           : [newQuickPrescriptionTest]
       });
     },
     onError: err => console.log(err)
   });
 
-  useEffect(() => {
-    setQuickPrescriptions(quickPrescriptionsData);
-  }, [quickPrescriptionsData]);
+  // useEffect(() => {
+  //   setQuickPrescriptions(quickPrescriptionsData);
+  // }, [quickPrescriptionsData]);
 
   return (
     <Page className={classes.root} title="Prescription Test">
       <Container ref={firstRender} maxWidth={false}>
         <Box mt={3}>
-          {!quickPrescriptions?.quickPrescriptionTests[0] && 'No result'}
+          {!data?.quickPrescriptions[0] && 'No result'}
           {quickPrescriptionsLoading && 'Loading...'}
-          {quickPrescriptions?.quickPrescriptionTests && (
+          {data?.quickPrescriptions && (
             <MainContainerTable
-              count={countData?.quickPrescriptionTestsCount}
+              count={countData?.quickPrescriptionCount}
               skipState={{ skip, setSkip }}
               takeState={{ take, setTake }}
             >
-              {quickPrescriptions.quickPrescriptionTests.map(
-                (quickPrescriptionTest, index) => {
-                  return occupation === Occupation.Reception ? (
-                    !quickPrescriptionTest.paid && (
-                      <SingleQuickPrescriptionTestRow
-                        key={index}
-                        prescription={quickPrescriptionTest}
-                      />
-                    )
-                  ) : (
+              {data.quickPrescriptions.map((quickPrescriptionTest, index) => {
+                return occupation === Occupation.Reception ? (
+                  !quickPrescriptionTest.paid && (
                     <SingleQuickPrescriptionTestRow
                       key={index}
                       prescription={quickPrescriptionTest}
                     />
-                  );
-                }
-              )}
+                  )
+                ) : (
+                  <SingleQuickPrescriptionTestRow
+                    key={index}
+                    prescription={quickPrescriptionTest}
+                  />
+                );
+              })}
             </MainContainerTable>
           )}
         </Box>

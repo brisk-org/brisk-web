@@ -1,0 +1,17 @@
+query QuickPrescription($id: ID!) {
+  quickPrescription(id: $id) {
+    id
+    name
+    price
+    paid
+    completed
+    new
+    medicines {
+      id
+      name
+    }
+    other
+    created_at
+    updated_at
+  }
+}

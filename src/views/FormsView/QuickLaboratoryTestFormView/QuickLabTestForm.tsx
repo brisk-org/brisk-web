@@ -13,9 +13,9 @@ import {
   TextField
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { QuickLabTest } from '.';
+import { QuickLabExamination } from '.';
 
-import SingleQuickLabTestForm from './SingleQuickLabTestForm';
+import QuickLaboratoryTestField from './QuickLaboratoryTestField';
 import { AuthContext } from '../../../context/AuthContext';
 import { Occupation } from '../../../generated/graphql';
 
@@ -33,8 +33,8 @@ const useStyles = makeStyles(() => ({
 interface PrescriptionFormProps {
   isQueried: boolean;
   qLabTestState: {
-    qLabTest: QuickLabTest;
-    setQLabTest: React.Dispatch<React.SetStateAction<QuickLabTest>>;
+    qLabTest: QuickLabExamination;
+    setQLabTest: React.Dispatch<React.SetStateAction<QuickLabExamination>>;
   };
 }
 
@@ -47,28 +47,29 @@ const QuickLabTestForm: React.FC<PrescriptionFormProps> = ({
   const { occupation } = useContext(AuthContext);
 
   const componentRef = useRef(null);
-  const handleChange:
+  const handleCheckboxClick:
     | ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void)
     | undefined = (event, checked) => {
     const name = event.target.name;
-    setQLabTest(prevPresc => ({
-      ...prevPresc,
-      [name]: { selected: checked, price: 0 }
+    setQLabTest(prevExamination => ({
+      ...prevExamination,
+      tests: prevExamination.tests.map(test =>
+        test.name === name ? { ...test, selected: checked } : { ...test }
+      )
     }));
   };
-  const handleFieldChange:
+  const handlePriceChange:
     | React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
     | undefined = event => {
     const name = event.target.name;
-    name === 'other' || name === 'name'
-      ? setQLabTest(prevPresc => ({
-          ...prevPresc,
-          [name]: event.target.value
-        }))
-      : setQLabTest(prevPresc => ({
-          ...prevPresc,
-          [name]: { price: Number(event.target.value), selected: true }
-        }));
+    setQLabTest(prevExamination => ({
+      ...prevExamination,
+      tests: prevExamination.tests.map(test =>
+        test.name === name
+          ? { ...test, price: parseInt(event.target.value) }
+          : { ...test }
+      )
+    }));
   };
   return (
     <>
@@ -79,7 +80,7 @@ const QuickLabTestForm: React.FC<PrescriptionFormProps> = ({
               <Typography variant="h5">Quick Emergency Lab Test</Typography>
               {!isQueried && occupation === Occupation.Laboratory && (
                 <Typography color="error" variant="body1">
-                  Please Go to Emergency Laboratory table and Select Test
+                  Please Go to Emergency Laboratory table and Pick a Test
                 </Typography>
               )}
             </>
@@ -93,34 +94,34 @@ const QuickLabTestForm: React.FC<PrescriptionFormProps> = ({
                 <Typography variant="h6">Name: {qLabTest.name}</Typography>
               ) : (
                 <TextField
-                  name="name"
-                  onChange={handleFieldChange}
+                  onChange={e =>
+                    setQLabTest(prevExamination => ({
+                      ...prevExamination,
+                      name: e.target.value
+                    }))
+                  }
                   value={qLabTest.name}
                   label="Name"
                   required
                 />
               )}
             </Grid>
-            {Object.entries(qLabTest).map(([key, value]: any) => {
-              if (!value || key === 'id' || key === 'other' || key === 'name')
-                return null;
-              if (occupation === Occupation.Laboratory && !value.selected)
-                return null;
-
-              return (
-                <Grid item md={4} sm={12}>
-                  <SingleQuickLabTestForm
-                    singleDetail={{
-                      name: key,
-                      price: value.price,
-                      selected: value.selected
-                    }}
-                    handleChange={handleChange}
-                    handleFieldChange={handleFieldChange}
-                  />
-                </Grid>
-              );
-            })}
+            {qLabTest.tests.map(
+              test =>
+                !(occupation === Occupation.Laboratory && !test.selected) && (
+                  <Grid item md={4} sm={12}>
+                    <QuickLaboratoryTestField
+                      test={{
+                        name: test.name,
+                        price: test.price,
+                        selected: test.selected
+                      }}
+                      handleCheckboxClick={handleCheckboxClick}
+                      handleChange={handlePriceChange}
+                    />
+                  </Grid>
+                )
+            )}
             {occupation === Occupation.Laboratory && (
               <Grid item md={12} xs={12}>
                 <TextareaAutosize
@@ -128,8 +129,13 @@ const QuickLabTestForm: React.FC<PrescriptionFormProps> = ({
                   minRows={6}
                   name="other"
                   placeholder="Other Detail"
-                  onChange={handleFieldChange}
-                  value={qLabTest.other}
+                  onChange={e =>
+                    setQLabTest(prevExamination => ({
+                      ...prevExamination,
+                      other: e.target.value
+                    }))
+                  }
+                  value={qLabTest.other || ''}
                 />
               </Grid>
             )}

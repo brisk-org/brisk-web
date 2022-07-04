@@ -1,0 +1,18 @@
+query QuickLaboratoryExamination($id: ID!) {
+  quickLaboratoryExamination(id: $id) {
+    id
+    name
+    price
+    paid
+    completed
+    new
+    result
+    tests {
+      id
+      name
+    }
+    other
+    created_at
+    updated_at
+  }
+}

@@ -1,0 +1,17 @@
+mutation CompleteQuickPrescription(
+  $id: String!
+  $price: Float
+  $other: String
+) {
+  completeQuickPrescription(id: $id, input: { price: $price, other: $other }) {
+    id
+    name
+    price
+    medicines {
+      id
+      name
+    }
+    other
+    created_at
+  }
+}

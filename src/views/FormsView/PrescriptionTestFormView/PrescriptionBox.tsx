@@ -93,7 +93,7 @@ const PrescriptionBox: React.FC<Props> = ({
                 {/* {medicine.price *
                   medicineEdit.forDays *
                   (medicine.perDay === 'BID' ? 2 : 1)} */}
-                birr
+                birr lasjdflksdjflksdjflkjsdkl
               </Typography>
             }
           />

@@ -1,0 +1,17 @@
+query QuickPrescriptions($skip: Float!, $take: Float!) {
+  quickPrescriptions(skip: $skip, take: $take) {
+    id
+    name
+    price
+    paid
+    completed
+    new
+    medicines {
+      id
+      name
+    }
+    other
+    created_at
+    updated_at
+  }
+}

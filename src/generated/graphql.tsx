@@ -117,14 +117,15 @@ export type CreateMedicationsInput = {
 export type CreateQuickLabTestInput = {
   name: Scalars['String'];
   price?: Maybe<Scalars['Float']>;
-  result: Scalars['String'];
+  testIds: Array<Scalars['ID']>;
+  result?: Maybe<QuickLaboratoryExaminationResult>;
   other?: Maybe<Scalars['String']>;
 };
 
 export type CreateQuickPrescriptionTestInput = {
   name: Scalars['String'];
   price?: Maybe<Scalars['Float']>;
-  result: QuickPrescriptionTestResults;
+  medicineIds: Array<Scalars['ID']>;
   other?: Maybe<Scalars['String']>;
 };
 
@@ -140,7 +141,6 @@ export type History = {
   cardId: Scalars['Float'];
   card: Card;
   result: Scalars['String'];
-  file_path?: Maybe<Array<Scalars['String']>>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
@@ -310,14 +310,14 @@ export type Mutation = {
   deletePrescription: Scalars['Boolean'];
   markPrescriptionAsSeen: Prescription;
   deleteMedication: Scalars['Boolean'];
-  createQuickPrescriptionTest: QuickPrescriptionTest;
-  completeQuickPrescriptionTest: QuickPrescriptionTest;
-  markQuickPrescriptionTestAsPaid: QuickPrescriptionTest;
-  markQuickPrescriptionTestAsSeen: QuickPrescriptionTest;
-  createQuickLaboratoryTest: QuickLaboratoryTest;
-  completeQuickLaboratoryTest: QuickLaboratoryTest;
-  markQuickLaboratoryTestAsPaid: QuickLaboratoryTest;
-  markQuickLaboratoryTestAsSeen: QuickLaboratoryTest;
+  createQuickPrescription: QuickPrescription;
+  completeQuickPrescription: QuickPrescription;
+  markQuickPrescriptionAsPaid: QuickPrescription;
+  markQuickPrescriptionAsSeen: QuickPrescription;
+  createQuickLaboratoryExamination: QuickLaboratoryExamination;
+  completeQuickLaboratoryExamination: QuickLaboratoryExamination;
+  markQuickLaboratoryExaminationAsPaid: QuickLaboratoryExamination;
+  markQuickLaboratoryExaminationAsSeen: QuickLaboratoryExamination;
   deleteNotification: Scalars['Boolean'];
   clearNotification: Scalars['Boolean'];
 };
@@ -570,44 +570,44 @@ export type MutationDeleteMedicationArgs = {
 };
 
 
-export type MutationCreateQuickPrescriptionTestArgs = {
+export type MutationCreateQuickPrescriptionArgs = {
   input: CreateQuickPrescriptionTestInput;
 };
 
 
-export type MutationCompleteQuickPrescriptionTestArgs = {
+export type MutationCompleteQuickPrescriptionArgs = {
   id: Scalars['String'];
   input: CompleteQuickPrescriptionTestInput;
 };
 
 
-export type MutationMarkQuickPrescriptionTestAsPaidArgs = {
+export type MutationMarkQuickPrescriptionAsPaidArgs = {
   id: Scalars['ID'];
 };
 
 
-export type MutationMarkQuickPrescriptionTestAsSeenArgs = {
+export type MutationMarkQuickPrescriptionAsSeenArgs = {
   id: Scalars['ID'];
 };
 
 
-export type MutationCreateQuickLaboratoryTestArgs = {
+export type MutationCreateQuickLaboratoryExaminationArgs = {
   input: CreateQuickLabTestInput;
 };
 
 
-export type MutationCompleteQuickLaboratoryTestArgs = {
+export type MutationCompleteQuickLaboratoryExaminationArgs = {
   id: Scalars['String'];
   input: CompleteQuickLabTestInput;
 };
 
 
-export type MutationMarkQuickLaboratoryTestAsPaidArgs = {
+export type MutationMarkQuickLaboratoryExaminationAsPaidArgs = {
   id: Scalars['ID'];
 };
 
 
-export type MutationMarkQuickLaboratoryTestAsSeenArgs = {
+export type MutationMarkQuickLaboratoryExaminationAsSeenArgs = {
   id: Scalars['ID'];
 };
 
@@ -625,8 +625,8 @@ export type Notification = {
   card?: Maybe<Card>;
   laboratory_test?: Maybe<LaboratoryExamination>;
   prescription?: Maybe<Prescription>;
-  quick_prescription_test?: Maybe<QuickPrescriptionTest>;
-  quick_laboratory_test?: Maybe<QuickLaboratoryTest>;
+  quick_prescription_test?: Maybe<QuickPrescription>;
+  quick_laboratory_test?: Maybe<QuickLaboratoryExamination>;
   created_at: Scalars['String'];
 };
 
@@ -698,10 +698,14 @@ export type Query = {
   medicationCount: Scalars['Float'];
   medications: Array<Medication>;
   medication: Medication;
-  quickPrescriptionTestsCount: Scalars['Float'];
-  quickPrescriptionTests: Array<QuickPrescriptionTest>;
-  quickLaboratoryTestsCount: Scalars['Float'];
+  quickPrescriptionCount: Scalars['Float'];
+  quickPrescription: Array<QuickPrescription>;
+  quickPrescriptions: Array<QuickPrescription>;
+  quickLaboratoryExaminationCount: Scalars['Float'];
+  quickLaboratoryExaminations: Array<QuickLaboratoryExamination>;
+  quickLaboratoryExamination: QuickLaboratoryExamination;
   quickLaboratoryTests: Array<QuickLaboratoryTest>;
+  quickMedicines: Array<QuickMedicine>;
   notifications: Array<Notification>;
 };
 
@@ -788,7 +792,12 @@ export type QueryMedicationArgs = {
 };
 
 
-export type QueryQuickPrescriptionTestsArgs = {
+export type QueryQuickPrescriptionArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryQuickPrescriptionsArgs = {
   skip: Scalars['Float'];
   take: Scalars['Float'];
   from?: Maybe<Scalars['String']>;
@@ -796,30 +805,59 @@ export type QueryQuickPrescriptionTestsArgs = {
 };
 
 
-export type QueryQuickLaboratoryTestsArgs = {
+export type QueryQuickLaboratoryExaminationsArgs = {
   skip: Scalars['Float'];
   take: Scalars['Float'];
   from?: Maybe<Scalars['String']>;
   to?: Maybe<Scalars['String']>;
 };
+
+
+export type QueryQuickLaboratoryExaminationArgs = {
+  id: Scalars['ID'];
+};
+
+export type QuickLaboratoryExamination = {
+  __typename?: 'QuickLaboratoryExamination';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  notifications?: Maybe<Array<Notification>>;
+  price: Scalars['Float'];
+  completed: Scalars['Boolean'];
+  new: Scalars['Boolean'];
+  paid: Scalars['Boolean'];
+  tests: Array<QuickLaboratoryTest>;
+  result?: Maybe<QuickLaboratoryExaminationResult>;
+  other?: Maybe<Scalars['String']>;
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
+};
+
+export enum QuickLaboratoryExaminationResult {
+  Positive = 'POSITIVE',
+  Negative = 'NEGATIVE'
+}
 
 export type QuickLaboratoryTest = {
   __typename?: 'QuickLaboratoryTest';
   id: Scalars['ID'];
   name: Scalars['String'];
-  notifications?: Maybe<Array<Notification>>;
-  price: Scalars['Float'];
-  completed: Scalars['Boolean'];
-  new: Scalars['Boolean'];
-  paid: Scalars['Boolean'];
-  result: Scalars['String'];
-  other?: Maybe<Scalars['String']>;
+  examination?: Maybe<QuickLaboratoryTest>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
 
-export type QuickPrescriptionTest = {
-  __typename?: 'QuickPrescriptionTest';
+export type QuickMedicine = {
+  __typename?: 'QuickMedicine';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  prescription: Array<QuickPrescription>;
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
+};
+
+export type QuickPrescription = {
+  __typename?: 'QuickPrescription';
   id: Scalars['ID'];
   name: Scalars['String'];
   notifications?: Maybe<Array<Notification>>;
@@ -827,19 +865,10 @@ export type QuickPrescriptionTest = {
   completed: Scalars['Boolean'];
   new: Scalars['Boolean'];
   paid: Scalars['Boolean'];
-  result: Scalars['String'];
+  medicines: Array<QuickMedicine>;
   other?: Maybe<Scalars['String']>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
-};
-
-export type QuickPrescriptionTestResults = {
-  bp: Scalars['Boolean'];
-  dressing: Scalars['Boolean'];
-  injection: Scalars['Boolean'];
-  tat: Scalars['Boolean'];
-  depo: Scalars['Boolean'];
-  other?: Maybe<Scalars['String']>;
 };
 
 export type Settings = {
@@ -859,8 +888,8 @@ export type Subscription = {
   newCreatedCard: Card;
   newMedicationUpdate: Prescription;
   newCreatedPrescription: Prescription;
-  newCreatedQuickPrescriptionTest: QuickPrescriptionTest;
-  newCreatedQuickLaboratoryTest: QuickLaboratoryTest;
+  newCreatedQuickPrescription: QuickPrescription;
+  newCreatedQuickLaboratoryExamination: QuickLaboratoryExamination;
   newNotificationSubscription: Notification;
   deleteNotificationSubscription: Notification;
 };
@@ -1402,117 +1431,134 @@ export type UpdatePrescriptionCheckInMutation = (
   ) }
 );
 
-export type CompleteQuickLaboratoryTestMutationVariables = Exact<{
+export type CompleteQuickLaboratoryExaminationMutationVariables = Exact<{
   id: Scalars['String'];
   price?: Maybe<Scalars['Float']>;
   other?: Maybe<Scalars['String']>;
 }>;
 
 
-export type CompleteQuickLaboratoryTestMutation = (
+export type CompleteQuickLaboratoryExaminationMutation = (
   { __typename?: 'Mutation' }
-  & { completeQuickLaboratoryTest: (
-    { __typename?: 'QuickLaboratoryTest' }
-    & Pick<QuickLaboratoryTest, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'created_at' | 'updated_at'>
+  & { completeQuickLaboratoryExamination: (
+    { __typename?: 'QuickLaboratoryExamination' }
+    & Pick<QuickLaboratoryExamination, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'created_at' | 'updated_at'>
+    & { tests: Array<(
+      { __typename?: 'QuickLaboratoryTest' }
+      & Pick<QuickLaboratoryTest, 'id' | 'name'>
+    )> }
   ) }
 );
 
-export type CreateQuickLaboratoryTestMutationVariables = Exact<{
+export type CreateQuickLaboratoryExaminationMutationVariables = Exact<{
   name: Scalars['String'];
   price?: Maybe<Scalars['Float']>;
-  result: Scalars['String'];
+  testIds: Array<Scalars['ID']> | Scalars['ID'];
+  result?: Maybe<QuickLaboratoryExaminationResult>;
   other?: Maybe<Scalars['String']>;
 }>;
 
 
-export type CreateQuickLaboratoryTestMutation = (
+export type CreateQuickLaboratoryExaminationMutation = (
   { __typename?: 'Mutation' }
-  & { createQuickLaboratoryTest: (
-    { __typename?: 'QuickLaboratoryTest' }
-    & Pick<QuickLaboratoryTest, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'created_at' | 'updated_at'>
+  & { createQuickLaboratoryExamination: (
+    { __typename?: 'QuickLaboratoryExamination' }
+    & Pick<QuickLaboratoryExamination, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'created_at' | 'updated_at'>
+    & { tests: Array<(
+      { __typename?: 'QuickLaboratoryTest' }
+      & Pick<QuickLaboratoryTest, 'id' | 'name'>
+    )> }
   ) }
 );
 
-export type MarkQuickLaboratoryTestAsPaidMutationVariables = Exact<{
+export type MarkQuickLaboratoryExaminationAsPaidMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type MarkQuickLaboratoryTestAsPaidMutation = (
+export type MarkQuickLaboratoryExaminationAsPaidMutation = (
   { __typename?: 'Mutation' }
-  & { markQuickLaboratoryTestAsPaid: (
-    { __typename?: 'QuickLaboratoryTest' }
-    & Pick<QuickLaboratoryTest, 'id' | 'paid'>
+  & { markQuickLaboratoryExaminationAsPaid: (
+    { __typename?: 'QuickLaboratoryExamination' }
+    & Pick<QuickLaboratoryExamination, 'id' | 'paid'>
   ) }
 );
 
-export type MarkQuickLaboratoryTestAsSeenMutationVariables = Exact<{
+export type MarkQuickLaboratoryExaminationAsSeenMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type MarkQuickLaboratoryTestAsSeenMutation = (
+export type MarkQuickLaboratoryExaminationAsSeenMutation = (
   { __typename?: 'Mutation' }
-  & { markQuickLaboratoryTestAsSeen: (
-    { __typename?: 'QuickLaboratoryTest' }
-    & Pick<QuickLaboratoryTest, 'id' | 'new'>
+  & { markQuickLaboratoryExaminationAsSeen: (
+    { __typename?: 'QuickLaboratoryExamination' }
+    & Pick<QuickLaboratoryExamination, 'id' | 'new'>
   ) }
 );
 
-export type CompleteQuickPrescriptionTestMutationVariables = Exact<{
+export type CompleteQuickPrescriptionMutationVariables = Exact<{
   id: Scalars['String'];
   price?: Maybe<Scalars['Float']>;
   other?: Maybe<Scalars['String']>;
 }>;
 
 
-export type CompleteQuickPrescriptionTestMutation = (
+export type CompleteQuickPrescriptionMutation = (
   { __typename?: 'Mutation' }
-  & { completeQuickPrescriptionTest: (
-    { __typename?: 'QuickPrescriptionTest' }
-    & Pick<QuickPrescriptionTest, 'id' | 'name' | 'price' | 'result' | 'other' | 'created_at'>
+  & { completeQuickPrescription: (
+    { __typename?: 'QuickPrescription' }
+    & Pick<QuickPrescription, 'id' | 'name' | 'price' | 'other' | 'created_at'>
+    & { medicines: Array<(
+      { __typename?: 'QuickMedicine' }
+      & Pick<QuickMedicine, 'id' | 'name'>
+    )> }
   ) }
 );
 
-export type CreateQuickPrescriptionTestMutationVariables = Exact<{
+export type CreateQuickPrescriptionMutationVariables = Exact<{
   name: Scalars['String'];
-  result: QuickPrescriptionTestResults;
+  medicineIds: Array<Scalars['ID']> | Scalars['ID'];
   price?: Maybe<Scalars['Float']>;
   other?: Maybe<Scalars['String']>;
 }>;
 
 
-export type CreateQuickPrescriptionTestMutation = (
+export type CreateQuickPrescriptionMutation = (
   { __typename?: 'Mutation' }
-  & { createQuickPrescriptionTest: (
-    { __typename?: 'QuickPrescriptionTest' }
-    & Pick<QuickPrescriptionTest, 'id' | 'name' | 'price' | 'result' | 'other' | 'created_at'>
+  & { createQuickPrescription: (
+    { __typename?: 'QuickPrescription' }
+    & Pick<QuickPrescription, 'id' | 'name' | 'price' | 'other' | 'created_at'>
+    & { medicines: Array<(
+      { __typename?: 'QuickMedicine' }
+      & Pick<QuickMedicine, 'id' | 'name'>
+    )> }
   ) }
 );
 
-export type MarkQuickPrescriptionTestAsPaidMutationVariables = Exact<{
+export type MarkQuickPrescriptionAsPaidMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type MarkQuickPrescriptionTestAsPaidMutation = (
+export type MarkQuickPrescriptionAsPaidMutation = (
   { __typename?: 'Mutation' }
-  & { markQuickPrescriptionTestAsPaid: (
-    { __typename?: 'QuickPrescriptionTest' }
-    & Pick<QuickPrescriptionTest, 'id' | 'paid'>
+  & { markQuickPrescriptionAsPaid: (
+    { __typename?: 'QuickPrescription' }
+    & Pick<QuickPrescription, 'id' | 'paid'>
   ) }
 );
 
-export type MarkQuickPrescriptionTestAsSeenMutationVariables = Exact<{
+export type MarkQuickPrescriptionAsSeenMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type MarkQuickPrescriptionTestAsSeenMutation = (
+export type MarkQuickPrescriptionAsSeenMutation = (
   { __typename?: 'Mutation' }
-  & { markQuickPrescriptionTestAsSeen: (
-    { __typename?: 'QuickPrescriptionTest' }
-    & Pick<QuickPrescriptionTest, 'id' | 'new'>
+  & { markQuickPrescriptionAsSeen: (
+    { __typename?: 'QuickPrescription' }
+    & Pick<QuickPrescription, 'id' | 'new'>
   ) }
 );
 
@@ -1955,11 +2001,11 @@ export type NotificationsQuery = (
         & Pick<Card, 'id' | 'name'>
       ) }
     )>, quick_laboratory_test?: Maybe<(
-      { __typename?: 'QuickLaboratoryTest' }
-      & Pick<QuickLaboratoryTest, 'id' | 'name'>
+      { __typename?: 'QuickLaboratoryExamination' }
+      & Pick<QuickLaboratoryExamination, 'id' | 'name'>
     )>, quick_prescription_test?: Maybe<(
-      { __typename?: 'QuickPrescriptionTest' }
-      & Pick<QuickPrescriptionTest, 'id' | 'name'>
+      { __typename?: 'QuickPrescription' }
+      & Pick<QuickPrescription, 'id' | 'name'>
     )> }
   )> }
 );
@@ -2006,7 +2052,7 @@ export type PrescriptionsForDashboardQuery = (
   { __typename?: 'Query' }
   & { prescriptions: Array<(
     { __typename?: 'Prescription' }
-    & Pick<Prescription, 'id' | 'paid' | 'price' | 'updated_at'>
+    & Pick<Prescription, 'id' | 'paid' | 'inrolled' | 'price' | 'updated_at'>
     & { medications?: Maybe<Array<(
       { __typename?: 'Medication' }
       & { checkIn: Array<(
@@ -2086,75 +2132,128 @@ export type SearchPrescriptionsQuery = (
   )> }
 );
 
-export type QuickLaboratoryTestsQueryVariables = Exact<{
+export type QuickLaboratoryExaminationQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type QuickLaboratoryExaminationQuery = (
+  { __typename?: 'Query' }
+  & { quickLaboratoryExamination: (
+    { __typename?: 'QuickLaboratoryExamination' }
+    & Pick<QuickLaboratoryExamination, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'other' | 'created_at' | 'updated_at'>
+    & { tests: Array<(
+      { __typename?: 'QuickLaboratoryTest' }
+      & Pick<QuickLaboratoryTest, 'id' | 'name'>
+    )> }
+  ) }
+);
+
+export type QuickLaboratoryExaminationCountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type QuickLaboratoryExaminationCountQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'quickLaboratoryExaminationCount'>
+);
+
+export type QuickLaboratoryExaminationsForDashboardQueryVariables = Exact<{
   skip: Scalars['Float'];
   take: Scalars['Float'];
 }>;
+
+
+export type QuickLaboratoryExaminationsForDashboardQuery = (
+  { __typename?: 'Query' }
+  & { quickLaboratoryExaminations: Array<(
+    { __typename?: 'QuickLaboratoryExamination' }
+    & Pick<QuickLaboratoryExamination, 'id' | 'price' | 'paid' | 'updated_at'>
+  )> }
+);
+
+export type QuickLaboratoryExaminationsQueryVariables = Exact<{
+  skip: Scalars['Float'];
+  take: Scalars['Float'];
+}>;
+
+
+export type QuickLaboratoryExaminationsQuery = (
+  { __typename?: 'Query' }
+  & { quickLaboratoryExaminations: Array<(
+    { __typename?: 'QuickLaboratoryExamination' }
+    & Pick<QuickLaboratoryExamination, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'other' | 'created_at' | 'updated_at'>
+    & { tests: Array<(
+      { __typename?: 'QuickLaboratoryTest' }
+      & Pick<QuickLaboratoryTest, 'id' | 'name'>
+    )> }
+  )> }
+);
+
+export type QuickLaboratoryTestsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type QuickLaboratoryTestsQuery = (
   { __typename?: 'Query' }
   & { quickLaboratoryTests: Array<(
     { __typename?: 'QuickLaboratoryTest' }
-    & Pick<QuickLaboratoryTest, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'other' | 'created_at' | 'updated_at'>
+    & Pick<QuickLaboratoryTest, 'id' | 'name' | 'created_at'>
   )> }
 );
 
-export type QuickLaboratoryTestsCountQueryVariables = Exact<{ [key: string]: never; }>;
+export type QuickPrescriptionQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
 
 
-export type QuickLaboratoryTestsCountQuery = (
+export type QuickPrescriptionQuery = (
   { __typename?: 'Query' }
-  & Pick<Query, 'quickLaboratoryTestsCount'>
+  & { quickPrescription: Array<(
+    { __typename?: 'QuickPrescription' }
+    & Pick<QuickPrescription, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'other' | 'created_at' | 'updated_at'>
+    & { medicines: Array<(
+      { __typename?: 'QuickMedicine' }
+      & Pick<QuickMedicine, 'id' | 'name'>
+    )> }
+  )> }
 );
 
-export type QuickLaboratoryTestsForDashboardQueryVariables = Exact<{
+export type QuickPrescriptionCountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type QuickPrescriptionCountQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'quickPrescriptionCount'>
+);
+
+export type QuickPrescriptionsForDashboardQueryVariables = Exact<{
   skip: Scalars['Float'];
   take: Scalars['Float'];
 }>;
 
 
-export type QuickLaboratoryTestsForDashboardQuery = (
+export type QuickPrescriptionsForDashboardQuery = (
   { __typename?: 'Query' }
-  & { quickLaboratoryTests: Array<(
-    { __typename?: 'QuickLaboratoryTest' }
-    & Pick<QuickLaboratoryTest, 'id' | 'price' | 'paid' | 'updated_at'>
+  & { quickPrescriptions: Array<(
+    { __typename?: 'QuickPrescription' }
+    & Pick<QuickPrescription, 'id' | 'price' | 'paid' | 'updated_at'>
   )> }
 );
 
-export type QuickPrescriptionTestsQueryVariables = Exact<{
+export type QuickPrescriptionsQueryVariables = Exact<{
   skip: Scalars['Float'];
   take: Scalars['Float'];
 }>;
 
 
-export type QuickPrescriptionTestsQuery = (
+export type QuickPrescriptionsQuery = (
   { __typename?: 'Query' }
-  & { quickPrescriptionTests: Array<(
-    { __typename?: 'QuickPrescriptionTest' }
-    & Pick<QuickPrescriptionTest, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'other' | 'created_at' | 'updated_at'>
-  )> }
-);
-
-export type QuickPrescriptionTestsCountQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type QuickPrescriptionTestsCountQuery = (
-  { __typename?: 'Query' }
-  & Pick<Query, 'quickPrescriptionTestsCount'>
-);
-
-export type QuickPrescriptionTestsForDashboardQueryVariables = Exact<{
-  skip: Scalars['Float'];
-  take: Scalars['Float'];
-}>;
-
-
-export type QuickPrescriptionTestsForDashboardQuery = (
-  { __typename?: 'Query' }
-  & { quickPrescriptionTests: Array<(
-    { __typename?: 'QuickPrescriptionTest' }
-    & Pick<QuickPrescriptionTest, 'id' | 'price' | 'paid' | 'updated_at'>
+  & { quickPrescriptions: Array<(
+    { __typename?: 'QuickPrescription' }
+    & Pick<QuickPrescription, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'other' | 'created_at' | 'updated_at'>
+    & { medicines: Array<(
+      { __typename?: 'QuickMedicine' }
+      & Pick<QuickMedicine, 'id' | 'name'>
+    )> }
   )> }
 );
 
@@ -2250,11 +2349,11 @@ export type NewNotificationSubscriptionSubscription = (
         & Pick<Card, 'id' | 'name'>
       ) }
     )>, quick_laboratory_test?: Maybe<(
-      { __typename?: 'QuickLaboratoryTest' }
-      & Pick<QuickLaboratoryTest, 'id' | 'name'>
+      { __typename?: 'QuickLaboratoryExamination' }
+      & Pick<QuickLaboratoryExamination, 'id' | 'name'>
     )>, quick_prescription_test?: Maybe<(
-      { __typename?: 'QuickPrescriptionTest' }
-      & Pick<QuickPrescriptionTest, 'id' | 'name'>
+      { __typename?: 'QuickPrescription' }
+      & Pick<QuickPrescription, 'id' | 'name'>
     )> }
   ) }
 );
@@ -2303,25 +2402,33 @@ export type NewMedicationUpdateSubscription = (
   ) }
 );
 
-export type NewCreatedQuickLaboratoryTestSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type NewCreatedQuickLaboratoryExaminationSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NewCreatedQuickLaboratoryTestSubscription = (
+export type NewCreatedQuickLaboratoryExaminationSubscription = (
   { __typename?: 'Subscription' }
-  & { newCreatedQuickLaboratoryTest: (
-    { __typename?: 'QuickLaboratoryTest' }
-    & Pick<QuickLaboratoryTest, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'created_at' | 'updated_at'>
+  & { newCreatedQuickLaboratoryExamination: (
+    { __typename?: 'QuickLaboratoryExamination' }
+    & Pick<QuickLaboratoryExamination, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'created_at' | 'updated_at'>
+    & { tests: Array<(
+      { __typename?: 'QuickLaboratoryTest' }
+      & Pick<QuickLaboratoryTest, 'id' | 'name'>
+    )> }
   ) }
 );
 
-export type NewCreatedQuickPrescriptionTestSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type NewCreatedQuickPrescriptionSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NewCreatedQuickPrescriptionTestSubscription = (
+export type NewCreatedQuickPrescriptionSubscription = (
   { __typename?: 'Subscription' }
-  & { newCreatedQuickPrescriptionTest: (
-    { __typename?: 'QuickPrescriptionTest' }
-    & Pick<QuickPrescriptionTest, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'result' | 'created_at' | 'updated_at'>
+  & { newCreatedQuickPrescription: (
+    { __typename?: 'QuickPrescription' }
+    & Pick<QuickPrescription, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'created_at' | 'updated_at'>
+    & { medicines: Array<(
+      { __typename?: 'QuickMedicine' }
+      & Pick<QuickMedicine, 'id' | 'name'>
+    )> }
   ) }
 );
 
@@ -3703,53 +3810,11 @@ export function useUpdatePrescriptionCheckInMutation(baseOptions?: Apollo.Mutati
 export type UpdatePrescriptionCheckInMutationHookResult = ReturnType<typeof useUpdatePrescriptionCheckInMutation>;
 export type UpdatePrescriptionCheckInMutationResult = Apollo.MutationResult<UpdatePrescriptionCheckInMutation>;
 export type UpdatePrescriptionCheckInMutationOptions = Apollo.BaseMutationOptions<UpdatePrescriptionCheckInMutation, UpdatePrescriptionCheckInMutationVariables>;
-export const CompleteQuickLaboratoryTestDocument = gql`
-    mutation CompleteQuickLaboratoryTest($id: String!, $price: Float, $other: String) {
-  completeQuickLaboratoryTest(id: $id, input: {price: $price, other: $other}) {
-    id
-    name
-    price
-    paid
-    completed
-    new
-    result
-    created_at
-    updated_at
-  }
-}
-    `;
-export type CompleteQuickLaboratoryTestMutationFn = Apollo.MutationFunction<CompleteQuickLaboratoryTestMutation, CompleteQuickLaboratoryTestMutationVariables>;
-
-/**
- * __useCompleteQuickLaboratoryTestMutation__
- *
- * To run a mutation, you first call `useCompleteQuickLaboratoryTestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCompleteQuickLaboratoryTestMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [completeQuickLaboratoryTestMutation, { data, loading, error }] = useCompleteQuickLaboratoryTestMutation({
- *   variables: {
- *      id: // value for 'id'
- *      price: // value for 'price'
- *      other: // value for 'other'
- *   },
- * });
- */
-export function useCompleteQuickLaboratoryTestMutation(baseOptions?: Apollo.MutationHookOptions<CompleteQuickLaboratoryTestMutation, CompleteQuickLaboratoryTestMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CompleteQuickLaboratoryTestMutation, CompleteQuickLaboratoryTestMutationVariables>(CompleteQuickLaboratoryTestDocument, options);
-      }
-export type CompleteQuickLaboratoryTestMutationHookResult = ReturnType<typeof useCompleteQuickLaboratoryTestMutation>;
-export type CompleteQuickLaboratoryTestMutationResult = Apollo.MutationResult<CompleteQuickLaboratoryTestMutation>;
-export type CompleteQuickLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<CompleteQuickLaboratoryTestMutation, CompleteQuickLaboratoryTestMutationVariables>;
-export const CreateQuickLaboratoryTestDocument = gql`
-    mutation CreateQuickLaboratoryTest($name: String!, $price: Float, $result: String!, $other: String) {
-  createQuickLaboratoryTest(
-    input: {name: $name, price: $price, result: $result, other: $other}
+export const CompleteQuickLaboratoryExaminationDocument = gql`
+    mutation CompleteQuickLaboratoryExamination($id: String!, $price: Float, $other: String) {
+  completeQuickLaboratoryExamination(
+    id: $id
+    input: {price: $price, other: $other}
   ) {
     id
     name
@@ -3758,134 +3823,29 @@ export const CreateQuickLaboratoryTestDocument = gql`
     completed
     new
     result
+    tests {
+      id
+      name
+    }
     created_at
     updated_at
   }
 }
     `;
-export type CreateQuickLaboratoryTestMutationFn = Apollo.MutationFunction<CreateQuickLaboratoryTestMutation, CreateQuickLaboratoryTestMutationVariables>;
+export type CompleteQuickLaboratoryExaminationMutationFn = Apollo.MutationFunction<CompleteQuickLaboratoryExaminationMutation, CompleteQuickLaboratoryExaminationMutationVariables>;
 
 /**
- * __useCreateQuickLaboratoryTestMutation__
+ * __useCompleteQuickLaboratoryExaminationMutation__
  *
- * To run a mutation, you first call `useCreateQuickLaboratoryTestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateQuickLaboratoryTestMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCompleteQuickLaboratoryExaminationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCompleteQuickLaboratoryExaminationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createQuickLaboratoryTestMutation, { data, loading, error }] = useCreateQuickLaboratoryTestMutation({
- *   variables: {
- *      name: // value for 'name'
- *      price: // value for 'price'
- *      result: // value for 'result'
- *      other: // value for 'other'
- *   },
- * });
- */
-export function useCreateQuickLaboratoryTestMutation(baseOptions?: Apollo.MutationHookOptions<CreateQuickLaboratoryTestMutation, CreateQuickLaboratoryTestMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateQuickLaboratoryTestMutation, CreateQuickLaboratoryTestMutationVariables>(CreateQuickLaboratoryTestDocument, options);
-      }
-export type CreateQuickLaboratoryTestMutationHookResult = ReturnType<typeof useCreateQuickLaboratoryTestMutation>;
-export type CreateQuickLaboratoryTestMutationResult = Apollo.MutationResult<CreateQuickLaboratoryTestMutation>;
-export type CreateQuickLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<CreateQuickLaboratoryTestMutation, CreateQuickLaboratoryTestMutationVariables>;
-export const MarkQuickLaboratoryTestAsPaidDocument = gql`
-    mutation MarkQuickLaboratoryTestAsPaid($id: ID!) {
-  markQuickLaboratoryTestAsPaid(id: $id) {
-    id
-    paid
-  }
-}
-    `;
-export type MarkQuickLaboratoryTestAsPaidMutationFn = Apollo.MutationFunction<MarkQuickLaboratoryTestAsPaidMutation, MarkQuickLaboratoryTestAsPaidMutationVariables>;
-
-/**
- * __useMarkQuickLaboratoryTestAsPaidMutation__
- *
- * To run a mutation, you first call `useMarkQuickLaboratoryTestAsPaidMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useMarkQuickLaboratoryTestAsPaidMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [markQuickLaboratoryTestAsPaidMutation, { data, loading, error }] = useMarkQuickLaboratoryTestAsPaidMutation({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useMarkQuickLaboratoryTestAsPaidMutation(baseOptions?: Apollo.MutationHookOptions<MarkQuickLaboratoryTestAsPaidMutation, MarkQuickLaboratoryTestAsPaidMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<MarkQuickLaboratoryTestAsPaidMutation, MarkQuickLaboratoryTestAsPaidMutationVariables>(MarkQuickLaboratoryTestAsPaidDocument, options);
-      }
-export type MarkQuickLaboratoryTestAsPaidMutationHookResult = ReturnType<typeof useMarkQuickLaboratoryTestAsPaidMutation>;
-export type MarkQuickLaboratoryTestAsPaidMutationResult = Apollo.MutationResult<MarkQuickLaboratoryTestAsPaidMutation>;
-export type MarkQuickLaboratoryTestAsPaidMutationOptions = Apollo.BaseMutationOptions<MarkQuickLaboratoryTestAsPaidMutation, MarkQuickLaboratoryTestAsPaidMutationVariables>;
-export const MarkQuickLaboratoryTestAsSeenDocument = gql`
-    mutation MarkQuickLaboratoryTestAsSeen($id: ID!) {
-  markQuickLaboratoryTestAsSeen(id: $id) {
-    id
-    new
-  }
-}
-    `;
-export type MarkQuickLaboratoryTestAsSeenMutationFn = Apollo.MutationFunction<MarkQuickLaboratoryTestAsSeenMutation, MarkQuickLaboratoryTestAsSeenMutationVariables>;
-
-/**
- * __useMarkQuickLaboratoryTestAsSeenMutation__
- *
- * To run a mutation, you first call `useMarkQuickLaboratoryTestAsSeenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useMarkQuickLaboratoryTestAsSeenMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [markQuickLaboratoryTestAsSeenMutation, { data, loading, error }] = useMarkQuickLaboratoryTestAsSeenMutation({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useMarkQuickLaboratoryTestAsSeenMutation(baseOptions?: Apollo.MutationHookOptions<MarkQuickLaboratoryTestAsSeenMutation, MarkQuickLaboratoryTestAsSeenMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<MarkQuickLaboratoryTestAsSeenMutation, MarkQuickLaboratoryTestAsSeenMutationVariables>(MarkQuickLaboratoryTestAsSeenDocument, options);
-      }
-export type MarkQuickLaboratoryTestAsSeenMutationHookResult = ReturnType<typeof useMarkQuickLaboratoryTestAsSeenMutation>;
-export type MarkQuickLaboratoryTestAsSeenMutationResult = Apollo.MutationResult<MarkQuickLaboratoryTestAsSeenMutation>;
-export type MarkQuickLaboratoryTestAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkQuickLaboratoryTestAsSeenMutation, MarkQuickLaboratoryTestAsSeenMutationVariables>;
-export const CompleteQuickPrescriptionTestDocument = gql`
-    mutation CompleteQuickPrescriptionTest($id: String!, $price: Float, $other: String) {
-  completeQuickPrescriptionTest(id: $id, input: {price: $price, other: $other}) {
-    id
-    name
-    price
-    result
-    other
-    created_at
-  }
-}
-    `;
-export type CompleteQuickPrescriptionTestMutationFn = Apollo.MutationFunction<CompleteQuickPrescriptionTestMutation, CompleteQuickPrescriptionTestMutationVariables>;
-
-/**
- * __useCompleteQuickPrescriptionTestMutation__
- *
- * To run a mutation, you first call `useCompleteQuickPrescriptionTestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCompleteQuickPrescriptionTestMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [completeQuickPrescriptionTestMutation, { data, loading, error }] = useCompleteQuickPrescriptionTestMutation({
+ * const [completeQuickLaboratoryExaminationMutation, { data, loading, error }] = useCompleteQuickLaboratoryExaminationMutation({
  *   variables: {
  *      id: // value for 'id'
  *      price: // value for 'price'
@@ -3893,124 +3853,289 @@ export type CompleteQuickPrescriptionTestMutationFn = Apollo.MutationFunction<Co
  *   },
  * });
  */
-export function useCompleteQuickPrescriptionTestMutation(baseOptions?: Apollo.MutationHookOptions<CompleteQuickPrescriptionTestMutation, CompleteQuickPrescriptionTestMutationVariables>) {
+export function useCompleteQuickLaboratoryExaminationMutation(baseOptions?: Apollo.MutationHookOptions<CompleteQuickLaboratoryExaminationMutation, CompleteQuickLaboratoryExaminationMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CompleteQuickPrescriptionTestMutation, CompleteQuickPrescriptionTestMutationVariables>(CompleteQuickPrescriptionTestDocument, options);
+        return Apollo.useMutation<CompleteQuickLaboratoryExaminationMutation, CompleteQuickLaboratoryExaminationMutationVariables>(CompleteQuickLaboratoryExaminationDocument, options);
       }
-export type CompleteQuickPrescriptionTestMutationHookResult = ReturnType<typeof useCompleteQuickPrescriptionTestMutation>;
-export type CompleteQuickPrescriptionTestMutationResult = Apollo.MutationResult<CompleteQuickPrescriptionTestMutation>;
-export type CompleteQuickPrescriptionTestMutationOptions = Apollo.BaseMutationOptions<CompleteQuickPrescriptionTestMutation, CompleteQuickPrescriptionTestMutationVariables>;
-export const CreateQuickPrescriptionTestDocument = gql`
-    mutation CreateQuickPrescriptionTest($name: String!, $result: QuickPrescriptionTestResults!, $price: Float, $other: String) {
-  createQuickPrescriptionTest(
-    input: {name: $name, price: $price, result: $result, other: $other}
+export type CompleteQuickLaboratoryExaminationMutationHookResult = ReturnType<typeof useCompleteQuickLaboratoryExaminationMutation>;
+export type CompleteQuickLaboratoryExaminationMutationResult = Apollo.MutationResult<CompleteQuickLaboratoryExaminationMutation>;
+export type CompleteQuickLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<CompleteQuickLaboratoryExaminationMutation, CompleteQuickLaboratoryExaminationMutationVariables>;
+export const CreateQuickLaboratoryExaminationDocument = gql`
+    mutation CreateQuickLaboratoryExamination($name: String!, $price: Float, $testIds: [ID!]!, $result: QuickLaboratoryExaminationResult, $other: String) {
+  createQuickLaboratoryExamination(
+    input: {name: $name, price: $price, testIds: $testIds, result: $result, other: $other}
   ) {
     id
     name
     price
+    paid
+    completed
+    new
     result
-    other
+    tests {
+      id
+      name
+    }
     created_at
+    updated_at
   }
 }
     `;
-export type CreateQuickPrescriptionTestMutationFn = Apollo.MutationFunction<CreateQuickPrescriptionTestMutation, CreateQuickPrescriptionTestMutationVariables>;
+export type CreateQuickLaboratoryExaminationMutationFn = Apollo.MutationFunction<CreateQuickLaboratoryExaminationMutation, CreateQuickLaboratoryExaminationMutationVariables>;
 
 /**
- * __useCreateQuickPrescriptionTestMutation__
+ * __useCreateQuickLaboratoryExaminationMutation__
  *
- * To run a mutation, you first call `useCreateQuickPrescriptionTestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateQuickPrescriptionTestMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCreateQuickLaboratoryExaminationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateQuickLaboratoryExaminationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createQuickPrescriptionTestMutation, { data, loading, error }] = useCreateQuickPrescriptionTestMutation({
+ * const [createQuickLaboratoryExaminationMutation, { data, loading, error }] = useCreateQuickLaboratoryExaminationMutation({
  *   variables: {
  *      name: // value for 'name'
- *      result: // value for 'result'
  *      price: // value for 'price'
+ *      testIds: // value for 'testIds'
+ *      result: // value for 'result'
  *      other: // value for 'other'
  *   },
  * });
  */
-export function useCreateQuickPrescriptionTestMutation(baseOptions?: Apollo.MutationHookOptions<CreateQuickPrescriptionTestMutation, CreateQuickPrescriptionTestMutationVariables>) {
+export function useCreateQuickLaboratoryExaminationMutation(baseOptions?: Apollo.MutationHookOptions<CreateQuickLaboratoryExaminationMutation, CreateQuickLaboratoryExaminationMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateQuickPrescriptionTestMutation, CreateQuickPrescriptionTestMutationVariables>(CreateQuickPrescriptionTestDocument, options);
+        return Apollo.useMutation<CreateQuickLaboratoryExaminationMutation, CreateQuickLaboratoryExaminationMutationVariables>(CreateQuickLaboratoryExaminationDocument, options);
       }
-export type CreateQuickPrescriptionTestMutationHookResult = ReturnType<typeof useCreateQuickPrescriptionTestMutation>;
-export type CreateQuickPrescriptionTestMutationResult = Apollo.MutationResult<CreateQuickPrescriptionTestMutation>;
-export type CreateQuickPrescriptionTestMutationOptions = Apollo.BaseMutationOptions<CreateQuickPrescriptionTestMutation, CreateQuickPrescriptionTestMutationVariables>;
-export const MarkQuickPrescriptionTestAsPaidDocument = gql`
-    mutation MarkQuickPrescriptionTestAsPaid($id: ID!) {
-  markQuickPrescriptionTestAsPaid(id: $id) {
+export type CreateQuickLaboratoryExaminationMutationHookResult = ReturnType<typeof useCreateQuickLaboratoryExaminationMutation>;
+export type CreateQuickLaboratoryExaminationMutationResult = Apollo.MutationResult<CreateQuickLaboratoryExaminationMutation>;
+export type CreateQuickLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<CreateQuickLaboratoryExaminationMutation, CreateQuickLaboratoryExaminationMutationVariables>;
+export const MarkQuickLaboratoryExaminationAsPaidDocument = gql`
+    mutation MarkQuickLaboratoryExaminationAsPaid($id: ID!) {
+  markQuickLaboratoryExaminationAsPaid(id: $id) {
     id
     paid
   }
 }
     `;
-export type MarkQuickPrescriptionTestAsPaidMutationFn = Apollo.MutationFunction<MarkQuickPrescriptionTestAsPaidMutation, MarkQuickPrescriptionTestAsPaidMutationVariables>;
+export type MarkQuickLaboratoryExaminationAsPaidMutationFn = Apollo.MutationFunction<MarkQuickLaboratoryExaminationAsPaidMutation, MarkQuickLaboratoryExaminationAsPaidMutationVariables>;
 
 /**
- * __useMarkQuickPrescriptionTestAsPaidMutation__
+ * __useMarkQuickLaboratoryExaminationAsPaidMutation__
  *
- * To run a mutation, you first call `useMarkQuickPrescriptionTestAsPaidMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useMarkQuickPrescriptionTestAsPaidMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useMarkQuickLaboratoryExaminationAsPaidMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkQuickLaboratoryExaminationAsPaidMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [markQuickPrescriptionTestAsPaidMutation, { data, loading, error }] = useMarkQuickPrescriptionTestAsPaidMutation({
+ * const [markQuickLaboratoryExaminationAsPaidMutation, { data, loading, error }] = useMarkQuickLaboratoryExaminationAsPaidMutation({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useMarkQuickPrescriptionTestAsPaidMutation(baseOptions?: Apollo.MutationHookOptions<MarkQuickPrescriptionTestAsPaidMutation, MarkQuickPrescriptionTestAsPaidMutationVariables>) {
+export function useMarkQuickLaboratoryExaminationAsPaidMutation(baseOptions?: Apollo.MutationHookOptions<MarkQuickLaboratoryExaminationAsPaidMutation, MarkQuickLaboratoryExaminationAsPaidMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<MarkQuickPrescriptionTestAsPaidMutation, MarkQuickPrescriptionTestAsPaidMutationVariables>(MarkQuickPrescriptionTestAsPaidDocument, options);
+        return Apollo.useMutation<MarkQuickLaboratoryExaminationAsPaidMutation, MarkQuickLaboratoryExaminationAsPaidMutationVariables>(MarkQuickLaboratoryExaminationAsPaidDocument, options);
       }
-export type MarkQuickPrescriptionTestAsPaidMutationHookResult = ReturnType<typeof useMarkQuickPrescriptionTestAsPaidMutation>;
-export type MarkQuickPrescriptionTestAsPaidMutationResult = Apollo.MutationResult<MarkQuickPrescriptionTestAsPaidMutation>;
-export type MarkQuickPrescriptionTestAsPaidMutationOptions = Apollo.BaseMutationOptions<MarkQuickPrescriptionTestAsPaidMutation, MarkQuickPrescriptionTestAsPaidMutationVariables>;
-export const MarkQuickPrescriptionTestAsSeenDocument = gql`
-    mutation MarkQuickPrescriptionTestAsSeen($id: ID!) {
-  markQuickPrescriptionTestAsSeen(id: $id) {
+export type MarkQuickLaboratoryExaminationAsPaidMutationHookResult = ReturnType<typeof useMarkQuickLaboratoryExaminationAsPaidMutation>;
+export type MarkQuickLaboratoryExaminationAsPaidMutationResult = Apollo.MutationResult<MarkQuickLaboratoryExaminationAsPaidMutation>;
+export type MarkQuickLaboratoryExaminationAsPaidMutationOptions = Apollo.BaseMutationOptions<MarkQuickLaboratoryExaminationAsPaidMutation, MarkQuickLaboratoryExaminationAsPaidMutationVariables>;
+export const MarkQuickLaboratoryExaminationAsSeenDocument = gql`
+    mutation MarkQuickLaboratoryExaminationAsSeen($id: ID!) {
+  markQuickLaboratoryExaminationAsSeen(id: $id) {
     id
     new
   }
 }
     `;
-export type MarkQuickPrescriptionTestAsSeenMutationFn = Apollo.MutationFunction<MarkQuickPrescriptionTestAsSeenMutation, MarkQuickPrescriptionTestAsSeenMutationVariables>;
+export type MarkQuickLaboratoryExaminationAsSeenMutationFn = Apollo.MutationFunction<MarkQuickLaboratoryExaminationAsSeenMutation, MarkQuickLaboratoryExaminationAsSeenMutationVariables>;
 
 /**
- * __useMarkQuickPrescriptionTestAsSeenMutation__
+ * __useMarkQuickLaboratoryExaminationAsSeenMutation__
  *
- * To run a mutation, you first call `useMarkQuickPrescriptionTestAsSeenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useMarkQuickPrescriptionTestAsSeenMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useMarkQuickLaboratoryExaminationAsSeenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkQuickLaboratoryExaminationAsSeenMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [markQuickPrescriptionTestAsSeenMutation, { data, loading, error }] = useMarkQuickPrescriptionTestAsSeenMutation({
+ * const [markQuickLaboratoryExaminationAsSeenMutation, { data, loading, error }] = useMarkQuickLaboratoryExaminationAsSeenMutation({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useMarkQuickPrescriptionTestAsSeenMutation(baseOptions?: Apollo.MutationHookOptions<MarkQuickPrescriptionTestAsSeenMutation, MarkQuickPrescriptionTestAsSeenMutationVariables>) {
+export function useMarkQuickLaboratoryExaminationAsSeenMutation(baseOptions?: Apollo.MutationHookOptions<MarkQuickLaboratoryExaminationAsSeenMutation, MarkQuickLaboratoryExaminationAsSeenMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<MarkQuickPrescriptionTestAsSeenMutation, MarkQuickPrescriptionTestAsSeenMutationVariables>(MarkQuickPrescriptionTestAsSeenDocument, options);
+        return Apollo.useMutation<MarkQuickLaboratoryExaminationAsSeenMutation, MarkQuickLaboratoryExaminationAsSeenMutationVariables>(MarkQuickLaboratoryExaminationAsSeenDocument, options);
       }
-export type MarkQuickPrescriptionTestAsSeenMutationHookResult = ReturnType<typeof useMarkQuickPrescriptionTestAsSeenMutation>;
-export type MarkQuickPrescriptionTestAsSeenMutationResult = Apollo.MutationResult<MarkQuickPrescriptionTestAsSeenMutation>;
-export type MarkQuickPrescriptionTestAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkQuickPrescriptionTestAsSeenMutation, MarkQuickPrescriptionTestAsSeenMutationVariables>;
+export type MarkQuickLaboratoryExaminationAsSeenMutationHookResult = ReturnType<typeof useMarkQuickLaboratoryExaminationAsSeenMutation>;
+export type MarkQuickLaboratoryExaminationAsSeenMutationResult = Apollo.MutationResult<MarkQuickLaboratoryExaminationAsSeenMutation>;
+export type MarkQuickLaboratoryExaminationAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkQuickLaboratoryExaminationAsSeenMutation, MarkQuickLaboratoryExaminationAsSeenMutationVariables>;
+export const CompleteQuickPrescriptionDocument = gql`
+    mutation CompleteQuickPrescription($id: String!, $price: Float, $other: String) {
+  completeQuickPrescription(id: $id, input: {price: $price, other: $other}) {
+    id
+    name
+    price
+    medicines {
+      id
+      name
+    }
+    other
+    created_at
+  }
+}
+    `;
+export type CompleteQuickPrescriptionMutationFn = Apollo.MutationFunction<CompleteQuickPrescriptionMutation, CompleteQuickPrescriptionMutationVariables>;
+
+/**
+ * __useCompleteQuickPrescriptionMutation__
+ *
+ * To run a mutation, you first call `useCompleteQuickPrescriptionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCompleteQuickPrescriptionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [completeQuickPrescriptionMutation, { data, loading, error }] = useCompleteQuickPrescriptionMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      price: // value for 'price'
+ *      other: // value for 'other'
+ *   },
+ * });
+ */
+export function useCompleteQuickPrescriptionMutation(baseOptions?: Apollo.MutationHookOptions<CompleteQuickPrescriptionMutation, CompleteQuickPrescriptionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CompleteQuickPrescriptionMutation, CompleteQuickPrescriptionMutationVariables>(CompleteQuickPrescriptionDocument, options);
+      }
+export type CompleteQuickPrescriptionMutationHookResult = ReturnType<typeof useCompleteQuickPrescriptionMutation>;
+export type CompleteQuickPrescriptionMutationResult = Apollo.MutationResult<CompleteQuickPrescriptionMutation>;
+export type CompleteQuickPrescriptionMutationOptions = Apollo.BaseMutationOptions<CompleteQuickPrescriptionMutation, CompleteQuickPrescriptionMutationVariables>;
+export const CreateQuickPrescriptionDocument = gql`
+    mutation CreateQuickPrescription($name: String!, $medicineIds: [ID!]!, $price: Float, $other: String) {
+  createQuickPrescription(
+    input: {name: $name, price: $price, medicineIds: $medicineIds, other: $other}
+  ) {
+    id
+    name
+    price
+    medicines {
+      id
+      name
+    }
+    other
+    created_at
+  }
+}
+    `;
+export type CreateQuickPrescriptionMutationFn = Apollo.MutationFunction<CreateQuickPrescriptionMutation, CreateQuickPrescriptionMutationVariables>;
+
+/**
+ * __useCreateQuickPrescriptionMutation__
+ *
+ * To run a mutation, you first call `useCreateQuickPrescriptionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateQuickPrescriptionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createQuickPrescriptionMutation, { data, loading, error }] = useCreateQuickPrescriptionMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      medicineIds: // value for 'medicineIds'
+ *      price: // value for 'price'
+ *      other: // value for 'other'
+ *   },
+ * });
+ */
+export function useCreateQuickPrescriptionMutation(baseOptions?: Apollo.MutationHookOptions<CreateQuickPrescriptionMutation, CreateQuickPrescriptionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateQuickPrescriptionMutation, CreateQuickPrescriptionMutationVariables>(CreateQuickPrescriptionDocument, options);
+      }
+export type CreateQuickPrescriptionMutationHookResult = ReturnType<typeof useCreateQuickPrescriptionMutation>;
+export type CreateQuickPrescriptionMutationResult = Apollo.MutationResult<CreateQuickPrescriptionMutation>;
+export type CreateQuickPrescriptionMutationOptions = Apollo.BaseMutationOptions<CreateQuickPrescriptionMutation, CreateQuickPrescriptionMutationVariables>;
+export const MarkQuickPrescriptionAsPaidDocument = gql`
+    mutation MarkQuickPrescriptionAsPaid($id: ID!) {
+  markQuickPrescriptionAsPaid(id: $id) {
+    id
+    paid
+  }
+}
+    `;
+export type MarkQuickPrescriptionAsPaidMutationFn = Apollo.MutationFunction<MarkQuickPrescriptionAsPaidMutation, MarkQuickPrescriptionAsPaidMutationVariables>;
+
+/**
+ * __useMarkQuickPrescriptionAsPaidMutation__
+ *
+ * To run a mutation, you first call `useMarkQuickPrescriptionAsPaidMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkQuickPrescriptionAsPaidMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markQuickPrescriptionAsPaidMutation, { data, loading, error }] = useMarkQuickPrescriptionAsPaidMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useMarkQuickPrescriptionAsPaidMutation(baseOptions?: Apollo.MutationHookOptions<MarkQuickPrescriptionAsPaidMutation, MarkQuickPrescriptionAsPaidMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkQuickPrescriptionAsPaidMutation, MarkQuickPrescriptionAsPaidMutationVariables>(MarkQuickPrescriptionAsPaidDocument, options);
+      }
+export type MarkQuickPrescriptionAsPaidMutationHookResult = ReturnType<typeof useMarkQuickPrescriptionAsPaidMutation>;
+export type MarkQuickPrescriptionAsPaidMutationResult = Apollo.MutationResult<MarkQuickPrescriptionAsPaidMutation>;
+export type MarkQuickPrescriptionAsPaidMutationOptions = Apollo.BaseMutationOptions<MarkQuickPrescriptionAsPaidMutation, MarkQuickPrescriptionAsPaidMutationVariables>;
+export const MarkQuickPrescriptionAsSeenDocument = gql`
+    mutation MarkQuickPrescriptionAsSeen($id: ID!) {
+  markQuickPrescriptionAsSeen(id: $id) {
+    id
+    new
+  }
+}
+    `;
+export type MarkQuickPrescriptionAsSeenMutationFn = Apollo.MutationFunction<MarkQuickPrescriptionAsSeenMutation, MarkQuickPrescriptionAsSeenMutationVariables>;
+
+/**
+ * __useMarkQuickPrescriptionAsSeenMutation__
+ *
+ * To run a mutation, you first call `useMarkQuickPrescriptionAsSeenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkQuickPrescriptionAsSeenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markQuickPrescriptionAsSeenMutation, { data, loading, error }] = useMarkQuickPrescriptionAsSeenMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useMarkQuickPrescriptionAsSeenMutation(baseOptions?: Apollo.MutationHookOptions<MarkQuickPrescriptionAsSeenMutation, MarkQuickPrescriptionAsSeenMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkQuickPrescriptionAsSeenMutation, MarkQuickPrescriptionAsSeenMutationVariables>(MarkQuickPrescriptionAsSeenDocument, options);
+      }
+export type MarkQuickPrescriptionAsSeenMutationHookResult = ReturnType<typeof useMarkQuickPrescriptionAsSeenMutation>;
+export type MarkQuickPrescriptionAsSeenMutationResult = Apollo.MutationResult<MarkQuickPrescriptionAsSeenMutation>;
+export type MarkQuickPrescriptionAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkQuickPrescriptionAsSeenMutation, MarkQuickPrescriptionAsSeenMutationVariables>;
 export const ChangeSettingDocument = gql`
     mutation ChangeSetting($card_price: Float!, $card_expiration_date: Float!, $laboratory_tests_data: String!, $prescription_data: String!) {
   changeSetting(
@@ -5245,6 +5370,7 @@ export const PrescriptionsForDashboardDocument = gql`
   prescriptions(skip: $skip, take: $take) {
     id
     paid
+    inrolled
     medications {
       checkIn {
         date
@@ -5437,9 +5563,9 @@ export function useSearchPrescriptionsLazyQuery(baseOptions?: Apollo.LazyQueryHo
 export type SearchPrescriptionsQueryHookResult = ReturnType<typeof useSearchPrescriptionsQuery>;
 export type SearchPrescriptionsLazyQueryHookResult = ReturnType<typeof useSearchPrescriptionsLazyQuery>;
 export type SearchPrescriptionsQueryResult = Apollo.QueryResult<SearchPrescriptionsQuery, SearchPrescriptionsQueryVariables>;
-export const QuickLaboratoryTestsDocument = gql`
-    query QuickLaboratoryTests($skip: Float!, $take: Float!) {
-  quickLaboratoryTests(skip: $skip, take: $take) {
+export const QuickLaboratoryExaminationDocument = gql`
+    query QuickLaboratoryExamination($id: ID!) {
+  quickLaboratoryExamination(id: $id) {
     id
     name
     price
@@ -5447,9 +5573,170 @@ export const QuickLaboratoryTestsDocument = gql`
     completed
     new
     result
+    tests {
+      id
+      name
+    }
     other
     created_at
     updated_at
+  }
+}
+    `;
+
+/**
+ * __useQuickLaboratoryExaminationQuery__
+ *
+ * To run a query within a React component, call `useQuickLaboratoryExaminationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuickLaboratoryExaminationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useQuickLaboratoryExaminationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useQuickLaboratoryExaminationQuery(baseOptions: Apollo.QueryHookOptions<QuickLaboratoryExaminationQuery, QuickLaboratoryExaminationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<QuickLaboratoryExaminationQuery, QuickLaboratoryExaminationQueryVariables>(QuickLaboratoryExaminationDocument, options);
+      }
+export function useQuickLaboratoryExaminationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickLaboratoryExaminationQuery, QuickLaboratoryExaminationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<QuickLaboratoryExaminationQuery, QuickLaboratoryExaminationQueryVariables>(QuickLaboratoryExaminationDocument, options);
+        }
+export type QuickLaboratoryExaminationQueryHookResult = ReturnType<typeof useQuickLaboratoryExaminationQuery>;
+export type QuickLaboratoryExaminationLazyQueryHookResult = ReturnType<typeof useQuickLaboratoryExaminationLazyQuery>;
+export type QuickLaboratoryExaminationQueryResult = Apollo.QueryResult<QuickLaboratoryExaminationQuery, QuickLaboratoryExaminationQueryVariables>;
+export const QuickLaboratoryExaminationCountDocument = gql`
+    query QuickLaboratoryExaminationCount {
+  quickLaboratoryExaminationCount
+}
+    `;
+
+/**
+ * __useQuickLaboratoryExaminationCountQuery__
+ *
+ * To run a query within a React component, call `useQuickLaboratoryExaminationCountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuickLaboratoryExaminationCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useQuickLaboratoryExaminationCountQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useQuickLaboratoryExaminationCountQuery(baseOptions?: Apollo.QueryHookOptions<QuickLaboratoryExaminationCountQuery, QuickLaboratoryExaminationCountQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<QuickLaboratoryExaminationCountQuery, QuickLaboratoryExaminationCountQueryVariables>(QuickLaboratoryExaminationCountDocument, options);
+      }
+export function useQuickLaboratoryExaminationCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickLaboratoryExaminationCountQuery, QuickLaboratoryExaminationCountQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<QuickLaboratoryExaminationCountQuery, QuickLaboratoryExaminationCountQueryVariables>(QuickLaboratoryExaminationCountDocument, options);
+        }
+export type QuickLaboratoryExaminationCountQueryHookResult = ReturnType<typeof useQuickLaboratoryExaminationCountQuery>;
+export type QuickLaboratoryExaminationCountLazyQueryHookResult = ReturnType<typeof useQuickLaboratoryExaminationCountLazyQuery>;
+export type QuickLaboratoryExaminationCountQueryResult = Apollo.QueryResult<QuickLaboratoryExaminationCountQuery, QuickLaboratoryExaminationCountQueryVariables>;
+export const QuickLaboratoryExaminationsForDashboardDocument = gql`
+    query QuickLaboratoryExaminationsForDashboard($skip: Float!, $take: Float!) {
+  quickLaboratoryExaminations(skip: $skip, take: $take) {
+    id
+    price
+    paid
+    updated_at
+  }
+}
+    `;
+
+/**
+ * __useQuickLaboratoryExaminationsForDashboardQuery__
+ *
+ * To run a query within a React component, call `useQuickLaboratoryExaminationsForDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuickLaboratoryExaminationsForDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useQuickLaboratoryExaminationsForDashboardQuery({
+ *   variables: {
+ *      skip: // value for 'skip'
+ *      take: // value for 'take'
+ *   },
+ * });
+ */
+export function useQuickLaboratoryExaminationsForDashboardQuery(baseOptions: Apollo.QueryHookOptions<QuickLaboratoryExaminationsForDashboardQuery, QuickLaboratoryExaminationsForDashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<QuickLaboratoryExaminationsForDashboardQuery, QuickLaboratoryExaminationsForDashboardQueryVariables>(QuickLaboratoryExaminationsForDashboardDocument, options);
+      }
+export function useQuickLaboratoryExaminationsForDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickLaboratoryExaminationsForDashboardQuery, QuickLaboratoryExaminationsForDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<QuickLaboratoryExaminationsForDashboardQuery, QuickLaboratoryExaminationsForDashboardQueryVariables>(QuickLaboratoryExaminationsForDashboardDocument, options);
+        }
+export type QuickLaboratoryExaminationsForDashboardQueryHookResult = ReturnType<typeof useQuickLaboratoryExaminationsForDashboardQuery>;
+export type QuickLaboratoryExaminationsForDashboardLazyQueryHookResult = ReturnType<typeof useQuickLaboratoryExaminationsForDashboardLazyQuery>;
+export type QuickLaboratoryExaminationsForDashboardQueryResult = Apollo.QueryResult<QuickLaboratoryExaminationsForDashboardQuery, QuickLaboratoryExaminationsForDashboardQueryVariables>;
+export const QuickLaboratoryExaminationsDocument = gql`
+    query QuickLaboratoryExaminations($skip: Float!, $take: Float!) {
+  quickLaboratoryExaminations(skip: $skip, take: $take) {
+    id
+    name
+    price
+    paid
+    completed
+    new
+    result
+    tests {
+      id
+      name
+    }
+    other
+    created_at
+    updated_at
+  }
+}
+    `;
+
+/**
+ * __useQuickLaboratoryExaminationsQuery__
+ *
+ * To run a query within a React component, call `useQuickLaboratoryExaminationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuickLaboratoryExaminationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useQuickLaboratoryExaminationsQuery({
+ *   variables: {
+ *      skip: // value for 'skip'
+ *      take: // value for 'take'
+ *   },
+ * });
+ */
+export function useQuickLaboratoryExaminationsQuery(baseOptions: Apollo.QueryHookOptions<QuickLaboratoryExaminationsQuery, QuickLaboratoryExaminationsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<QuickLaboratoryExaminationsQuery, QuickLaboratoryExaminationsQueryVariables>(QuickLaboratoryExaminationsDocument, options);
+      }
+export function useQuickLaboratoryExaminationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickLaboratoryExaminationsQuery, QuickLaboratoryExaminationsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<QuickLaboratoryExaminationsQuery, QuickLaboratoryExaminationsQueryVariables>(QuickLaboratoryExaminationsDocument, options);
+        }
+export type QuickLaboratoryExaminationsQueryHookResult = ReturnType<typeof useQuickLaboratoryExaminationsQuery>;
+export type QuickLaboratoryExaminationsLazyQueryHookResult = ReturnType<typeof useQuickLaboratoryExaminationsLazyQuery>;
+export type QuickLaboratoryExaminationsQueryResult = Apollo.QueryResult<QuickLaboratoryExaminationsQuery, QuickLaboratoryExaminationsQueryVariables>;
+export const QuickLaboratoryTestsDocument = gql`
+    query QuickLaboratoryTests {
+  quickLaboratoryTests {
+    id
+    name
+    created_at
   }
 }
     `;
@@ -5466,12 +5753,10 @@ export const QuickLaboratoryTestsDocument = gql`
  * @example
  * const { data, loading, error } = useQuickLaboratoryTestsQuery({
  *   variables: {
- *      skip: // value for 'skip'
- *      take: // value for 'take'
  *   },
  * });
  */
-export function useQuickLaboratoryTestsQuery(baseOptions: Apollo.QueryHookOptions<QuickLaboratoryTestsQuery, QuickLaboratoryTestsQueryVariables>) {
+export function useQuickLaboratoryTestsQuery(baseOptions?: Apollo.QueryHookOptions<QuickLaboratoryTestsQuery, QuickLaboratoryTestsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<QuickLaboratoryTestsQuery, QuickLaboratoryTestsQueryVariables>(QuickLaboratoryTestsDocument, options);
       }
@@ -5482,87 +5767,19 @@ export function useQuickLaboratoryTestsLazyQuery(baseOptions?: Apollo.LazyQueryH
 export type QuickLaboratoryTestsQueryHookResult = ReturnType<typeof useQuickLaboratoryTestsQuery>;
 export type QuickLaboratoryTestsLazyQueryHookResult = ReturnType<typeof useQuickLaboratoryTestsLazyQuery>;
 export type QuickLaboratoryTestsQueryResult = Apollo.QueryResult<QuickLaboratoryTestsQuery, QuickLaboratoryTestsQueryVariables>;
-export const QuickLaboratoryTestsCountDocument = gql`
-    query QuickLaboratoryTestsCount {
-  quickLaboratoryTestsCount
-}
-    `;
-
-/**
- * __useQuickLaboratoryTestsCountQuery__
- *
- * To run a query within a React component, call `useQuickLaboratoryTestsCountQuery` and pass it any options that fit your needs.
- * When your component renders, `useQuickLaboratoryTestsCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useQuickLaboratoryTestsCountQuery({
- *   variables: {
- *   },
- * });
- */
-export function useQuickLaboratoryTestsCountQuery(baseOptions?: Apollo.QueryHookOptions<QuickLaboratoryTestsCountQuery, QuickLaboratoryTestsCountQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<QuickLaboratoryTestsCountQuery, QuickLaboratoryTestsCountQueryVariables>(QuickLaboratoryTestsCountDocument, options);
-      }
-export function useQuickLaboratoryTestsCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickLaboratoryTestsCountQuery, QuickLaboratoryTestsCountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<QuickLaboratoryTestsCountQuery, QuickLaboratoryTestsCountQueryVariables>(QuickLaboratoryTestsCountDocument, options);
-        }
-export type QuickLaboratoryTestsCountQueryHookResult = ReturnType<typeof useQuickLaboratoryTestsCountQuery>;
-export type QuickLaboratoryTestsCountLazyQueryHookResult = ReturnType<typeof useQuickLaboratoryTestsCountLazyQuery>;
-export type QuickLaboratoryTestsCountQueryResult = Apollo.QueryResult<QuickLaboratoryTestsCountQuery, QuickLaboratoryTestsCountQueryVariables>;
-export const QuickLaboratoryTestsForDashboardDocument = gql`
-    query QuickLaboratoryTestsForDashboard($skip: Float!, $take: Float!) {
-  quickLaboratoryTests(skip: $skip, take: $take) {
-    id
-    price
-    paid
-    updated_at
-  }
-}
-    `;
-
-/**
- * __useQuickLaboratoryTestsForDashboardQuery__
- *
- * To run a query within a React component, call `useQuickLaboratoryTestsForDashboardQuery` and pass it any options that fit your needs.
- * When your component renders, `useQuickLaboratoryTestsForDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useQuickLaboratoryTestsForDashboardQuery({
- *   variables: {
- *      skip: // value for 'skip'
- *      take: // value for 'take'
- *   },
- * });
- */
-export function useQuickLaboratoryTestsForDashboardQuery(baseOptions: Apollo.QueryHookOptions<QuickLaboratoryTestsForDashboardQuery, QuickLaboratoryTestsForDashboardQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<QuickLaboratoryTestsForDashboardQuery, QuickLaboratoryTestsForDashboardQueryVariables>(QuickLaboratoryTestsForDashboardDocument, options);
-      }
-export function useQuickLaboratoryTestsForDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickLaboratoryTestsForDashboardQuery, QuickLaboratoryTestsForDashboardQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<QuickLaboratoryTestsForDashboardQuery, QuickLaboratoryTestsForDashboardQueryVariables>(QuickLaboratoryTestsForDashboardDocument, options);
-        }
-export type QuickLaboratoryTestsForDashboardQueryHookResult = ReturnType<typeof useQuickLaboratoryTestsForDashboardQuery>;
-export type QuickLaboratoryTestsForDashboardLazyQueryHookResult = ReturnType<typeof useQuickLaboratoryTestsForDashboardLazyQuery>;
-export type QuickLaboratoryTestsForDashboardQueryResult = Apollo.QueryResult<QuickLaboratoryTestsForDashboardQuery, QuickLaboratoryTestsForDashboardQueryVariables>;
-export const QuickPrescriptionTestsDocument = gql`
-    query QuickPrescriptionTests($skip: Float!, $take: Float!) {
-  quickPrescriptionTests(skip: $skip, take: $take) {
+export const QuickPrescriptionDocument = gql`
+    query QuickPrescription($id: ID!) {
+  quickPrescription(id: $id) {
     id
     name
     price
     paid
     completed
     new
-    result
+    medicines {
+      id
+      name
+    }
     other
     created_at
     updated_at
@@ -5571,68 +5788,67 @@ export const QuickPrescriptionTestsDocument = gql`
     `;
 
 /**
- * __useQuickPrescriptionTestsQuery__
+ * __useQuickPrescriptionQuery__
  *
- * To run a query within a React component, call `useQuickPrescriptionTestsQuery` and pass it any options that fit your needs.
- * When your component renders, `useQuickPrescriptionTestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useQuickPrescriptionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuickPrescriptionQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useQuickPrescriptionTestsQuery({
+ * const { data, loading, error } = useQuickPrescriptionQuery({
  *   variables: {
- *      skip: // value for 'skip'
- *      take: // value for 'take'
+ *      id: // value for 'id'
  *   },
  * });
  */
-export function useQuickPrescriptionTestsQuery(baseOptions: Apollo.QueryHookOptions<QuickPrescriptionTestsQuery, QuickPrescriptionTestsQueryVariables>) {
+export function useQuickPrescriptionQuery(baseOptions: Apollo.QueryHookOptions<QuickPrescriptionQuery, QuickPrescriptionQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<QuickPrescriptionTestsQuery, QuickPrescriptionTestsQueryVariables>(QuickPrescriptionTestsDocument, options);
+        return Apollo.useQuery<QuickPrescriptionQuery, QuickPrescriptionQueryVariables>(QuickPrescriptionDocument, options);
       }
-export function useQuickPrescriptionTestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickPrescriptionTestsQuery, QuickPrescriptionTestsQueryVariables>) {
+export function useQuickPrescriptionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickPrescriptionQuery, QuickPrescriptionQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<QuickPrescriptionTestsQuery, QuickPrescriptionTestsQueryVariables>(QuickPrescriptionTestsDocument, options);
+          return Apollo.useLazyQuery<QuickPrescriptionQuery, QuickPrescriptionQueryVariables>(QuickPrescriptionDocument, options);
         }
-export type QuickPrescriptionTestsQueryHookResult = ReturnType<typeof useQuickPrescriptionTestsQuery>;
-export type QuickPrescriptionTestsLazyQueryHookResult = ReturnType<typeof useQuickPrescriptionTestsLazyQuery>;
-export type QuickPrescriptionTestsQueryResult = Apollo.QueryResult<QuickPrescriptionTestsQuery, QuickPrescriptionTestsQueryVariables>;
-export const QuickPrescriptionTestsCountDocument = gql`
-    query QuickPrescriptionTestsCount {
-  quickPrescriptionTestsCount
+export type QuickPrescriptionQueryHookResult = ReturnType<typeof useQuickPrescriptionQuery>;
+export type QuickPrescriptionLazyQueryHookResult = ReturnType<typeof useQuickPrescriptionLazyQuery>;
+export type QuickPrescriptionQueryResult = Apollo.QueryResult<QuickPrescriptionQuery, QuickPrescriptionQueryVariables>;
+export const QuickPrescriptionCountDocument = gql`
+    query QuickPrescriptionCount {
+  quickPrescriptionCount
 }
     `;
 
 /**
- * __useQuickPrescriptionTestsCountQuery__
+ * __useQuickPrescriptionCountQuery__
  *
- * To run a query within a React component, call `useQuickPrescriptionTestsCountQuery` and pass it any options that fit your needs.
- * When your component renders, `useQuickPrescriptionTestsCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useQuickPrescriptionCountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuickPrescriptionCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useQuickPrescriptionTestsCountQuery({
+ * const { data, loading, error } = useQuickPrescriptionCountQuery({
  *   variables: {
  *   },
  * });
  */
-export function useQuickPrescriptionTestsCountQuery(baseOptions?: Apollo.QueryHookOptions<QuickPrescriptionTestsCountQuery, QuickPrescriptionTestsCountQueryVariables>) {
+export function useQuickPrescriptionCountQuery(baseOptions?: Apollo.QueryHookOptions<QuickPrescriptionCountQuery, QuickPrescriptionCountQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<QuickPrescriptionTestsCountQuery, QuickPrescriptionTestsCountQueryVariables>(QuickPrescriptionTestsCountDocument, options);
+        return Apollo.useQuery<QuickPrescriptionCountQuery, QuickPrescriptionCountQueryVariables>(QuickPrescriptionCountDocument, options);
       }
-export function useQuickPrescriptionTestsCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickPrescriptionTestsCountQuery, QuickPrescriptionTestsCountQueryVariables>) {
+export function useQuickPrescriptionCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickPrescriptionCountQuery, QuickPrescriptionCountQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<QuickPrescriptionTestsCountQuery, QuickPrescriptionTestsCountQueryVariables>(QuickPrescriptionTestsCountDocument, options);
+          return Apollo.useLazyQuery<QuickPrescriptionCountQuery, QuickPrescriptionCountQueryVariables>(QuickPrescriptionCountDocument, options);
         }
-export type QuickPrescriptionTestsCountQueryHookResult = ReturnType<typeof useQuickPrescriptionTestsCountQuery>;
-export type QuickPrescriptionTestsCountLazyQueryHookResult = ReturnType<typeof useQuickPrescriptionTestsCountLazyQuery>;
-export type QuickPrescriptionTestsCountQueryResult = Apollo.QueryResult<QuickPrescriptionTestsCountQuery, QuickPrescriptionTestsCountQueryVariables>;
-export const QuickPrescriptionTestsForDashboardDocument = gql`
-    query QuickPrescriptionTestsForDashboard($skip: Float!, $take: Float!) {
-  quickPrescriptionTests(skip: $skip, take: $take) {
+export type QuickPrescriptionCountQueryHookResult = ReturnType<typeof useQuickPrescriptionCountQuery>;
+export type QuickPrescriptionCountLazyQueryHookResult = ReturnType<typeof useQuickPrescriptionCountLazyQuery>;
+export type QuickPrescriptionCountQueryResult = Apollo.QueryResult<QuickPrescriptionCountQuery, QuickPrescriptionCountQueryVariables>;
+export const QuickPrescriptionsForDashboardDocument = gql`
+    query QuickPrescriptionsForDashboard($skip: Float!, $take: Float!) {
+  quickPrescriptions(skip: $skip, take: $take) {
     id
     price
     paid
@@ -5642,33 +5858,81 @@ export const QuickPrescriptionTestsForDashboardDocument = gql`
     `;
 
 /**
- * __useQuickPrescriptionTestsForDashboardQuery__
+ * __useQuickPrescriptionsForDashboardQuery__
  *
- * To run a query within a React component, call `useQuickPrescriptionTestsForDashboardQuery` and pass it any options that fit your needs.
- * When your component renders, `useQuickPrescriptionTestsForDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useQuickPrescriptionsForDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuickPrescriptionsForDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useQuickPrescriptionTestsForDashboardQuery({
+ * const { data, loading, error } = useQuickPrescriptionsForDashboardQuery({
  *   variables: {
  *      skip: // value for 'skip'
  *      take: // value for 'take'
  *   },
  * });
  */
-export function useQuickPrescriptionTestsForDashboardQuery(baseOptions: Apollo.QueryHookOptions<QuickPrescriptionTestsForDashboardQuery, QuickPrescriptionTestsForDashboardQueryVariables>) {
+export function useQuickPrescriptionsForDashboardQuery(baseOptions: Apollo.QueryHookOptions<QuickPrescriptionsForDashboardQuery, QuickPrescriptionsForDashboardQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<QuickPrescriptionTestsForDashboardQuery, QuickPrescriptionTestsForDashboardQueryVariables>(QuickPrescriptionTestsForDashboardDocument, options);
+        return Apollo.useQuery<QuickPrescriptionsForDashboardQuery, QuickPrescriptionsForDashboardQueryVariables>(QuickPrescriptionsForDashboardDocument, options);
       }
-export function useQuickPrescriptionTestsForDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickPrescriptionTestsForDashboardQuery, QuickPrescriptionTestsForDashboardQueryVariables>) {
+export function useQuickPrescriptionsForDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickPrescriptionsForDashboardQuery, QuickPrescriptionsForDashboardQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<QuickPrescriptionTestsForDashboardQuery, QuickPrescriptionTestsForDashboardQueryVariables>(QuickPrescriptionTestsForDashboardDocument, options);
+          return Apollo.useLazyQuery<QuickPrescriptionsForDashboardQuery, QuickPrescriptionsForDashboardQueryVariables>(QuickPrescriptionsForDashboardDocument, options);
         }
-export type QuickPrescriptionTestsForDashboardQueryHookResult = ReturnType<typeof useQuickPrescriptionTestsForDashboardQuery>;
-export type QuickPrescriptionTestsForDashboardLazyQueryHookResult = ReturnType<typeof useQuickPrescriptionTestsForDashboardLazyQuery>;
-export type QuickPrescriptionTestsForDashboardQueryResult = Apollo.QueryResult<QuickPrescriptionTestsForDashboardQuery, QuickPrescriptionTestsForDashboardQueryVariables>;
+export type QuickPrescriptionsForDashboardQueryHookResult = ReturnType<typeof useQuickPrescriptionsForDashboardQuery>;
+export type QuickPrescriptionsForDashboardLazyQueryHookResult = ReturnType<typeof useQuickPrescriptionsForDashboardLazyQuery>;
+export type QuickPrescriptionsForDashboardQueryResult = Apollo.QueryResult<QuickPrescriptionsForDashboardQuery, QuickPrescriptionsForDashboardQueryVariables>;
+export const QuickPrescriptionsDocument = gql`
+    query QuickPrescriptions($skip: Float!, $take: Float!) {
+  quickPrescriptions(skip: $skip, take: $take) {
+    id
+    name
+    price
+    paid
+    completed
+    new
+    medicines {
+      id
+      name
+    }
+    other
+    created_at
+    updated_at
+  }
+}
+    `;
+
+/**
+ * __useQuickPrescriptionsQuery__
+ *
+ * To run a query within a React component, call `useQuickPrescriptionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuickPrescriptionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useQuickPrescriptionsQuery({
+ *   variables: {
+ *      skip: // value for 'skip'
+ *      take: // value for 'take'
+ *   },
+ * });
+ */
+export function useQuickPrescriptionsQuery(baseOptions: Apollo.QueryHookOptions<QuickPrescriptionsQuery, QuickPrescriptionsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<QuickPrescriptionsQuery, QuickPrescriptionsQueryVariables>(QuickPrescriptionsDocument, options);
+      }
+export function useQuickPrescriptionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickPrescriptionsQuery, QuickPrescriptionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<QuickPrescriptionsQuery, QuickPrescriptionsQueryVariables>(QuickPrescriptionsDocument, options);
+        }
+export type QuickPrescriptionsQueryHookResult = ReturnType<typeof useQuickPrescriptionsQuery>;
+export type QuickPrescriptionsLazyQueryHookResult = ReturnType<typeof useQuickPrescriptionsLazyQuery>;
+export type QuickPrescriptionsQueryResult = Apollo.QueryResult<QuickPrescriptionsQuery, QuickPrescriptionsQueryVariables>;
 export const SettingDocument = gql`
     query Setting {
   setting {
@@ -6029,9 +6293,9 @@ export function useNewMedicationUpdateSubscription(baseOptions?: Apollo.Subscrip
       }
 export type NewMedicationUpdateSubscriptionHookResult = ReturnType<typeof useNewMedicationUpdateSubscription>;
 export type NewMedicationUpdateSubscriptionResult = Apollo.SubscriptionResult<NewMedicationUpdateSubscription>;
-export const NewCreatedQuickLaboratoryTestDocument = gql`
-    subscription NewCreatedQuickLaboratoryTest {
-  newCreatedQuickLaboratoryTest {
+export const NewCreatedQuickLaboratoryExaminationDocument = gql`
+    subscription NewCreatedQuickLaboratoryExamination {
+  newCreatedQuickLaboratoryExamination {
     id
     name
     price
@@ -6039,6 +6303,10 @@ export const NewCreatedQuickLaboratoryTestDocument = gql`
     completed
     new
     result
+    tests {
+      id
+      name
+    }
     created_at
     updated_at
   }
@@ -6046,36 +6314,39 @@ export const NewCreatedQuickLaboratoryTestDocument = gql`
     `;
 
 /**
- * __useNewCreatedQuickLaboratoryTestSubscription__
+ * __useNewCreatedQuickLaboratoryExaminationSubscription__
  *
- * To run a query within a React component, call `useNewCreatedQuickLaboratoryTestSubscription` and pass it any options that fit your needs.
- * When your component renders, `useNewCreatedQuickLaboratoryTestSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useNewCreatedQuickLaboratoryExaminationSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewCreatedQuickLaboratoryExaminationSubscription` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useNewCreatedQuickLaboratoryTestSubscription({
+ * const { data, loading, error } = useNewCreatedQuickLaboratoryExaminationSubscription({
  *   variables: {
  *   },
  * });
  */
-export function useNewCreatedQuickLaboratoryTestSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewCreatedQuickLaboratoryTestSubscription, NewCreatedQuickLaboratoryTestSubscriptionVariables>) {
+export function useNewCreatedQuickLaboratoryExaminationSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewCreatedQuickLaboratoryExaminationSubscription, NewCreatedQuickLaboratoryExaminationSubscriptionVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useSubscription<NewCreatedQuickLaboratoryTestSubscription, NewCreatedQuickLaboratoryTestSubscriptionVariables>(NewCreatedQuickLaboratoryTestDocument, options);
+        return Apollo.useSubscription<NewCreatedQuickLaboratoryExaminationSubscription, NewCreatedQuickLaboratoryExaminationSubscriptionVariables>(NewCreatedQuickLaboratoryExaminationDocument, options);
       }
-export type NewCreatedQuickLaboratoryTestSubscriptionHookResult = ReturnType<typeof useNewCreatedQuickLaboratoryTestSubscription>;
-export type NewCreatedQuickLaboratoryTestSubscriptionResult = Apollo.SubscriptionResult<NewCreatedQuickLaboratoryTestSubscription>;
-export const NewCreatedQuickPrescriptionTestDocument = gql`
-    subscription NewCreatedQuickPrescriptionTest {
-  newCreatedQuickPrescriptionTest {
+export type NewCreatedQuickLaboratoryExaminationSubscriptionHookResult = ReturnType<typeof useNewCreatedQuickLaboratoryExaminationSubscription>;
+export type NewCreatedQuickLaboratoryExaminationSubscriptionResult = Apollo.SubscriptionResult<NewCreatedQuickLaboratoryExaminationSubscription>;
+export const NewCreatedQuickPrescriptionDocument = gql`
+    subscription NewCreatedQuickPrescription {
+  newCreatedQuickPrescription {
     id
     name
     price
     paid
     completed
     new
-    result
+    medicines {
+      id
+      name
+    }
     created_at
     updated_at
   }
@@ -6083,23 +6354,23 @@ export const NewCreatedQuickPrescriptionTestDocument = gql`
     `;
 
 /**
- * __useNewCreatedQuickPrescriptionTestSubscription__
+ * __useNewCreatedQuickPrescriptionSubscription__
  *
- * To run a query within a React component, call `useNewCreatedQuickPrescriptionTestSubscription` and pass it any options that fit your needs.
- * When your component renders, `useNewCreatedQuickPrescriptionTestSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useNewCreatedQuickPrescriptionSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewCreatedQuickPrescriptionSubscription` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useNewCreatedQuickPrescriptionTestSubscription({
+ * const { data, loading, error } = useNewCreatedQuickPrescriptionSubscription({
  *   variables: {
  *   },
  * });
  */
-export function useNewCreatedQuickPrescriptionTestSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewCreatedQuickPrescriptionTestSubscription, NewCreatedQuickPrescriptionTestSubscriptionVariables>) {
+export function useNewCreatedQuickPrescriptionSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewCreatedQuickPrescriptionSubscription, NewCreatedQuickPrescriptionSubscriptionVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useSubscription<NewCreatedQuickPrescriptionTestSubscription, NewCreatedQuickPrescriptionTestSubscriptionVariables>(NewCreatedQuickPrescriptionTestDocument, options);
+        return Apollo.useSubscription<NewCreatedQuickPrescriptionSubscription, NewCreatedQuickPrescriptionSubscriptionVariables>(NewCreatedQuickPrescriptionDocument, options);
       }
-export type NewCreatedQuickPrescriptionTestSubscriptionHookResult = ReturnType<typeof useNewCreatedQuickPrescriptionTestSubscription>;
-export type NewCreatedQuickPrescriptionTestSubscriptionResult = Apollo.SubscriptionResult<NewCreatedQuickPrescriptionTestSubscription>;
+export type NewCreatedQuickPrescriptionSubscriptionHookResult = ReturnType<typeof useNewCreatedQuickPrescriptionSubscription>;
+export type NewCreatedQuickPrescriptionSubscriptionResult = Apollo.SubscriptionResult<NewCreatedQuickPrescriptionSubscription>;

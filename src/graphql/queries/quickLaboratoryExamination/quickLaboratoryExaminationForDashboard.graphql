@@ -1,0 +1,8 @@
+query QuickLaboratoryExaminationsForDashboard($skip: Float!, $take: Float!) {
+  quickLaboratoryExaminations(skip: $skip, take: $take) {
+    id
+    price
+    paid
+    updated_at
+  }
+}

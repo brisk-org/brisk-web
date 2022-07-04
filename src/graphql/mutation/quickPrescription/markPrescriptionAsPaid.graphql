@@ -1,0 +1,6 @@
+mutation MarkQuickPrescriptionAsPaid($id: ID!) {
+  markQuickPrescriptionAsPaid(id: $id) {
+    id
+    paid
+  }
+}

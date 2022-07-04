@@ -1,8 +1,0 @@
-query QuickLaboratoryTestsForDashboard($skip: Float!, $take: Float!) {
-  quickLaboratoryTests(skip: $skip, take: $take) {
-    id
-    price
-    paid
-    updated_at
-  }
-}

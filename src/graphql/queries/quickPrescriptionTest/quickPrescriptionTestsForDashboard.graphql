@@ -1,8 +1,0 @@
-query QuickPrescriptionTestsForDashboard($skip: Float!, $take: Float!) {
-  quickPrescriptionTests(skip: $skip, take: $take) {
-    id
-    price
-    paid
-    updated_at
-  }
-}

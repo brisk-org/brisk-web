@@ -2,6 +2,7 @@ query prescriptionsForDashboard($skip: Float!, $take: Float!) {
   prescriptions(skip: $skip, take: $take) {
     id
     paid
+    inrolled
     medications {
       checkIn {
         date

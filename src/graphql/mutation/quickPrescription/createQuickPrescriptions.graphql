@@ -1,0 +1,25 @@
+mutation CreateQuickPrescription(
+  $name: String!
+  $medicineIds: [ID!]!
+  $price: Float
+  $other: String
+) {
+  createQuickPrescription(
+    input: {
+      name: $name
+      price: $price
+      medicineIds: $medicineIds
+      other: $other
+    }
+  ) {
+    id
+    name
+    price
+    medicines {
+      id
+      name
+    }
+    other
+    created_at
+  }
+}

@@ -5,14 +5,6 @@ import {
   useLaboratoryTestCategoriesQuery,
   useSettingQuery
 } from '../generated/graphql';
-export type PrescriptionPerDay = 'BID' | 'STAT';
-export type PrescriptionCheckIn = {
-  perDay: PrescriptionPerDay;
-  date: string;
-  price: number;
-  isPaid: boolean;
-  completed: boolean;
-};
 
 type ContextType = {
   cardPrice?: number;

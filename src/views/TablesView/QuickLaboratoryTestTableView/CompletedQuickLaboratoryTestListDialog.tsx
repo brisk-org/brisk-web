@@ -8,7 +8,7 @@ import {
   Box,
   colors,
   Fab,
-  Grid,
+  Grid
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import {
@@ -16,7 +16,7 @@ import {
   DoneAllRounded,
   LocalHospitalOutlined
 } from '@mui/icons-material';
-import { QuickLabTestType } from '../../../@types/QuickLaboratoryTests';
+import { QuickLaboratoryExaminationsQuery } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  laboratoryTest: QuickLabTestType;
+  laboratoryTest: QuickLaboratoryExaminationsQuery['quickLaboratoryExaminations'][0];
 }
 const CompletedQuickLaboratoryTestListDialog: React.FC<ConfirmationDialogProps> = ({
   open,
@@ -89,21 +89,21 @@ const CompletedQuickLaboratoryTestListDialog: React.FC<ConfirmationDialogProps> 
               This is a Laboratory Test for {laboratoryTest.name}
             </Typography>
             <Grid container>
-              {Object.entries(
-                JSON.parse(laboratoryTest.result) as Record<string, boolean>
-              ).map(
-                ([key, value], index) =>
-                  value && (
-                    <Grid item md={6} sm={12} key={index}>
-                      <Fab className={classes.doneAllIcon} size="large">
-                        <DoneAllRounded />
-                      </Fab>
-                      <Typography>{key}</Typography>
-                    </Grid>
-                  )
-              )}
+              {laboratoryTest.tests.map(tests => (
+                <Grid item md={6} sm={12} key={tests.id}>
+                  <Fab className={classes.doneAllIcon} size="large">
+                    <DoneAllRounded />
+                  </Fab>
+                  <Typography>{tests.name}</Typography>
+                </Grid>
+              ))}
             </Grid>
             <Typography gutterBottom>price: {laboratoryTest.price}</Typography>
+            {laboratoryTest.result && (
+              <Typography gutterBottom>
+                Result: {laboratoryTest.result}
+              </Typography>
+            )}
             {laboratoryTest.other && (
               <Typography gutterBottom>
                 Other: {laboratoryTest.other}

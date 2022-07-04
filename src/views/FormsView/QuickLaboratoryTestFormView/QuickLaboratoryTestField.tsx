@@ -1,22 +1,26 @@
-import { Checkbox, FormControlLabel, Typography } from '@mui/material';
+import {
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  Typography
+} from '@mui/material';
 import React, { useContext } from 'react';
-import NumberTextField from '../../../components/helpers/NumberTextField';
 import { AuthContext } from '../../../context/AuthContext';
 import { Occupation } from '../../../generated/graphql';
 
-interface SingleLabTestProps {
-  singleDetail: { name: string; price: number; selected: boolean };
-  handleChange:
+interface Props {
+  test: { name: string; price: number; selected: boolean };
+  handleCheckboxClick:
     | ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void)
     | undefined;
-  handleFieldChange:
+  handleChange:
     | React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
     | undefined;
 }
-const SingleQuickLabTestForm: React.FC<SingleLabTestProps> = ({
-  singleDetail: { name, price, selected },
+const QuickLaboratoryTestField: React.FC<Props> = ({
+  test: { name, price, selected },
   handleChange,
-  handleFieldChange
+  handleCheckboxClick
 }) => {
   const { occupation } = useContext(AuthContext);
   return (
@@ -24,10 +28,13 @@ const SingleQuickLabTestForm: React.FC<SingleLabTestProps> = ({
       {occupation === Occupation.Laboratory ? (
         <>
           <Typography>{name}:</Typography>
-          <NumberTextField
-            handleChange={handleFieldChange}
-            label="By Price:"
+          <TextField
+            fullWidth
             name={name}
+            type="number"
+            onChange={handleChange}
+            required
+            label="By Price:"
             value={price}
           />
         </>
@@ -36,7 +43,7 @@ const SingleQuickLabTestForm: React.FC<SingleLabTestProps> = ({
           control={
             <Checkbox
               checked={selected}
-              onChange={handleChange}
+              onChange={handleCheckboxClick}
               name={name}
               color="primary"
             />
@@ -48,4 +55,4 @@ const SingleQuickLabTestForm: React.FC<SingleLabTestProps> = ({
   );
 };
 
-export default SingleQuickLabTestForm;
+export default QuickLaboratoryTestField;

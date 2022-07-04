@@ -85,7 +85,7 @@ interface Props {
   prescriptionSales: SalesValue;
   laboratoryTestSales: SalesValue;
   quickLaboratoryTestSales: SalesValue;
-  quickprescriptionales: SalesValue;
+  quickPrescriptionSales: SalesValue;
 }
 
 const SalesContainer: React.FC<Props> = ({
@@ -93,7 +93,7 @@ const SalesContainer: React.FC<Props> = ({
   prescriptionSales,
   laboratoryTestSales,
   quickLaboratoryTestSales,
-  quickprescriptionales: quickPrescriptionSales
+  quickPrescriptionSales
 }) => {
   const classes = useStyles();
   const [totalAmount, setTotalAmount] = useState(0);

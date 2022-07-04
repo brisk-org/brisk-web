@@ -17,11 +17,11 @@ import clsx from 'clsx';
 import { useHistory } from 'react-router';
 import { quickPrescribeQuery } from '../../../constants/queries';
 import ConfirmationDialog from './ConfirmationDialog';
-import { QuickPrescriptionType } from '../../../@types/QuickLaboratoryTests';
 import CompletedQuickPrescriptionTestListDialog from './CompletedQuickPrescriptionTestListDialog';
 import {
   Occupation,
-  useMarkQuickPrescriptionTestAsSeenMutation
+  QuickPrescriptionsQuery,
+  useMarkQuickPrescriptionAsSeenMutation
 } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SingleQuickPrescriptionTestRow: React.FC<{
-  prescription: QuickPrescriptionType;
+  prescription: QuickPrescriptionsQuery['quickPrescriptions'][0];
 }> = ({ prescription }) => {
   const classes = useStyles();
   const { containerProps, indicatorEl } = useLoading({
@@ -71,12 +71,12 @@ const SingleQuickPrescriptionTestRow: React.FC<{
   const { occupation } = useContext(AuthContext);
   const [
     markQuickPerscriptionAsSeen
-  ] = useMarkQuickPrescriptionTestAsSeenMutation();
+  ] = useMarkQuickPrescriptionAsSeenMutation();
 
   const handleClick = async () => {
-    const { bp, dressing, injection, depo, tat } = JSON.parse(
-      prescription.result
-    ) as any;
+    // const { bp, dressing, injection, depo, tat } = JSON.parse(
+    //   prescription.result
+    // ) as any;
     switch (occupation) {
       case Occupation.Reception:
         !prescription.paid && setPaymentDialogOpen(true);
@@ -93,13 +93,7 @@ const SingleQuickPrescriptionTestRow: React.FC<{
           ? setCompletedListDialogOpen(true)
           : history.push(
               quickPrescribeQuery({
-                id: prescription.id,
-                name: prescription.name,
-                bp,
-                dressing,
-                injection,
-                depo,
-                tat
+                id: prescription.id
               })
             );
     }

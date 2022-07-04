@@ -13,12 +13,11 @@ import DailyCalander from './DailyCalander';
 import {
   useCardsForDashboardQuery,
   NewCreatedCardDocument,
-  NewCreatedPrescriptionDocument,
   usePrescriptionsForDashboardQuery,
-  useQuickPrescriptionTestsForDashboardQuery,
-  useQuickLaboratoryTestsForDashboardQuery,
-  NewCreatedQuickLaboratoryTestDocument,
-  NewCreatedQuickPrescriptionTestDocument,
+  useQuickPrescriptionsForDashboardQuery,
+  useQuickLaboratoryExaminationsForDashboardQuery,
+  NewCreatedQuickLaboratoryExaminationDocument,
+  NewCreatedQuickPrescriptionDocument,
   useLaboratoryExaminationsForDashboardQuery,
   NewCreatedLaboratoryExaminationDocument,
   NewMedicationUpdateDocument,
@@ -46,15 +45,15 @@ const DashboardView = () => {
   });
   const {
     data: quickPrescriptionData,
-    subscribeToMore: subscribeToMoreQuickprescription
-  } = useQuickPrescriptionTestsForDashboardQuery({
+    subscribeToMore: subscribeToMoreQuickPrescription
+  } = useQuickPrescriptionsForDashboardQuery({
     variables: { skip: 0, take: 0 }
   });
 
   const {
     data: quickLaboratoryTestData,
-    subscribeToMore: subscribeToMoreQuickLaboratoryTests
-  } = useQuickLaboratoryTestsForDashboardQuery({
+    subscribeToMore: subscribeToMoreQuickLaboratoryExamination
+  } = useQuickLaboratoryExaminationsForDashboardQuery({
     variables: { skip: 0, take: 0 }
   });
 
@@ -96,27 +95,30 @@ const DashboardView = () => {
       },
       onError: err => console.log(err)
     });
-    subscribeToMoreQuickLaboratoryTests({
-      document: NewCreatedQuickLaboratoryTestDocument,
+    subscribeToMoreQuickLaboratoryExamination({
+      document: NewCreatedQuickLaboratoryExaminationDocument,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const newCreatedCard = subscriptionData.data;
         return Object.assign({}, prev, {
-          quickLaboratoryTests: [newCreatedCard, ...prev.quickLaboratoryTests]
+          quickLaboratoryTests: [
+            newCreatedCard,
+            ...prev.quickLaboratoryExaminations
+          ]
         });
       },
       onError: err => console.log(err)
     });
 
-    subscribeToMoreQuickprescription({
-      document: NewCreatedQuickPrescriptionTestDocument,
+    subscribeToMoreQuickPrescription({
+      document: NewCreatedQuickPrescriptionDocument,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const newCreatedPrescriptionTest = subscriptionData.data;
         return Object.assign({}, prev, {
           quickprescription: [
             newCreatedPrescriptionTest,
-            ...prev.quickPrescriptionTests
+            ...prev.quickPrescriptions
           ]
         });
       },
@@ -133,25 +135,30 @@ const DashboardView = () => {
     )
     .flat();
   const prescriptionSales = prescriptionData?.prescriptions
-    .map(
-      prescription =>
-        prescription.medications
-          ?.map(medication =>
-            medication.checkIn.map(
-              ({ price, status }) =>
-                status
-                  .map(({ isPaid, paidAt }) => {
-                    if (!isPaid) return { price: 0, updated_at: '' };
-                    return {
-                      price,
-                      updated_at: String(getTime(new Date(paidAt)))
-                    };
-                  })
-                  .filter(({ price }) => price !== 0)!
-            )
+    .map(prescription => {
+      if (!prescription.inrolled && prescription.paid) {
+        return {
+          price: prescription.price,
+          updated_at: prescription.updated_at
+        };
+      }
+      return prescription.medications
+        ?.map(medication =>
+          medication.checkIn.map(
+            ({ price, status }) =>
+              status
+                .map(({ isPaid, paidAt }) => {
+                  if (!isPaid) return { price: 0, updated_at: '' };
+                  return {
+                    price,
+                    updated_at: String(getTime(new Date(paidAt)))
+                  };
+                })
+                .filter(({ price }) => price !== 0)!
           )
-          .filter(medication => medication)!
-    )
+        )
+        .filter(medication => medication)!;
+    })
     .flat()
     .flat()
     .flat();
@@ -166,11 +173,9 @@ const DashboardView = () => {
               laboratoryTestSales={laboratoryTestsData?.laboratoryExaminations}
               prescriptionSales={prescriptionSales}
               quickLaboratoryTestSales={
-                quickLaboratoryTestData?.quickLaboratoryTests
+                quickLaboratoryTestData?.quickLaboratoryExaminations
               }
-              quickprescriptionales={
-                quickPrescriptionData?.quickPrescriptionTests
-              }
+              quickPrescriptionSales={quickPrescriptionData?.quickPrescriptions}
             />
           </Grid>
           <Grid container item lg={8} md={7} xs={12} spacing={2}>

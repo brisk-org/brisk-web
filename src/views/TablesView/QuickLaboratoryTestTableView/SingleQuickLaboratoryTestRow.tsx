@@ -16,10 +16,12 @@ import { BallTriangle, useLoading } from '@agney/react-loading';
 import clsx from 'clsx';
 import { quickLabTest } from '../../../constants/queries';
 import ConfirmationDialog from './ConfirmationDialog';
-import { QuickLabTestType } from '../../../@types/QuickLaboratoryTests';
 import { useHistory } from 'react-router';
 import CompletedQuickLaboratoryTestListDialog from './CompletedQuickLaboratoryTestListDialog';
-import { Occupation } from '../../../generated/graphql';
+import {
+  Occupation,
+  QuickLaboratoryExaminationsQuery
+} from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -54,8 +56,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SingleQuickLaboratoryTestRow: React.FC<{
-  labTest: QuickLabTestType;
-}> = ({ labTest: laboratoryTest }) => {
+  laboratoryTest: QuickLaboratoryExaminationsQuery['quickLaboratoryExaminations'][0];
+}> = ({ laboratoryTest }) => {
   const classes = useStyles();
   const { containerProps, indicatorEl } = useLoading({
     loading: true,
@@ -68,7 +70,6 @@ const SingleQuickLaboratoryTestRow: React.FC<{
   const { occupation } = useContext(AuthContext);
 
   const handleClick = () => {
-    const { fbs, hcg, rbs } = JSON.parse(laboratoryTest.result) as any;
     switch (occupation) {
       case Occupation.Reception:
         setPaymentDialogOpen(true);
@@ -78,11 +79,7 @@ const SingleQuickLaboratoryTestRow: React.FC<{
           ? setCompletedListDialogOpen(true)
           : history.push(
               quickLabTest({
-                id: laboratoryTest.id,
-                name: laboratoryTest.name,
-                fbs,
-                hcg,
-                rbs
+                id: laboratoryTest.id
               })
             );
         break;

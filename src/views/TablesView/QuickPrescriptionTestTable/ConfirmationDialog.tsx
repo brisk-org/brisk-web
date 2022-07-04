@@ -8,12 +8,14 @@ import {
   Dialog,
   Button,
   Box,
-  colors,
+  colors
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { AttachMoney, Close } from '@mui/icons-material';
-import { useMarkQuickPrescriptionTestAsPaidMutation } from '../../../generated/graphql';
-import { QuickPrescriptionType } from '../../../@types/QuickLaboratoryTests';
+import {
+  QuickPrescriptionQuery,
+  useMarkQuickPrescriptionAsPaidMutation
+} from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -35,7 +37,7 @@ const useStyles = makeStyles(theme => ({
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  prescription: QuickPrescriptionType;
+  prescription: QuickPrescriptionQuery['quickPrescription'][0];
 }
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,
@@ -44,9 +46,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   const classes = useStyles();
 
-  const [
-    markQuickPrescriptionAsPaid
-  ] = useMarkQuickPrescriptionTestAsPaidMutation({
+  const [markQuickPrescriptionAsPaid] = useMarkQuickPrescriptionAsPaidMutation({
     onError: err => console.log(err)
   });
 

@@ -1,0 +1,8 @@
+query QuickPrescriptionsForDashboard($skip: Float!, $take: Float!) {
+  quickPrescriptions(skip: $skip, take: $take) {
+    id
+    price
+    paid
+    updated_at
+  }
+}

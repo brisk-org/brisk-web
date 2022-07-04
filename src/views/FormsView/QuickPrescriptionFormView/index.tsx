@@ -5,8 +5,8 @@ import Page from '../../../components/Page';
 import PrescriptionForm from './QuickPrescriptionForm';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
-  useCreateQuickPrescriptionTestMutation,
-  useCompleteQuickPrescriptionTestMutation
+  useCreateQuickPrescriptionMutation,
+  useCompleteQuickPrescriptionMutation
 } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
@@ -67,10 +67,10 @@ const QuickPrescriptionFormView = () => {
     prescription.id && setIsQueried(true);
   }, [query]);
 
-  const [createQuickPrescription] = useCreateQuickPrescriptionTestMutation({
+  const [createQuickPrescription] = useCreateQuickPrescriptionMutation({
     onError: err => console.log(err)
   });
-  const [completeQuickPrescription] = useCompleteQuickPrescriptionTestMutation({
+  const [completeQuickPrescription] = useCompleteQuickPrescriptionMutation({
     onError: err => console.log(err)
   });
   const handleSubmit:
@@ -100,7 +100,8 @@ const QuickPrescriptionFormView = () => {
       ? createQuickPrescription({
           variables: {
             name,
-            result,
+            // result,
+            medicineIds: [''],
             other
           }
         })

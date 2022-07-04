@@ -1,16 +1,14 @@
 import React from 'react';
 import {
-  DialogActions,
   DialogTitle,
   DialogContent,
   Typography,
   IconButton,
   Dialog,
-  Button,
   Box,
   colors,
   Fab,
-  Grid,
+  Grid
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import {
@@ -18,8 +16,7 @@ import {
   DoneAllRounded,
   LocalHospitalOutlined
 } from '@mui/icons-material';
-import { useMarkQuickPrescriptionTestAsSeenMutation } from '../../../generated/graphql';
-import { QuickPrescriptionType } from '../../../@types/QuickLaboratoryTests';
+import { QuickPrescriptionsQuery } from '../../../generated/graphql';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -45,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  prescription: QuickPrescriptionType;
+  prescription: QuickPrescriptionsQuery['quickPrescriptions'][0];
 }
 const CompletedQuickPrescriptionTestListDialog: React.FC<ConfirmationDialogProps> = ({
   open,
@@ -92,19 +89,14 @@ const CompletedQuickPrescriptionTestListDialog: React.FC<ConfirmationDialogProps
               This is a Quick Prescription for {prescription.name}
             </Typography>
             <Grid container>
-              {Object.entries(
-                JSON.parse(prescription.result) as Record<string, boolean>
-              ).map(
-                ([key, value], index) =>
-                  value && (
-                    <Grid item md={6} sm={12} key={index}>
-                      <Fab className={classes.doneAllIcon} size="large">
-                        <DoneAllRounded />
-                      </Fab>
-                      <Typography>{key}</Typography>
-                    </Grid>
-                  )
-              )}
+              {prescription.medicines.map(medicine => (
+                <Grid item md={6} sm={12} key={medicine.id}>
+                  <Fab className={classes.doneAllIcon} size="large">
+                    <DoneAllRounded />
+                  </Fab>
+                  <Typography>{medicine.name}</Typography>
+                </Grid>
+              ))}
             </Grid>
             <Typography gutterBottom>price: {prescription.price}</Typography>
             {prescription.other && (

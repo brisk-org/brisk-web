@@ -1,0 +1,6 @@
+mutation MarkQuickPrescriptionAsSeen($id: ID!) {
+  markQuickPrescriptionAsSeen(id: $id) {
+    id
+    new
+  }
+}
