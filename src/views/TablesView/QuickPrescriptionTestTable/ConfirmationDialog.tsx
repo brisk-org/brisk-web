@@ -13,7 +13,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { AttachMoney, Close } from '@mui/icons-material';
 import {
-  QuickPrescriptionQuery,
+  QuickPrescriptionsQuery,
   useMarkQuickPrescriptionAsPaidMutation
 } from '../../../generated/graphql';
 
@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
 interface ConfirmationDialogProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  prescription: QuickPrescriptionQuery['quickPrescription'][0];
+  prescription: QuickPrescriptionsQuery['quickPrescriptions'][0];
 }
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   open,

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useContext, useState } from 'react';
+import React, { useEffect, useRef, useContext, useState, useMemo } from 'react';
 import { Box, Container } from '@mui/material';
 
 import makeStyles from '@mui/styles/makeStyles';
@@ -7,6 +7,7 @@ import Page from '../../../components/Page';
 import {
   NewCreatedQuickLaboratoryExaminationDocument,
   Occupation,
+  QuickLaboratoryExaminationsQuery,
   useQuickLaboratoryExaminationCountQuery,
   useQuickLaboratoryExaminationsQuery
 } from '../../../generated/graphql';
@@ -22,7 +23,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const QuickLaboratoryTestTableView = () => {
+const QuickLaboratoryTestExaminationView = () => {
   const classes = useStyles();
 
   const { occupation } = useContext(AuthContext);
@@ -30,9 +31,9 @@ const QuickLaboratoryTestTableView = () => {
 
   const [skip, setSkip] = useState(0);
   const [take, setTake] = useState(10);
-  // const [quickLabTests, setQuickLabTests] = useState<
-  //   QuickLaboratoryExaminations
-  // >();
+  const [quickLabTests, setQuickLabTests] = useState<
+    QuickLaboratoryExaminationsQuery['quickLaboratoryExaminations']
+  >();
 
   const { data: countData } = useQuickLaboratoryExaminationCountQuery();
 
@@ -44,54 +45,66 @@ const QuickLaboratoryTestTableView = () => {
     variables: { skip, take },
     fetchPolicy: firstRender.current ? 'cache-first' : 'network-only'
   });
-  subscribeToMore({
-    document: NewCreatedQuickLaboratoryExaminationDocument,
-    updateQuery: (prev, { subscriptionData }) => {
-      const newCreatedQuickLaboratoryTest = subscriptionData.data;
-      if (!newCreatedQuickLaboratoryTest) return prev;
+  useEffect(() => {
+    subscribeToMore({
+      document: NewCreatedQuickLaboratoryExaminationDocument,
+      updateQuery: (prev, { subscriptionData }) => {
+        const {
+          newCreatedQuickLaboratoryExamination
+        }: any = subscriptionData.data;
+        if (!newCreatedQuickLaboratoryExamination) return prev;
+        if (
+          prev.quickLaboratoryExaminations.find(
+            ({ id }) => id === newCreatedQuickLaboratoryExamination.id
+          )
+        )
+          return prev;
 
-      return Object.assign({}, prev, {
-        quickLaboratoryTests: prev.quickLaboratoryExaminations
-          ? [newCreatedQuickLaboratoryTest, ...prev.quickLaboratoryExaminations]
-          : [newCreatedQuickLaboratoryTest]
-      });
-    },
-    onError: err => console.log(err)
-  });
+        return Object.assign({}, prev, {
+          quickLaboratoryExaminations: prev.quickLaboratoryExaminations
+            ? [
+                newCreatedQuickLaboratoryExamination,
+                ...prev.quickLaboratoryExaminations
+              ]
+            : [newCreatedQuickLaboratoryExamination]
+        });
+      },
+      onError: err => console.log(err)
+    });
+  }, []);
 
-  // useEffect(() => {
-  //   setQuickLabTests(data);
-  // }, [data]);
+  useEffect(() => {
+    if (!data) return;
+    setQuickLabTests(data?.quickLaboratoryExaminations);
+  }, [data]);
 
   return (
     <Page className={classes.root} title="Quick Laboratory Examination">
       <Container ref={firstRender} maxWidth={false}>
         <Box mt={3}>
-          {!data?.quickLaboratoryExaminations[0] && 'No result'}
+          {quickLabTests && !quickLabTests[0] && 'No result'}
           {quickLabTestsLoading && 'Loading...'}
-          {data?.quickLaboratoryExaminations && (
+          {quickLabTests && (
             <MainContainerTable
               count={countData?.quickLaboratoryExaminationCount}
               skipState={{ skip, setSkip }}
               takeState={{ take, setTake }}
             >
-              {data.quickLaboratoryExaminations.map(
-                (quickLaboratoryTest, index) => {
-                  return occupation === Occupation.Reception ? (
-                    !quickLaboratoryTest.paid && (
-                      <SingleQuickLaboratoryTestRow
-                        key={index}
-                        laboratoryTest={quickLaboratoryTest}
-                      />
-                    )
-                  ) : (
+              {quickLabTests.map((quickLaboratoryTest, index) => {
+                return occupation === Occupation.Reception ? (
+                  !quickLaboratoryTest.paid && (
                     <SingleQuickLaboratoryTestRow
                       key={index}
                       laboratoryTest={quickLaboratoryTest}
                     />
-                  );
-                }
-              )}
+                  )
+                ) : (
+                  <SingleQuickLaboratoryTestRow
+                    key={index}
+                    laboratoryTest={quickLaboratoryTest}
+                  />
+                );
+              })}
             </MainContainerTable>
           )}
         </Box>
@@ -100,4 +113,4 @@ const QuickLaboratoryTestTableView = () => {
   );
 };
 
-export default QuickLaboratoryTestTableView;
+export default QuickLaboratoryTestExaminationView;

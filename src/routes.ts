@@ -22,7 +22,7 @@ import MedicalRequestFormView from './views/FormsView/MedicalRequestFormView';
 import SettingsView from './views/SettingsView';
 import AsstTableView from './views/TablesView/AsstTableView/Index';
 import CardTableView from './views/TablesView/CardTableView';
-import QuickLaboratoryTestTableView from './views/TablesView/QuickLaboratoryTestTableView';
+import QuickLaboratoryTestExaminationView from './views/TablesView/QuickLaboratoryExaminationTableView';
 import QuickPrescriptionTestTableView from './views/TablesView/QuickPrescriptionTestTable';
 import MedicalCertificateFormView from './views/FormsView/MedicalCertificateFormView';
 import RequestLaboratoryExaminationFormView from './views/FormsView/LaboratoryExaminationFormView/RequestForm';
@@ -118,7 +118,7 @@ export const useRoutes = function(): Routes[] {
         Occupation.Laboratory,
         Occupation.Doctor
       ],
-      component: QuickLaboratoryTestTableView
+      component: QuickLaboratoryTestExaminationView
     },
     {
       path: '/app/data/quick-prescription-test',

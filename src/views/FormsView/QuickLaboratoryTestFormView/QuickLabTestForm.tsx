@@ -106,22 +106,19 @@ const QuickLabTestForm: React.FC<PrescriptionFormProps> = ({
                 />
               )}
             </Grid>
-            {qLabTest.tests.map(
-              test =>
-                !(occupation === Occupation.Laboratory && !test.selected) && (
-                  <Grid item md={4} sm={12}>
-                    <QuickLaboratoryTestField
-                      test={{
-                        name: test.name,
-                        price: test.price,
-                        selected: test.selected
-                      }}
-                      handleCheckboxClick={handleCheckboxClick}
-                      handleChange={handlePriceChange}
-                    />
-                  </Grid>
-                )
-            )}
+            {qLabTest.tests.map(test => (
+              <Grid item md={4} sm={12}>
+                <QuickLaboratoryTestField
+                  test={{
+                    name: test.name,
+                    price: test.price,
+                    selected: test.selected
+                  }}
+                  handleCheckboxClick={handleCheckboxClick}
+                  handleChange={handlePriceChange}
+                />
+              </Grid>
+            ))}
             {occupation === Occupation.Laboratory && (
               <Grid item md={12} xs={12}>
                 <TextareaAutosize

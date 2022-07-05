@@ -59,7 +59,7 @@ const QuickLaboratoryTestFormView = () => {
     data: quickLaboratoryExaminationData
   } = useQuickLaboratoryExaminationQuery({
     variables: { id: qLabTest.id || '' },
-    skip: !isQueried
+    skip: !qLabTest.id
   });
 
   useEffect(() => {
@@ -73,6 +73,7 @@ const QuickLaboratoryTestFormView = () => {
         other,
         result
       } = quickLaboratoryExaminationData.quickLaboratoryExamination;
+      console.log(result, tests, id);
 
       setQLabTest({
         id,

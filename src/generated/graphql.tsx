@@ -699,7 +699,7 @@ export type Query = {
   medications: Array<Medication>;
   medication: Medication;
   quickPrescriptionCount: Scalars['Float'];
-  quickPrescription: Array<QuickPrescription>;
+  quickPrescription: QuickPrescription;
   quickPrescriptions: Array<QuickPrescription>;
   quickLaboratoryExaminationCount: Scalars['Float'];
   quickLaboratoryExaminations: Array<QuickLaboratoryExamination>;
@@ -842,7 +842,7 @@ export type QuickLaboratoryTest = {
   __typename?: 'QuickLaboratoryTest';
   id: Scalars['ID'];
   name: Scalars['String'];
-  examination?: Maybe<QuickLaboratoryTest>;
+  examinations?: Maybe<Array<QuickLaboratoryExamination>>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
@@ -2200,6 +2200,17 @@ export type QuickLaboratoryTestsQuery = (
   )> }
 );
 
+export type QuickMedicinesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type QuickMedicinesQuery = (
+  { __typename?: 'Query' }
+  & { quickMedicines: Array<(
+    { __typename?: 'QuickMedicine' }
+    & Pick<QuickMedicine, 'id' | 'name' | 'created_at'>
+  )> }
+);
+
 export type QuickPrescriptionQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -2207,14 +2218,14 @@ export type QuickPrescriptionQueryVariables = Exact<{
 
 export type QuickPrescriptionQuery = (
   { __typename?: 'Query' }
-  & { quickPrescription: Array<(
+  & { quickPrescription: (
     { __typename?: 'QuickPrescription' }
     & Pick<QuickPrescription, 'id' | 'name' | 'price' | 'paid' | 'completed' | 'new' | 'other' | 'created_at' | 'updated_at'>
     & { medicines: Array<(
       { __typename?: 'QuickMedicine' }
       & Pick<QuickMedicine, 'id' | 'name'>
     )> }
-  )> }
+  ) }
 );
 
 export type QuickPrescriptionCountQueryVariables = Exact<{ [key: string]: never; }>;
@@ -5767,6 +5778,42 @@ export function useQuickLaboratoryTestsLazyQuery(baseOptions?: Apollo.LazyQueryH
 export type QuickLaboratoryTestsQueryHookResult = ReturnType<typeof useQuickLaboratoryTestsQuery>;
 export type QuickLaboratoryTestsLazyQueryHookResult = ReturnType<typeof useQuickLaboratoryTestsLazyQuery>;
 export type QuickLaboratoryTestsQueryResult = Apollo.QueryResult<QuickLaboratoryTestsQuery, QuickLaboratoryTestsQueryVariables>;
+export const QuickMedicinesDocument = gql`
+    query QuickMedicines {
+  quickMedicines {
+    id
+    name
+    created_at
+  }
+}
+    `;
+
+/**
+ * __useQuickMedicinesQuery__
+ *
+ * To run a query within a React component, call `useQuickMedicinesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQuickMedicinesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useQuickMedicinesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useQuickMedicinesQuery(baseOptions?: Apollo.QueryHookOptions<QuickMedicinesQuery, QuickMedicinesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<QuickMedicinesQuery, QuickMedicinesQueryVariables>(QuickMedicinesDocument, options);
+      }
+export function useQuickMedicinesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QuickMedicinesQuery, QuickMedicinesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<QuickMedicinesQuery, QuickMedicinesQueryVariables>(QuickMedicinesDocument, options);
+        }
+export type QuickMedicinesQueryHookResult = ReturnType<typeof useQuickMedicinesQuery>;
+export type QuickMedicinesLazyQueryHookResult = ReturnType<typeof useQuickMedicinesLazyQuery>;
+export type QuickMedicinesQueryResult = Apollo.QueryResult<QuickMedicinesQuery, QuickMedicinesQueryVariables>;
 export const QuickPrescriptionDocument = gql`
     query QuickPrescription($id: ID!) {
   quickPrescription(id: $id) {

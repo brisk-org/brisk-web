@@ -171,8 +171,8 @@ const NotificationProvider: React.FC = ({ children }) => {
       updateQuery: (prev, { subscriptionData }) => {
         const newNotification: Notification = (subscriptionData.data as any)
           .newNotificationSubscription;
-        console.log(prev, 'sdfh');
-        // if (!newNotification) return prev;
+        if (prev.notifications.find(({ id }) => id === newNotification.id))
+          return prev;
         setNotifications(prevNotifications =>
           prevNotifications
             ? [newNotification, ...prevNotifications]
@@ -182,7 +182,6 @@ const NotificationProvider: React.FC = ({ children }) => {
           variant: 'success'
         });
 
-        console.log(notifications);
         return Object.assign({}, prev, {
           notifications: prev.notifications
             ? [newNotification, ...prev.notifications]

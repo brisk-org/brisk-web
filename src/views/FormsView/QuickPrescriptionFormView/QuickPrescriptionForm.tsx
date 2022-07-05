@@ -47,29 +47,33 @@ const PrescribtionForm: React.FC<PrescriptionFormProps> = ({
   const { occupation } = useContext(AuthContext);
 
   const componentRef = useRef(null);
-  const handleChange:
+  const handleCheckboxClick:
     | ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void)
     | undefined = (event, checked) => {
     const name = event.target.name;
-    setPrescription(prevPresc => ({
-      ...prevPresc,
-      [name]: { selected: checked, price: 0 }
+    setPrescription(prevPrescriptions => ({
+      ...prevPrescriptions,
+      medicines: prevPrescriptions.medicines.map(medicine =>
+        medicine.name === name
+          ? { ...medicine, selected: checked }
+          : { ...medicine }
+      )
     }));
   };
-  const handleFieldChange:
+  const handlePriceChange:
     | React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
     | undefined = event => {
     const name = event.target.name;
-    name === 'other' || name === 'name'
-      ? setPrescription(prevPresc => ({
-          ...prevPresc,
-          [name]: event.target.value
-        }))
-      : setPrescription(prevPresc => ({
-          ...prevPresc,
-          [name]: { price: Number(event.target.value), selected: true }
-        }));
+    setPrescription(prevPrescriptions => ({
+      ...prevPrescriptions,
+      medicines: prevPrescriptions.medicines.map(medicines =>
+        medicines.name === name
+          ? { ...medicines, price: parseInt(event.target.value) }
+          : { ...medicines }
+      )
+    }));
   };
+
   return (
     <>
       <Card className={classes.root} ref={componentRef}>
@@ -96,33 +100,31 @@ const PrescribtionForm: React.FC<PrescriptionFormProps> = ({
               ) : (
                 <TextField
                   name="name"
-                  onChange={handleFieldChange}
+                  onChange={e =>
+                    setPrescription(prevExamination => ({
+                      ...prevExamination,
+                      name: e.target.value
+                    }))
+                  }
                   value={prescription.name}
                   label="Name"
                   required
                 />
               )}
             </Grid>
-            {Object.entries(prescription).map(([key, value]: any, index) => {
-              if (!value || key === 'id' || key === 'other' || key === 'name')
-                return null;
-              if (occupation === Occupation.Nurse && !value.selected)
-                return null;
-
-              return (
-                <Grid item md={4} sm={12}>
-                  <SingleQuickPrescForm
-                    singleDetail={{
-                      name: key,
-                      price: value.price,
-                      selected: value.selected
-                    }}
-                    handleChange={handleChange}
-                    handleFieldChange={handleFieldChange}
-                  />
-                </Grid>
-              );
-            })}
+            {prescription.medicines.map(medicine => (
+              <Grid key={medicine.id} item md={4} sm={12}>
+                <SingleQuickPrescForm
+                  singleDetail={{
+                    name: medicine.name,
+                    price: medicine.price,
+                    selected: medicine.selected
+                  }}
+                  handleChange={handleCheckboxClick}
+                  handleFieldChange={handlePriceChange}
+                />
+              </Grid>
+            ))}
             {occupation === Occupation.Nurse && (
               <Grid item md={12} xs={12}>
                 <TextareaAutosize
@@ -130,8 +132,13 @@ const PrescribtionForm: React.FC<PrescriptionFormProps> = ({
                   minRows={6}
                   name="other"
                   placeholder="Other Detail"
-                  onChange={handleFieldChange}
-                  value={prescription.other}
+                  onChange={e =>
+                    setPrescription(prevExamination => ({
+                      ...prevExamination,
+                      other: e.target.value
+                    }))
+                  }
+                  value={prescription.other || ''}
                 />
               </Grid>
             )}

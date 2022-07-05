@@ -99,10 +99,12 @@ const DashboardView = () => {
       document: NewCreatedQuickLaboratoryExaminationDocument,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const newCreatedCard = subscriptionData.data;
+        const {
+          newCreatedQuickLaboratoryExamination
+        }: any = subscriptionData.data;
         return Object.assign({}, prev, {
-          quickLaboratoryTests: [
-            newCreatedCard,
+          quickLaboratoryExaminations: [
+            newCreatedQuickLaboratoryExamination,
             ...prev.quickLaboratoryExaminations
           ]
         });
@@ -114,10 +116,10 @@ const DashboardView = () => {
       document: NewCreatedQuickPrescriptionDocument,
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
-        const newCreatedPrescriptionTest = subscriptionData.data;
+        const { newCreatedQuickPrescription }: any = subscriptionData.data;
         return Object.assign({}, prev, {
-          quickprescription: [
-            newCreatedPrescriptionTest,
+          quickPrescriptions: [
+            newCreatedQuickPrescription,
             ...prev.quickPrescriptions
           ]
         });

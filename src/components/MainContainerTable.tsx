@@ -81,10 +81,12 @@ const MainContainerTable: React.FC<MainContainerTableProps> = ({
   };
 
   const handlePageChange = (_: any, newPage: number) => {
+    console.log(page);
     setPage(newPage);
   };
   const handleLable = ({ from }: any) => {
-    setSkip(from - 1);
+    console.log(skip, from);
+    setSkip(from === 0 ? 0 : from - 1);
     const to = skip + take;
     return `${from} -${to < (count || 0) ? to : skip + (count || 0)}`;
   };

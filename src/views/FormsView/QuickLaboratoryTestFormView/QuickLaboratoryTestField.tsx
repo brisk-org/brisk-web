@@ -27,14 +27,14 @@ const QuickLaboratoryTestField: React.FC<Props> = ({
     <>
       {occupation === Occupation.Laboratory ? (
         <>
-          <Typography>{name}:</Typography>
+          {/* <Typography>{name}:</Typography> */}
           <TextField
             fullWidth
             name={name}
             type="number"
             onChange={handleChange}
             required
-            label="By Price:"
+            label={name}
             value={price}
           />
         </>

@@ -1,5 +1,5 @@
-query QuickLaboratoryTests {
-  quickLaboratoryTests {
+query QuickMedicines {
+  quickMedicines {
     id
     name
     created_at

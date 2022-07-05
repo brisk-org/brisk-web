@@ -151,35 +151,16 @@ const SalesContainer: React.FC<Props> = ({
 
   useEffect(() => {
     if (!cardSales) return;
-    // dispatch({
-    //   type: 'card',
-    //   payload: { data: cardSales, selectGeneralDuration, selectDailyDuration }
-    // });
     setSales(prevSales => setSalesFunc(prevSales, cardSales, 'card'));
   }, [cardSales, selectGeneralDuration, selectDailyDuration]);
 
   useEffect(() => {
     if (!laboratoryTestSales) return;
-    // dispatch({
-    //   type: 'test',
-    //   payload: {
-    //     data: laboratoryTestSales,
-    //     selectGeneralDuration: selectGeneralDuration
-    //   }
-    // });
-    console.log(laboratoryTestSales, 'tesssss');
     setSales(prevSales => setSalesFunc(prevSales, laboratoryTestSales, 'test'));
   }, [laboratoryTestSales, selectGeneralDuration]);
 
   useEffect(() => {
     if (!prescriptionSales) return;
-    // dispatch({
-    //   type: 'prescription',
-    //   payload: {
-    //     data: prescriptionSales,
-    //     selectGeneralDuration: selectGeneralDuration
-    //   }
-    // });
     setSales(prevSales =>
       setSalesFunc(prevSales, prescriptionSales, 'prescription')
     );
@@ -188,13 +169,6 @@ const SalesContainer: React.FC<Props> = ({
 
   useEffect(() => {
     if (!quickPrescriptionSales) return;
-    // dispatch({
-    //   type: 'quickPrescription',
-    //   payload: {
-    //     data: quickprescriptionales,
-    //     selectGeneralDuration: selectGeneralDuration
-    //   }
-    // });
     setSales(prevSales =>
       setSalesFunc(prevSales, quickPrescriptionSales, 'quickPrescription')
     );
@@ -202,13 +176,6 @@ const SalesContainer: React.FC<Props> = ({
 
   useEffect(() => {
     if (!quickLaboratoryTestSales) return;
-    // dispatch({
-    //   type: 'quickLabTest',
-    //   payload: {
-    //     data: quickLaboratoryTestSales,
-    //     selectGeneralDuration: selectGeneralDuration
-    //   }
-    // });
     setSales(prevSales =>
       setSalesFunc(prevSales, quickLaboratoryTestSales, 'quickLabTest')
     );
