@@ -1,0 +1,28 @@
+query LaboratoryTestCategoriesForGraph {
+  laboratoryTestCategories {
+    id
+    name
+    laboratoryTests {
+      id
+      name
+      normalValue
+      commonValues
+      price
+      hasPrice
+      laboratoryTestExaminations {
+        id
+        paid
+        completed
+        new
+        price
+        created_at
+      }
+      isInfluencedByCategory
+      inStock
+      trackInStock
+      created_at
+    }
+    inStock
+    created_at
+  }
+}

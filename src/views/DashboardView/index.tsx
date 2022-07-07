@@ -206,10 +206,7 @@ const DashboardView = () => {
             </Grid>
           </Grid>
           <Grid item lg={12} md={12} xl={9} xs={12}>
-            <LaboratoryTestsCategoryGraph
-              laboratoryTests={[{ result: '', created_at: '' }]}
-              // laboratoryTests={laboratoryTestsData?.laboratoryExaminations}
-            />
+            <LaboratoryTestsCategoryGraph />
           </Grid>
           <Grid item lg={12} md={12} xl={9} xs={12}>
             <DailyCalander />

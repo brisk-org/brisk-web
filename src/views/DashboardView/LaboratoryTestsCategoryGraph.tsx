@@ -21,6 +21,10 @@ import { getTimeSubbedFromSelectedDay } from '../../constants/getUnixFromSelecte
 import { laboratoryTestsCount } from '../../utils/laboratoryTestsCount';
 import { Link } from 'react-router-dom';
 import LaboratoryTestsGraph from './LaboratoryTestsGraph';
+import {
+  useLaboratoryTestCategoriesForGraphQuery,
+  useLaboratoryTestCategoriesQuery
+} from '../../generated/graphql';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -32,17 +36,15 @@ const useStyles = makeStyles(() => ({
     height: 500
   }
 }));
-type TestStats = {
+type CategoryCount = {
+  name: string;
   value: number;
-  name: CategoryOptions;
 };
 export type LaboratoryTestResultType =
   | { result: string; created_at: string }[]
   | undefined;
-interface Props {
-  laboratoryTests: LaboratoryTestResultType;
-}
-const LaboratoryTestsCategoryGraph: React.FC<Props> = ({ laboratoryTests }) => {
+
+const LaboratoryTestsCategoryGraph = () => {
   const classes = useStyles();
   const categoryChartDom = useRef<HTMLDivElement>(null);
 
@@ -54,38 +56,43 @@ const LaboratoryTestsCategoryGraph: React.FC<Props> = ({ laboratoryTests }) => {
     { order: 3, label: 'last 30 days', days: 30, active: false },
     { order: 4, label: 'life time', active: false }
   ]);
-  const [testStats, setTestStats] = useState<TestStats[]>([
-    { name: 'Hematology', value: 0 },
-    { name: 'STOOL TEST', value: 0 },
-    { name: 'Urinalysis', value: 0 },
-    { name: 'Microscopy', value: 0 },
-    { name: 'Serology', value: 0 },
-    { name: 'Bacteriology', value: 0 },
-    { name: 'Hormone Test', value: 0 },
-    { name: 'Clinical Chemistry', value: 0 }
-  ]);
+  const [categoriesCount, setCategoriesCount] = useState<CategoryCount[]>([]);
+  const { data } = useLaboratoryTestCategoriesForGraphQuery();
 
   const categoryOption = laboratoryTestCategoryChartOption({
-    stats: testStats
+    stats: categoriesCount
   });
 
   useEffect(() => {
-    if (!laboratoryTests) return;
+    if (!data) return;
+    setCategoriesCount(
+      data.laboratoryTestCategories.map(({ name }) => ({ name, value: 0 }))
+    );
 
     const unixFromSelectedDays = getTimeSubbedFromSelectedDay(selectDuration);
 
-    const { categoryCount } = laboratoryTestsCount(
-      laboratoryTests,
-      unixFromSelectedDays
-    );
+    setCategoriesCount(prevCategories =>
+      prevCategories?.map(category => {
+        const selectedLaboratoryTestCategoriesExaminationLength = data.laboratoryTestCategories
+          .find(({ name }) => name === category.name)
+          ?.laboratoryTests.reduce(
+            (prevValue, currentValue) =>
+              prevValue +
+              (currentValue.laboratoryTestExaminations?.filter(examination =>
+                unixFromSelectedDays
+                  ? unixFromSelectedDays < parseInt(examination.created_at)
+                  : category
+              )?.length || 0),
+            0
+          );
 
-    setTestStats(
-      Object.entries(categoryCount).map(([key, value]) => ({
-        value,
-        name: key as CategoryOptions
-      }))
+        return {
+          name: category.name,
+          value: selectedLaboratoryTestCategoriesExaminationLength || 0
+        };
+      })
     );
-  }, [laboratoryTests, selectDuration]);
+  }, [data, selectDuration]);
 
   useEffect(() => {
     if (!categoryChartDom) return;
@@ -109,10 +116,15 @@ const LaboratoryTestsCategoryGraph: React.FC<Props> = ({ laboratoryTests }) => {
       <Divider />
       <CardContent>
         <section className={classes.chart} ref={categoryChartDom}></section>
-        <LaboratoryTestsGraph
-          laboratoryTests={laboratoryTests}
-          selectDuration={selectDuration}
-        />
+        {data && (
+          <LaboratoryTestsGraph
+            categories={data.laboratoryTestCategories.map(({ id, name }) => ({
+              id,
+              name
+            }))}
+            selectDuration={selectDuration}
+          />
+        )}
       </CardContent>
       <Divider />
       <Box display="flex" justifyContent="flex-end" p={2}>

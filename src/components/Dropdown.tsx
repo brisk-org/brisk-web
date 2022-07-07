@@ -21,7 +21,7 @@ export type SelectDropdownType<T> = {
 interface DurationDropdownProps {
   selectDropdownState: {
     selectDropdown: SelectDropdownType<
-      SelectGeneralDuration | CategoryOptions | SelectDailyDuration
+      SelectGeneralDuration | string | SelectDailyDuration
     >;
     setSelectDropdown: React.Dispatch<
       React.SetStateAction<SelectDropdownType<any>>

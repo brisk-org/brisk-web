@@ -179,7 +179,7 @@ export const laboratoryTestChartOption: laboratoryTestCategoryChartOptionType = 
       data: name,
       axisLabel: {
         inside: true,
-        color: '#fff'
+        color: '#000'
       },
       axisTick: {
         show: false

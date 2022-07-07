@@ -1,0 +1,19 @@
+query LaboratoryTestsForCategory($categoryId: ID!) {
+  laboratoryTestsForCategory(categoryId: $categoryId) {
+    id
+    name
+    price
+    hasPrice
+    laboratoryTestExaminations {
+      id
+      paid
+      completed
+      new
+      price
+      created_at
+    }
+    inStock
+    trackInStock
+    created_at
+  }
+}

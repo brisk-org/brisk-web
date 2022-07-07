@@ -175,7 +175,7 @@ export type LaboratoryTest = {
   commonValues?: Maybe<Array<Scalars['String']>>;
   category?: Maybe<LaboratoryTest>;
   subCategory?: Maybe<LaboratoryTestSubCategory>;
-  laboratoryTestExaminations: Array<LaboratoryTestRequest>;
+  laboratoryTestExaminations?: Maybe<Array<LaboratoryExamination>>;
   price?: Maybe<Scalars['Float']>;
   hasPrice: Scalars['Boolean'];
   isInfluencedByCategory: Scalars['Boolean'];
@@ -676,6 +676,8 @@ export type Query = {
   laboratoryExaminations: Array<LaboratoryExamination>;
   laboratoryExamination: LaboratoryExamination;
   searchLaboratoryExamination: Array<LaboratoryExamination>;
+  laboratoryTests: Array<LaboratoryTest>;
+  laboratoryTestsForCategory: Array<LaboratoryTest>;
   laboratoryTestCategories: Array<LaboratoryTestCategory>;
   laboratoryTestSubCategories: Array<LaboratoryTestSubCategory>;
   laboratoryTestRequests: Array<LaboratoryTestRequest>;
@@ -727,6 +729,11 @@ export type QuerySearchLaboratoryExaminationArgs = {
   term: Scalars['String'];
   skip: Scalars['Float'];
   take: Scalars['Float'];
+};
+
+
+export type QueryLaboratoryTestsForCategoryArgs = {
+  categoryId: Scalars['ID'];
 };
 
 
@@ -1883,6 +1890,23 @@ export type SearchLaboratoryExaminationQuery = (
   )> }
 );
 
+export type LaboratoryTestsForCategoryQueryVariables = Exact<{
+  categoryId: Scalars['ID'];
+}>;
+
+
+export type LaboratoryTestsForCategoryQuery = (
+  { __typename?: 'Query' }
+  & { laboratoryTestsForCategory: Array<(
+    { __typename?: 'LaboratoryTest' }
+    & Pick<LaboratoryTest, 'id' | 'name' | 'price' | 'hasPrice' | 'inStock' | 'trackInStock' | 'created_at'>
+    & { laboratoryTestExaminations?: Maybe<Array<(
+      { __typename?: 'LaboratoryExamination' }
+      & Pick<LaboratoryExamination, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'created_at'>
+    )>> }
+  )> }
+);
+
 export type LaboratoryTestCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1901,6 +1925,25 @@ export type LaboratoryTestCategoriesQuery = (
         { __typename?: 'LaboratoryTest' }
         & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasPrice' | 'isInfluencedByCategory' | 'inStock' | 'trackInStock' | 'created_at'>
       )> }
+    )> }
+  )> }
+);
+
+export type LaboratoryTestCategoriesForGraphQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LaboratoryTestCategoriesForGraphQuery = (
+  { __typename?: 'Query' }
+  & { laboratoryTestCategories: Array<(
+    { __typename?: 'LaboratoryTestCategory' }
+    & Pick<LaboratoryTestCategory, 'id' | 'name' | 'inStock' | 'created_at'>
+    & { laboratoryTests: Array<(
+      { __typename?: 'LaboratoryTest' }
+      & Pick<LaboratoryTest, 'id' | 'name' | 'normalValue' | 'commonValues' | 'price' | 'hasPrice' | 'isInfluencedByCategory' | 'inStock' | 'trackInStock' | 'created_at'>
+      & { laboratoryTestExaminations?: Maybe<Array<(
+        { __typename?: 'LaboratoryExamination' }
+        & Pick<LaboratoryExamination, 'id' | 'paid' | 'completed' | 'new' | 'price' | 'created_at'>
+      )>> }
     )> }
   )> }
 );
@@ -4949,6 +4992,55 @@ export function useSearchLaboratoryExaminationLazyQuery(baseOptions?: Apollo.Laz
 export type SearchLaboratoryExaminationQueryHookResult = ReturnType<typeof useSearchLaboratoryExaminationQuery>;
 export type SearchLaboratoryExaminationLazyQueryHookResult = ReturnType<typeof useSearchLaboratoryExaminationLazyQuery>;
 export type SearchLaboratoryExaminationQueryResult = Apollo.QueryResult<SearchLaboratoryExaminationQuery, SearchLaboratoryExaminationQueryVariables>;
+export const LaboratoryTestsForCategoryDocument = gql`
+    query LaboratoryTestsForCategory($categoryId: ID!) {
+  laboratoryTestsForCategory(categoryId: $categoryId) {
+    id
+    name
+    price
+    hasPrice
+    laboratoryTestExaminations {
+      id
+      paid
+      completed
+      new
+      price
+      created_at
+    }
+    inStock
+    trackInStock
+    created_at
+  }
+}
+    `;
+
+/**
+ * __useLaboratoryTestsForCategoryQuery__
+ *
+ * To run a query within a React component, call `useLaboratoryTestsForCategoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLaboratoryTestsForCategoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLaboratoryTestsForCategoryQuery({
+ *   variables: {
+ *      categoryId: // value for 'categoryId'
+ *   },
+ * });
+ */
+export function useLaboratoryTestsForCategoryQuery(baseOptions: Apollo.QueryHookOptions<LaboratoryTestsForCategoryQuery, LaboratoryTestsForCategoryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LaboratoryTestsForCategoryQuery, LaboratoryTestsForCategoryQueryVariables>(LaboratoryTestsForCategoryDocument, options);
+      }
+export function useLaboratoryTestsForCategoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryTestsForCategoryQuery, LaboratoryTestsForCategoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LaboratoryTestsForCategoryQuery, LaboratoryTestsForCategoryQueryVariables>(LaboratoryTestsForCategoryDocument, options);
+        }
+export type LaboratoryTestsForCategoryQueryHookResult = ReturnType<typeof useLaboratoryTestsForCategoryQuery>;
+export type LaboratoryTestsForCategoryLazyQueryHookResult = ReturnType<typeof useLaboratoryTestsForCategoryLazyQuery>;
+export type LaboratoryTestsForCategoryQueryResult = Apollo.QueryResult<LaboratoryTestsForCategoryQuery, LaboratoryTestsForCategoryQueryVariables>;
 export const LaboratoryTestCategoriesDocument = gql`
     query LaboratoryTestCategories {
   laboratoryTestCategories {
@@ -5021,6 +5113,63 @@ export function useLaboratoryTestCategoriesLazyQuery(baseOptions?: Apollo.LazyQu
 export type LaboratoryTestCategoriesQueryHookResult = ReturnType<typeof useLaboratoryTestCategoriesQuery>;
 export type LaboratoryTestCategoriesLazyQueryHookResult = ReturnType<typeof useLaboratoryTestCategoriesLazyQuery>;
 export type LaboratoryTestCategoriesQueryResult = Apollo.QueryResult<LaboratoryTestCategoriesQuery, LaboratoryTestCategoriesQueryVariables>;
+export const LaboratoryTestCategoriesForGraphDocument = gql`
+    query LaboratoryTestCategoriesForGraph {
+  laboratoryTestCategories {
+    id
+    name
+    laboratoryTests {
+      id
+      name
+      normalValue
+      commonValues
+      price
+      hasPrice
+      laboratoryTestExaminations {
+        id
+        paid
+        completed
+        new
+        price
+        created_at
+      }
+      isInfluencedByCategory
+      inStock
+      trackInStock
+      created_at
+    }
+    inStock
+    created_at
+  }
+}
+    `;
+
+/**
+ * __useLaboratoryTestCategoriesForGraphQuery__
+ *
+ * To run a query within a React component, call `useLaboratoryTestCategoriesForGraphQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLaboratoryTestCategoriesForGraphQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLaboratoryTestCategoriesForGraphQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLaboratoryTestCategoriesForGraphQuery(baseOptions?: Apollo.QueryHookOptions<LaboratoryTestCategoriesForGraphQuery, LaboratoryTestCategoriesForGraphQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LaboratoryTestCategoriesForGraphQuery, LaboratoryTestCategoriesForGraphQueryVariables>(LaboratoryTestCategoriesForGraphDocument, options);
+      }
+export function useLaboratoryTestCategoriesForGraphLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LaboratoryTestCategoriesForGraphQuery, LaboratoryTestCategoriesForGraphQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LaboratoryTestCategoriesForGraphQuery, LaboratoryTestCategoriesForGraphQueryVariables>(LaboratoryTestCategoriesForGraphDocument, options);
+        }
+export type LaboratoryTestCategoriesForGraphQueryHookResult = ReturnType<typeof useLaboratoryTestCategoriesForGraphQuery>;
+export type LaboratoryTestCategoriesForGraphLazyQueryHookResult = ReturnType<typeof useLaboratoryTestCategoriesForGraphLazyQuery>;
+export type LaboratoryTestCategoriesForGraphQueryResult = Apollo.QueryResult<LaboratoryTestCategoriesForGraphQuery, LaboratoryTestCategoriesForGraphQueryVariables>;
 export const MedicationDocument = gql`
     query Medication($id: ID!) {
   medication(id: $id) {

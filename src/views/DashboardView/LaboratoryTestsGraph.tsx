@@ -20,8 +20,8 @@ import { init } from 'echarts';
 import { getTimeSubbedFromSelectedDay } from '../../constants/getUnixFromSelectedDay';
 import { laboratoryTestsCount } from '../../utils/laboratoryTestsCount';
 import { Link } from 'react-router-dom';
-import { categories } from '../../data/testsPlaceHolder';
 import { LaboratoryTestResultType } from './LaboratoryTestsCategoryGraph';
+import { useLaboratoryTestsForCategoryQuery } from '../../generated/graphql';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -33,57 +33,77 @@ const useStyles = makeStyles(() => ({
     height: 500
   }
 }));
-type TestStats = {
-  value: number;
+type LaboratoryTestsStat = {
   name: string;
+  value: number;
 };
 
 interface Props {
-  laboratoryTests: LaboratoryTestResultType;
+  categories: { id: string; name: string }[];
   selectDuration: SelectDropdownType<SelectGeneralDuration>;
 }
 const LaboratoryTestsGraph: React.FC<Props> = ({
-  laboratoryTests,
+  categories,
   selectDuration
 }) => {
   const classes = useStyles();
   const testsChartDom = useRef<HTMLDivElement>(null);
 
-  const [selectLabOptionDropdown, setSelectLabOptionsDropdown] = useState<
-    SelectDropdownType<CategoryOptions>
+  const [selectedCategoryDropdown, setSelectedCategoryDropdown] = useState<
+    SelectDropdownType<string>
   >(
-    Object.keys(categories).map((category, idx) => ({
+    categories.map((category, idx) => ({
       order: idx,
-      label: category as CategoryOptions,
+      label: category.name,
       active: idx === 0
     }))
   );
-  const [testStats, setTestStats] = useState<TestStats[]>([]);
+  const [laboratoryTestStats, setLaboratoryTestsStat] = useState<
+    LaboratoryTestsStat[]
+  >([]);
 
-  const testsOption = laboratoryTestChartOption({ stats: testStats });
+  const testsOption = laboratoryTestChartOption({ stats: laboratoryTestStats });
+
+  const { data } = useLaboratoryTestsForCategoryQuery({
+    variables: {
+      categoryId:
+        categories.find(
+          category =>
+            selectedCategoryDropdown.find(({ active }) => active)?.label ===
+            category.name
+        )?.id || ''
+    },
+    skip: !selectedCategoryDropdown[0]
+  });
 
   useEffect(() => {
-    if (!laboratoryTests) return;
+    if (!data) return;
+    setLaboratoryTestsStat(
+      data.laboratoryTestsForCategory.map(labTest => ({
+        name: labTest.name,
+        value: 0
+      }))
+    );
 
     const unixFromSelectedDays = getTimeSubbedFromSelectedDay(selectDuration);
 
-    const activeCategoryOption = selectLabOptionDropdown.find(
-      content => content.active
-    )?.label;
-    const { testsCount } = laboratoryTestsCount(
-      laboratoryTests,
-      unixFromSelectedDays,
-      activeCategoryOption
+    setLaboratoryTestsStat(prevLabTestStat =>
+      prevLabTestStat?.map(labTest => {
+        const selectedLaboratoryTestExaminationsLength = data.laboratoryTestsForCategory
+          .find(({ name }) => name === labTest.name)
+          ?.laboratoryTestExaminations?.filter(examination => {
+            return unixFromSelectedDays
+              ? unixFromSelectedDays < parseInt(examination.created_at)
+              : labTest;
+          }).length;
+        console.log(selectedLaboratoryTestExaminationsLength);
+        return {
+          name: labTest.name,
+          value: selectedLaboratoryTestExaminationsLength || 0
+        };
+      })
     );
-
-    console.log(testsCount, testStats);
-    setTestStats(
-      Object.entries(testsCount).map(([name, value]) => ({
-        value,
-        name
-      }))
-    );
-  }, [laboratoryTests, selectDuration, selectLabOptionDropdown]);
+  }, [data, selectDuration, selectedCategoryDropdown]);
 
   useEffect(() => {
     if (!testsChartDom) return;
@@ -91,25 +111,24 @@ const LaboratoryTestsGraph: React.FC<Props> = ({
     const zoomSize = 6;
     chart.on('click', function(params) {
       console.log(
-        testStats.map(STAT => STAT.name)[
+        laboratoryTestStats.map(STAT => STAT.name)[
           Math.max(params.dataIndex - zoomSize / 2, 0)
         ]
       );
       chart.dispatchAction({
         type: 'dataZoom',
-        startValue: testStats.map(STAT => STAT.name)[
+        startValue: laboratoryTestStats.map(STAT => STAT.name)[
           Math.max(params.dataIndex - zoomSize / 2, 0)
         ],
-        endValue: testStats.map(STAT => STAT.name)[
+        endValue: laboratoryTestStats.map(STAT => STAT.name)[
           Math.min(
             params.dataIndex + zoomSize / 2,
-            testStats.map(STAT => STAT.value).length - 1
+            laboratoryTestStats.map(STAT => STAT.value).length - 1
           )
         ]
       });
     });
     chart.setOption(testsOption);
-    console.log('1');
   }, [testsChartDom, testsOption]);
 
   return (
@@ -118,8 +137,8 @@ const LaboratoryTestsGraph: React.FC<Props> = ({
         action={
           <Dropdown
             selectDropdownState={{
-              selectDropdown: selectLabOptionDropdown,
-              setSelectDropdown: setSelectLabOptionsDropdown
+              selectDropdown: selectedCategoryDropdown,
+              setSelectDropdown: setSelectedCategoryDropdown
             }}
           />
         }
