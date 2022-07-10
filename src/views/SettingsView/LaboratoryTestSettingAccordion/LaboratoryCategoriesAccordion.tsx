@@ -44,8 +44,11 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
             >
               <Box>
                 <Typography variant="h6">{category.name}</Typography>
-                {category.price && (
-                  <Typography variant="body2">{category.price}birr</Typography>
+                {!!category.price && (
+                  <Typography variant="body2">
+                    {console.log(category.price)}
+                    {category.price} birr
+                  </Typography>
                 )}
                 {category.trackInStock && (
                   <Typography variant="body2">

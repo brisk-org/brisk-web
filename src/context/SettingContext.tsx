@@ -27,8 +27,10 @@ const SettingsProvider: React.FC = ({ children }) => {
     data: laboratoryCategoriesData,
     loading: laboraotryCategoryLoading
   } = useLaboratoryTestCategoriesQuery();
+  console.log(data, 'data');
   useEffect(() => {
     if (!data) return;
+    console.log(data, 'data');
     setCardPrice(data.setting.card_price);
     setCardExpirationDate(data.setting.card_expiration_date);
   }, [data, loading]);

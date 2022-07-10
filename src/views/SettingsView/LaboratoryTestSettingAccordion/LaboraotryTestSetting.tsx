@@ -25,7 +25,7 @@ import {
   ExpandMore
 } from '@mui/icons-material';
 import LaboraotryTestSettingContent from './LaboraotryTestSettingItems';
-import { Box } from '@mui/system';
+import { Box } from '@mui/material';
 
 interface Props {
   categoryTracksStock: boolean;

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Typography, TextField, Box, Button } from '@mui/material';
 import {
   SettingDocument,
@@ -15,9 +15,14 @@ const CardSettings = () => {
     cardExpirationDate: oldCardExpirationDate
   } = useContext(SettingsContext);
 
+  console.log('context', oldCardPrice);
   const [price, setPrice] = useState(oldCardPrice);
   const [expirationDate, setExpirationDate] = useState(oldCardExpirationDate);
 
+  useEffect(() => {
+    setPrice(oldCardPrice);
+    setExpirationDate(oldCardExpirationDate);
+  }, [oldCardExpirationDate, oldCardPrice]);
   const [changeSetting] = useChangeSettingMutation({
     refetchQueries: [
       {

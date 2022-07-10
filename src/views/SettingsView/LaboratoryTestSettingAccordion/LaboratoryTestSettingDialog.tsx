@@ -104,7 +104,7 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
                       laboratoryTest.name
                   )
                   .filter(value => !!value)
-                  .join(', ')}
+                  .join(', ') || `No Tests are Influenced By ${category.name}`}
                 )
               </Typography>
             )}
