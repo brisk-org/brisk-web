@@ -83,18 +83,6 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
     });
   };
 
-  // const preSubmit: React.FormEventHandler<HTMLFormElement> = event => {
-  //   event.preventDefault();
-  //   const emptyCategory = category.laboratoryTests.find(
-  //     laboratoryTest => laboratoryTest.hasPrice && !laboratoryTest.price
-  //   );
-
-  //   if (emptyCategory) {
-  //     setExpandedLaboratoryTest(emptyCategory.name);
-  //     return;
-  //   }
-  //   // handleSubmit(event);
-  // };
   return (
     <>
       <Dialog
@@ -103,7 +91,6 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
         aria-labelledby={`alert-dialog-title`}
         aria-describedby="alert-dialog-description"
       >
-        {/* <form onSubmit={preSubmit}> */}
         <DialogTitle>
           <Typography variant="h5">
             {category.name}

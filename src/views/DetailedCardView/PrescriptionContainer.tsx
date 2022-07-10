@@ -47,30 +47,32 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface Props {
-  name: string;
-  prescriptions: CardQuery['card']['prescriptions'];
+  cardName: string;
+  prescriptions: NonNullable<CardQuery['card']['prescriptions']>;
 }
-const PrescriptionContainer: React.FC<Props> = ({ name, prescriptions }) => {
+const PrescriptionContainer: React.FC<Props> = ({
+  cardName,
+  prescriptions
+}) => {
   const classes = useStyles();
   return (
     <Card className={classes.root}>
       <CardHeader
         className={classes.header}
         avatar={<WindowOutlined />}
-        title={`All ${name}'s Prescriptions`}
+        title={`All ${cardName}'s Prescriptions`}
       />
       <Divider />
       <CardContent>
         <Grid container spacing={2}>
-          {prescriptions &&
-            prescriptions
-              .sort((a, b) => Number(b.id) - Number(a.id))
-              .map((prescription, index) => (
-                <SingleDetailedPrescription
-                  key={index}
-                  prescription={prescription}
-                />
-              ))}
+          {[...prescriptions]
+            .sort((a, b) => parseInt(b.created_at) - parseInt(a.created_at))
+            .map((prescription, index) => (
+              <SingleDetailedPrescription
+                key={index}
+                prescription={prescription}
+              />
+            ))}
         </Grid>
       </CardContent>
     </Card>

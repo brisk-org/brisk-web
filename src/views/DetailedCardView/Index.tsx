@@ -58,7 +58,7 @@ const DetailedCardView = () => {
               )}
               {data.card.prescriptions && data.card.prescriptions[0] && (
                 <PrescriptionContainer
-                  name={data.card.name}
+                  cardName={data.card.name}
                   prescriptions={data.card.prescriptions}
                 />
               )}

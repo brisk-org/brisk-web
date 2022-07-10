@@ -88,10 +88,7 @@ const PrescriptionTestFormView = () => {
   });
   const [medications, setMedications] = useState<SelectablePrescription[]>();
   const { data, loading } = useMedicinesQuery();
-  // const [
-  //   createMedication,
-  //   { loading: createMedicationLoading }
-  // ] = useCreateMedicationMutation();
+
   const [
     createPrescriptionTest,
     { loading: createPrescriptionTestLoading }

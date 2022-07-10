@@ -32,9 +32,6 @@ const LaboratoryTestSettingMainAccordion = () => {
   const [addLaboratoryTestCategory] = useCreateLaboratoryTestCategoryMutation({
     refetchQueries: [{ query: LaboratoryTestCategoriesDocument }]
   });
-  useEffect(() => {
-    console.log(data, 'herer');
-  }, [data]);
 
   const onSubmit = async () => {
     await addLaboratoryTestCategory({

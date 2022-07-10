@@ -12,32 +12,15 @@ import {
   ListItemText
 } from '@mui/material';
 import { ExpandMore, Settings } from '@mui/icons-material';
-import makeStyles from '@mui/styles/makeStyles';
 import LaboratoryTestSettingDialog from './LaboratoryTestSettingDialog';
 // import { laboaratoryTestSettingReducer } from '../../../reducer/laboratoryTestSettingReducer';
 import { LaboratoryTestCategoriesQuery } from '../../../generated/graphql';
-
-const useStyles = makeStyles(theme => ({
-  root: {},
-  items: {
-    backgroundColor: theme.palette.background.default
-  },
-  list: {
-    border: '1px solid grey'
-  },
-  details: {
-    display: 'inline-block',
-    width: '50%'
-  }
-}));
 
 interface Props {
   // category: LaboratoryTestCatagories;
   category: LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0];
 }
 const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
-  const classes = useStyles();
-
   const [parentAccordionDialogOpen, setParentAccordionDialogOpen] = useState(
     false
   );
@@ -47,7 +30,7 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
 
   return (
     <Grid item md={4} sm={6} xs={12}>
-      <Box className={classes.items}>
+      <Box>
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Box
@@ -121,7 +104,6 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
                   </List>
                 </Accordion>
               ))}
-            {console.log(category.laboratoryTests, 'tests')}
             {category.laboratoryTests &&
               [...category.laboratoryTests]
                 .sort((a, b) => parseInt(a.created_at) - parseInt(b.created_at))

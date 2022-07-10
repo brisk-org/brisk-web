@@ -59,8 +59,6 @@ export type CardSales = {
 export type ChangeSettingsInput = {
   card_price: Scalars['Float'];
   card_expiration_date: Scalars['Float'];
-  laboratory_tests_data: Scalars['String'];
-  prescription_data: Scalars['String'];
 };
 
 export type CheckIn = {
@@ -882,8 +880,6 @@ export type Settings = {
   __typename?: 'Settings';
   id: Scalars['ID'];
   card_price: Scalars['Float'];
-  laboratory_tests_data: Scalars['String'];
-  prescription_data: Scalars['String'];
   card_expiration_date: Scalars['Float'];
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
@@ -1572,8 +1568,6 @@ export type MarkQuickPrescriptionAsSeenMutation = (
 export type ChangeSettingMutationVariables = Exact<{
   card_price: Scalars['Float'];
   card_expiration_date: Scalars['Float'];
-  laboratory_tests_data: Scalars['String'];
-  prescription_data: Scalars['String'];
 }>;
 
 
@@ -1581,7 +1575,7 @@ export type ChangeSettingMutation = (
   { __typename?: 'Mutation' }
   & { changeSetting: (
     { __typename?: 'Settings' }
-    & Pick<Settings, 'id' | 'card_price' | 'card_expiration_date' | 'laboratory_tests_data' | 'prescription_data'>
+    & Pick<Settings, 'id' | 'card_price' | 'card_expiration_date'>
   ) }
 );
 
@@ -2318,7 +2312,7 @@ export type SettingQuery = (
   { __typename?: 'Query' }
   & { setting: (
     { __typename?: 'Settings' }
-    & Pick<Settings, 'id' | 'card_price' | 'card_expiration_date' | 'laboratory_tests_data' | 'prescription_data'>
+    & Pick<Settings, 'id' | 'card_price' | 'card_expiration_date'>
   ) }
 );
 
@@ -4191,15 +4185,13 @@ export type MarkQuickPrescriptionAsSeenMutationHookResult = ReturnType<typeof us
 export type MarkQuickPrescriptionAsSeenMutationResult = Apollo.MutationResult<MarkQuickPrescriptionAsSeenMutation>;
 export type MarkQuickPrescriptionAsSeenMutationOptions = Apollo.BaseMutationOptions<MarkQuickPrescriptionAsSeenMutation, MarkQuickPrescriptionAsSeenMutationVariables>;
 export const ChangeSettingDocument = gql`
-    mutation ChangeSetting($card_price: Float!, $card_expiration_date: Float!, $laboratory_tests_data: String!, $prescription_data: String!) {
+    mutation ChangeSetting($card_price: Float!, $card_expiration_date: Float!) {
   changeSetting(
-    setting: {card_price: $card_price, card_expiration_date: $card_expiration_date, laboratory_tests_data: $laboratory_tests_data, prescription_data: $prescription_data}
+    setting: {card_price: $card_price, card_expiration_date: $card_expiration_date}
   ) {
     id
     card_price
     card_expiration_date
-    laboratory_tests_data
-    prescription_data
   }
 }
     `;
@@ -4220,8 +4212,6 @@ export type ChangeSettingMutationFn = Apollo.MutationFunction<ChangeSettingMutat
  *   variables: {
  *      card_price: // value for 'card_price'
  *      card_expiration_date: // value for 'card_expiration_date'
- *      laboratory_tests_data: // value for 'laboratory_tests_data'
- *      prescription_data: // value for 'prescription_data'
  *   },
  * });
  */
@@ -6135,8 +6125,6 @@ export const SettingDocument = gql`
     id
     card_price
     card_expiration_date
-    laboratory_tests_data
-    prescription_data
   }
 }
     `;

@@ -57,18 +57,20 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
 
   useEffect(() => {
     setCategories(prevCategories =>
-      prevCategories?.map(category => ({
-        name: category.name,
-        laboratoryTests: laboratoryExamination.laboratoryTests
-          .filter(test => test.category?.name === category.name)
-          .map(test => ({
-            name: test.name,
-            normalValue: test.normalValue,
-            value:
-              laboratoryExamination.values?.find(({ id }) => test.id === id)
-                ?.value || ''
-          }))
-      }))
+      prevCategories
+        ?.map(category => ({
+          name: category.name,
+          laboratoryTests: laboratoryExamination.laboratoryTests
+            .filter(test => test.category?.name === category.name)
+            .map(test => ({
+              name: test.name,
+              normalValue: test.normalValue,
+              value:
+                laboratoryExamination.values?.find(({ id }) => test.id === id)
+                  ?.value || ''
+            }))
+        }))
+        .filter(category => category.laboratoryTests.length > 0)
     );
   }, []);
 

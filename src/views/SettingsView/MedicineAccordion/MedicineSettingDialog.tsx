@@ -9,7 +9,8 @@ import {
   DialogActions,
   SelectChangeEvent,
   Button,
-  TextareaAutosize
+  TextareaAutosize,
+  Typography
 } from '@mui/material';
 import SelectTextField from '../../../components/helpers/SelectTextField';
 import { AddMedicineMutationVariables } from '../../../generated/graphql';
@@ -20,6 +21,7 @@ interface MedicineType extends AddMedicineMutationVariables {
 }
 
 interface Props {
+  error?: string;
   type: 'add' | 'update' | 'request';
   title: string;
   buttonText: string;
@@ -32,6 +34,7 @@ interface Props {
 }
 
 const PrescriptionSettingDialog: React.FC<Props> = ({
+  error,
   type,
   title,
   buttonText,
@@ -68,6 +71,7 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
         <form onSubmit={handleSubmit}>
           <DialogTitle>{title}</DialogTitle>
           <DialogContent sx={{ width: '400px' }}>
+            <Typography color="error">{error}</Typography>
             <FormControl fullWidth>
               {!(type === 'request') && (
                 <>
@@ -151,7 +155,12 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            <Button type="submit" variant="contained" sx={{ mr: 2 }}>
+            <Button
+              disabled={!!error}
+              type="submit"
+              variant="contained"
+              sx={{ mr: 2 }}
+            >
               {loading ? '...Loading' : buttonText}
             </Button>
           </DialogActions>

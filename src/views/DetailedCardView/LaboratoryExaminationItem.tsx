@@ -78,7 +78,7 @@ const LaboratoryExaminationItem: React.FC<{
     deleteLabExamination,
     { client }
   ] = useDeleteLaboratoryExaminationMutation({
-    onError: err => console.error,
+    onError: err => console.error(err),
     variables: {
       id: laboratoryExaminations.id
     },

@@ -59,9 +59,8 @@ const LaboratoryExaminationConatiner: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  // Helps while Sorting
-  const mutableTests = [...laboratoryExaminations];
-  console.log(mutableTests, 'soo');
+  console.log(laboratoryExaminations, 'ksldjfskdj');
+
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -72,12 +71,12 @@ const LaboratoryExaminationConatiner: React.FC<Props> = ({
       <Divider />
       <CardContent>
         <List>
-          {mutableTests
+          {[...laboratoryExaminations]
             .sort((a, b) => parseInt(b.id) - parseInt(a.id))
-            .map((laboratoryTest, index) => (
+            .map((laboratoryExamination, index) => (
               <LaboratoryExaminationItem
                 key={index}
-                laboratoryExaminations={laboratoryTest}
+                laboratoryExaminations={laboratoryExamination}
               />
             ))}
         </List>

@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Checkbox,
   ListItem,
   ListItemButton,
   ListItemIcon,
-  ListItemText,
-  Typography
+  ListItemText
 } from '@mui/material';
 import { SelectablePrescription } from '.';
-import { AddMedicineMutationVariables } from '../../../generated/graphql';
+import {
+  AddMedicineMutationVariables,
+  PerDay
+} from '../../../generated/graphql';
 import PrescriptionSettingDialog from '../../SettingsView/MedicineAccordion/MedicineSettingDialog';
 
 interface Props {
@@ -21,6 +23,7 @@ const PrescriptionBox: React.FC<Props> = ({
   medication,
   setMedications: setMedicine
 }) => {
+  const [error, setError] = useState('');
   const [medicationEdit, setMedicationEdit] = useState<
     AddMedicineMutationVariables
   >({
@@ -29,6 +32,21 @@ const PrescriptionBox: React.FC<Props> = ({
     price: medication.medicine.price,
     inStock: medication.medicine.inStock
   });
+  useEffect(() => {
+    if (!medicationEdit.forDays) return;
+    if (medicationEdit.perDay === PerDay['Stat']) {
+      if (medicationEdit.forDays > medication.medicine.inStock) {
+        setError(`We only have ${medication.medicine.inStock} inStock`);
+        return;
+      }
+    } else {
+      if (medicationEdit.forDays * 2 > medication.medicine.inStock) {
+        setError(`We only have ${medication.medicine.inStock} inStock`);
+        return;
+      }
+    }
+    setError('');
+  }, [medicationEdit]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const handleClick = () => {
     if (!medication.selected) {
@@ -37,7 +55,7 @@ const PrescriptionBox: React.FC<Props> = ({
     }
     setMedicine(prevMedications =>
       prevMedications?.map(prevMedication =>
-        prevMedication.medicine.id === medication.medicine.name
+        prevMedication.medicine.id === medication.medicine.id
           ? { ...prevMedication, selected: false }
           : { ...prevMedication }
       )
@@ -47,6 +65,7 @@ const PrescriptionBox: React.FC<Props> = ({
     setDialogOpen(false);
   };
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+    if (error) return;
     event.preventDefault();
     setMedicine(prevPrescriptions => {
       return prevPrescriptions!.map(prevPrescription => {
@@ -84,22 +103,17 @@ const PrescriptionBox: React.FC<Props> = ({
           sx={{ backgroundColor: 'gray.100' }}
         >
           <ListItemIcon>
-            <Checkbox checked={medication.selected} color="primary" />
+            <Checkbox
+              checked={medication.selected}
+              disabled={medication.medicine.inStock === 0}
+              color="primary"
+            />
           </ListItemIcon>
-          <ListItemText
-            primary={medication.medicine.name}
-            secondary={
-              <Typography variant="caption">
-                {/* {medicine.price *
-                  medicineEdit.forDays *
-                  (medicine.perDay === 'BID' ? 2 : 1)} */}
-                birr lasjdflksdjflksdjflkjsdkl
-              </Typography>
-            }
-          />
+          <ListItemText primary={medication.medicine.name} />
         </ListItemButton>
       </ListItem>
       <PrescriptionSettingDialog
+        error={error}
         open={dialogOpen}
         title="Prescription Info"
         type="request"
