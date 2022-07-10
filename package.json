@@ -40,8 +40,8 @@
     "@types/js-cookie": "^3.0.0",
     "@types/jwt-decode": "^3.1.0",
     "@types/node": "^12.20.12",
-    "@types/react": "^17.0.5",
     "@types/react-big-calendar": "^0.36.2",
+    "@types/react": "^17.0.5",
     "@types/react-dom": "^17.0.3",
     "@types/react-helmet": "^6.1.0",
     "@types/react-router-dom": "^5.1.7",
@@ -58,8 +58,8 @@
     "gen": "graphql-codegen --config codegen.yml"
   },
   "resolutions": {
-    "@types/react": "17.0.2",
-    "@types/react-dom": "17.0.2"
+    "@types/react": "^17.0.5",
+    "@types/react-dom": "^17.0.3"
   },
   "eslintConfig": {
     "extends": [

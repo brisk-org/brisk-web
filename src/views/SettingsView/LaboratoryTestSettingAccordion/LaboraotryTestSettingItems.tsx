@@ -29,6 +29,10 @@ const LaboraotryTestSettingContent: React.FC<Props> = ({
   useEffect(() => {
     setLaboratoryTest(prevLabTest => ({
       ...prevLabTest,
+      hasPrice:
+        !prevLabTest.hasPrice && !prevLabTest.isInfluencedByCategory
+          ? true
+          : prevLabTest.hasPrice,
       trackInStock:
         categoryTracksStock && laboratoryTest.isInfluencedByCategory
           ? false
