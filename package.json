@@ -18,13 +18,13 @@
     "js-cookie": "^3.0.1",
     "jwt-decode": "^3.1.2",
     "notistack": "^2.0.5",
-    "react": "^17.0.2",
+    "react": "^18.2.0",
     "react-big-calendar": "^0.38.4",
-    "react-dom": "^17.0.2",
+    "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-perfect-scrollbar": "^1.5.8",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
     "react-to-print": "^2.12.3",
     "subscriptions-transport-ws": "^0.9.19"
   },
@@ -40,9 +40,9 @@
     "@types/js-cookie": "^3.0.0",
     "@types/jwt-decode": "^3.1.0",
     "@types/node": "^12.20.12",
+    "@types/react": "^18.0.15",
     "@types/react-big-calendar": "^0.36.2",
-    "@types/react": "^17.0.5",
-    "@types/react-dom": "^17.0.3",
+    "@types/react-dom": "^18.0.6",
     "@types/react-helmet": "^6.1.0",
     "@types/react-router-dom": "^5.1.7",
     "eslint": "^7.32.0",
@@ -56,10 +56,6 @@
     "serve": "node serveHandler/serve.js",
     "eject": "react-scripts eject",
     "gen": "graphql-codegen --config codegen.yml"
-  },
-  "resolutions": {
-    "@types/react": "^17.0.5",
-    "@types/react-dom": "^17.0.3"
   },
   "eslintConfig": {
     "extends": [
