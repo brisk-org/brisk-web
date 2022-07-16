@@ -149,18 +149,6 @@ const LaboratoryTestsGraph: React.FC<Props> = ({
         <section className={classes.chart} ref={testsChartDom}></section>
       </CardContent>
       <Divider />
-      <Box display="flex" justifyContent="flex-end" p={2}>
-        <Link to="/app/lab/request">
-          <Button
-            color="primary"
-            endIcon={<ArrowRightIcon />}
-            size="small"
-            variant="text"
-          >
-            Create Laboratory Test
-          </Button>
-        </Link>
-      </Box>
     </Card>
   );
 };

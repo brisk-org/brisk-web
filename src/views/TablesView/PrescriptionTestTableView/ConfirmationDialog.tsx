@@ -119,14 +119,10 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   const [markPrescriptionAsComplete] = useMarkPrescriptionAsCompletedMutation({
     variables: { id: prescription.id }
   });
-  useEffect(() => {
-    if (confirmComplete) {
-      (async function() {
-        await markPrescriptionAsComplete();
-      })();
-      handleClose();
-    }
-  }, [confirmComplete]);
+  const handleCompletePrescription = async () => {
+    await markPrescriptionAsComplete();
+    handleClose();
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -265,13 +261,13 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         </DialogActions>
       </Dialog>
       <AlertDialog
-        dialogText={`This Prescription Will Now Be Completed`}
-        state={{
-          dialogToggle: completeDialogOpen,
-          setDialogToggle: setCompleteDialogOpen,
-          setProceedToAction: setConfirmComplete
-        }}
-      />
+        title="Complete Prescription"
+        open={completeDialogOpen}
+        handleClose={() => setCompleteDialogOpen(false)}
+        handleConfirm={handleCompletePrescription}
+      >
+        This action cant' be undone
+      </AlertDialog>
     </>
   );
 };

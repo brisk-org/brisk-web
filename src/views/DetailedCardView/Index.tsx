@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Backdrop, CircularProgress, Container, Grid } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../components/Page';
@@ -27,10 +27,12 @@ const DetailedCardView = () => {
       id: id || ''
     },
     fetchPolicy: 'no-cache',
+    pollInterval: 10000,
     onError: err => {
       console.log(err);
     }
   });
+  useEffect(() => console.log(data), [data]);
 
   return (
     <Page title="Customers">

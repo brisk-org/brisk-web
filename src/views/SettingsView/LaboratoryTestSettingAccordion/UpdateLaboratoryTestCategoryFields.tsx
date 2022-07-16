@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, TextField } from '@mui/material';
 import {
   LaboratoryTestCategoriesDocument,
@@ -7,9 +7,11 @@ import {
 } from '../../../generated/graphql';
 
 interface Props {
+  submit: boolean;
   fields: UpdateLaboratoryTestCategoryMutationVariables;
 }
 const UpdateLaboratoryTestCategoryFields: React.FC<Props> = ({
+  submit,
   fields: fieldsProps
 }) => {
   const [fields, setFields] = useState(fieldsProps);
@@ -27,54 +29,45 @@ const UpdateLaboratoryTestCategoryFields: React.FC<Props> = ({
     setFields(prevFields => ({ ...prevFields, [name]: value }));
   };
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async event => {
-    event.preventDefault();
-
-    await updateLaboraotryTestCategory({
-      variables: {
-        ...fields,
-        trackInStock: !!fields.inStock
-      }
-    });
-  };
-
+  useEffect(() => {
+    (async function() {
+      if (!submit) return;
+      await updateLaboraotryTestCategory({
+        variables: {
+          ...fields,
+          trackInStock: !!fields.inStock
+        }
+      });
+    })();
+  }, [submit]);
   return (
-    <form onSubmit={handleSubmit}>
-      <Box sx={{ mt: '15px', display: 'flex' }}>
-        <TextField
-          required
-          sx={{ mr: 1 }}
-          name="name"
-          label="Change Name"
-          variant="outlined"
-          value={fields.name}
-          onChange={handleChange}
-        />
-        <TextField
-          label="Change Price"
-          variant="outlined"
-          type="number"
-          name="price"
-          value={fields.price}
-          onChange={handleChange}
-        />
-        <TextField
-          label="Change InStock"
-          variant="outlined"
-          name="inStock"
-          type="number"
-          value={fields.inStock}
-          onChange={handleChange}
-        />
-      </Box>
-      <Box
-        sx={{ mt: 2, width: '100%', display: 'flex', justifyContent: 'end' }}
-      >
-        <Button variant="outlined" type="submit">
-          Submit Update
-        </Button>
-      </Box>
-    </form>
+    <Box sx={{ mt: '15px', display: 'flex' }}>
+      <TextField
+        required
+        sx={{ mr: 1 }}
+        name="name"
+        label="Change Name"
+        variant="outlined"
+        value={fields.name}
+        onChange={handleChange}
+      />
+      <TextField
+        label="Change Price"
+        variant="outlined"
+        type="number"
+        name="price"
+        value={fields.price}
+        onChange={handleChange}
+      />
+      <TextField
+        label="Change InStock"
+        variant="outlined"
+        name="inStock"
+        type="number"
+        value={fields.inStock}
+        onChange={handleChange}
+      />
+    </Box>
   );
 };
 

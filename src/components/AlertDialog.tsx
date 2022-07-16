@@ -9,45 +9,31 @@ import {
   DialogTitle
 } from '@mui/material';
 
-interface AlertDialogProps {
-  dialogText: string;
-  state: {
-    dialogToggle: boolean;
-    setDialogToggle: React.Dispatch<React.SetStateAction<boolean>>;
-    setProceedToAction: React.Dispatch<React.SetStateAction<boolean>>;
-  };
+interface Props {
+  title: string;
+  open: boolean;
+  handleConfirm: () => void;
+  handleClose: () => void;
 }
-const AlertDialog: React.FC<AlertDialogProps> = ({
-  dialogText,
-  state: { dialogToggle, setDialogToggle, setProceedToAction }
+const AlertDialog: React.FC<Props> = ({
+  title,
+  open,
+  handleConfirm,
+  handleClose,
+  children
 }) => {
-  const handleCancel = () => {
-    setDialogToggle(false);
-  };
-  const handleContinue = async () => {
-    setDialogToggle(false);
-    setProceedToAction(true);
-  };
-
   return (
-    <Dialog
-      open={dialogToggle}
-      onClose={handleCancel}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle id="alert-dialog-title">Are you sure</DialogTitle>
+    <Dialog open={open} onClose={handleClose}>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          {dialogText}
-        </DialogContentText>
+        <DialogContentText>{children}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCancel} color="primary">
+        <Button onClick={handleClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={handleContinue} color="primary" autoFocus>
-          Continue
+        <Button onClick={handleConfirm} color="primary" autoFocus>
+          Confirm
         </Button>
       </DialogActions>
     </Dialog>

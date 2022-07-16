@@ -29,10 +29,6 @@ const DialogExaminationCollapseListItem: React.FC<Props> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  if (confirmDelete) {
-    handleDelete();
-  }
-
   return (
     <>
       <ListItemButton
@@ -67,13 +63,13 @@ const DialogExaminationCollapseListItem: React.FC<Props> = ({
         </List>
       </Collapse>
       <AlertDialog
-        dialogText={`Delete ${listItemPrimaryText}`}
-        state={{
-          dialogToggle: deleteDialogOpen,
-          setDialogToggle: setDeleteDialogOpen,
-          setProceedToAction: setConfirmDelete
-        }}
-      />
+        title="Are you sure?"
+        open={deleteDialogOpen}
+        handleClose={() => setDeleteDialogOpen(false)}
+        handleConfirm={handleDelete}
+      >
+        Delete ${listItemPrimaryText}
+      </AlertDialog>
       {isExpanded && <Divider sx={{ mt: 3 }} />}
     </>
   );

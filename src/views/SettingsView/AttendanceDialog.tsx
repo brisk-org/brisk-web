@@ -8,7 +8,7 @@ import {
   DialogActions,
   Button
 } from '@mui/material';
-import * as faceapi from 'face-api.js';
+// import * as faceapi from 'face-api.js';
 import loadLabeledImages from '../../utils/loadLabeledImages';
 
 interface Props {
@@ -46,45 +46,45 @@ const AttendanceDialog: React.FC<Props> = ({ open, setOpen }) => {
   const handlePlay:
     | React.ReactEventHandler<HTMLVideoElement>
     | undefined = async event => {
-    if (!videoDom.current) return;
-    console.log(videoDom.current, event.target);
-    const canvas = faceapi.createCanvasFromMedia(videoDom.current);
-    canvas.style.position = 'absolute';
-    document.body.append(canvas);
-    const labeledFaceDescriptors = await loadLabeledImages(['Kranz Aklilu']);
-    const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
-    const displaySize = {
-      width: videoDom.current.width,
-      height: videoDom.current.width
-    };
-    faceapi.matchDimensions(canvas, displaySize);
-    console.log('faceMatcher', faceMatcher);
-    setInterval(async () => {
-      const detections = await faceapi
-        .detectAllFaces(
-          videoDom.current!,
-          new faceapi.TinyFaceDetectorOptions()
-        )
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-      console.log('detections', detections);
-      const resizedDetections = faceapi.resizeResults(detections, displaySize);
-      console.log('resizedDetections', resizedDetections);
-      const results = resizedDetections.map(({ descriptor }) =>
-        faceMatcher.findBestMatch(descriptor)
-      );
-      console.log('results', results);
-      results.forEach((result, idx) => {
-        const box = resizedDetections[idx].detection.box;
-        const drawBox = new faceapi.draw.DrawBox(box, {
-          label: result.toString()
-        });
-        drawBox.draw(canvas);
-      });
-      canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
-      faceapi.draw.drawDetections(canvas, resizedDetections);
-      faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-    }, 5000);
+    // if (!videoDom.current) return;
+    // console.log(videoDom.current, event.target);
+    // const canvas = faceapi.createCanvasFromMedia(videoDom.current);
+    // canvas.style.position = 'absolute';
+    // document.body.append(canvas);
+    // const labeledFaceDescriptors = await loadLabeledImages(['Kranz Aklilu']);
+    // const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
+    // const displaySize = {
+    //   width: videoDom.current.width,
+    //   height: videoDom.current.width
+    // };
+    // faceapi.matchDimensions(canvas, displaySize);
+    // console.log('faceMatcher', faceMatcher);
+    // setInterval(async () => {
+    //   const detections = await faceapi
+    //     .detectAllFaces(
+    //       videoDom.current!,
+    //       new faceapi.TinyFaceDetectorOptions()
+    //     )
+    //     .withFaceLandmarks()
+    //     .withFaceDescriptors();
+    //   console.log('detections', detections);
+    //   const resizedDetections = faceapi.resizeResults(detections, displaySize);
+    //   console.log('resizedDetections', resizedDetections);
+    //   const results = resizedDetections.map(({ descriptor }) =>
+    //     faceMatcher.findBestMatch(descriptor)
+    //   );
+    //   console.log('results', results);
+    //   results.forEach((result, idx) => {
+    //     const box = resizedDetections[idx].detection.box;
+    //     const drawBox = new faceapi.draw.DrawBox(box, {
+    //       label: result.toString()
+    //     });
+    //     drawBox.draw(canvas);
+    //   });
+    //   canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
+    //   faceapi.draw.drawDetections(canvas, resizedDetections);
+    //   faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+    // }, 5000);
   };
 
   return (

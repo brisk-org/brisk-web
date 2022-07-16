@@ -56,7 +56,6 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({ medicine }) => {
   >(medicine);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const [updateMedicine, { loading }] = useUpdateMedicineMutation({
     onError(err) {
@@ -71,10 +70,8 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({ medicine }) => {
     setMedicineEdit(medicine);
   }, [medicine]);
 
-  useEffect(() => {
-    console.log(confirmDelete);
-    if (!confirmDelete) return;
-    deleteMedicine({ variables: { id: medicine.id } })
+  const handleDeleteMedicine = async () => {
+    await deleteMedicine({ variables: { id: medicine.id } })
       .then(res => {
         console.log(res);
         if (!res.data?.deleteMedicine) {
@@ -87,8 +84,8 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({ medicine }) => {
         setMedicineEdit(medicine);
       })
       .catch(err => enqueueSnackbar(err, { variant: 'error' }));
-    setConfirmDelete(false);
-  }, [confirmDelete]);
+    setDeleteDialogOpen(false);
+  };
 
   const onClose = () => {
     setOpenSettingDialog(false);
@@ -156,13 +153,13 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({ medicine }) => {
         onClose={onClose}
       />
       <AlertDialog
-        dialogText={`Delete ${medicine.name}? Can't be reversed`}
-        state={{
-          dialogToggle: deleteDialogOpen,
-          setDialogToggle: setDeleteDialogOpen,
-          setProceedToAction: setConfirmDelete
-        }}
-      />
+        title="Are you sure?"
+        open={deleteDialogOpen}
+        handleClose={() => setDeleteDialogOpen(false)}
+        handleConfirm={handleDeleteMedicine}
+      >
+        Delete {medicine.name}? Can't be reversed
+      </AlertDialog>
     </>
   );
 };

@@ -71,7 +71,17 @@ const LaboratoryCategoriesAccordion: React.FC<Props> = ({ category }) => {
               category.subCategories.map(subCategory => (
                 <Accordion key={subCategory.name}>
                   <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant="h6">{subCategory.name}</Typography>
+                    <Box>
+                      <Typography variant="h6">{subCategory.name}</Typography>
+                      <Typography variant="body2">
+                        {subCategory.price} etb
+                      </Typography>
+                      {subCategory.trackInStock && (
+                        <Typography variant="body2">
+                          {subCategory.inStock} in stock
+                        </Typography>
+                      )}
+                    </Box>
                   </AccordionSummary>
                   <List dense>
                     {subCategory.laboratoryTests &&

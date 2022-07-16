@@ -50,6 +50,10 @@ query Card($id: ID!) {
           id
           name
         }
+        subCategory {
+          id
+          name
+        }
       }
       values {
         id

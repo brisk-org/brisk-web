@@ -62,8 +62,7 @@ const HistoryContainer: React.FC<HistoryContainerProps> = ({ history }) => {
   const [viewedHistoryIndex, setViewedHistoryIndex] = useState(
     history.length - 1
   );
-  const [dialogToggle, setDialogToggle] = useState(false);
-  const [proceedToAction, setProceedToAction] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const result = JSON.parse(history[viewedHistoryIndex].result);
   const vsHistoryProps = {
@@ -92,16 +91,14 @@ const HistoryContainer: React.FC<HistoryContainerProps> = ({ history }) => {
   };
 
   const locationHistory = useHistory();
-  const [deleteCard] = useDeleteHistoryMutation({
+  const [deleteHistory] = useDeleteHistoryMutation({
     onError: err => console.log(err)
   });
 
-  useEffect(() => {
-    if (!proceedToAction) return;
-    deleteCard({ variables: { id: history[viewedHistoryIndex].id } });
+  const handleDeleteHistory = async () => {
+    await deleteHistory({ variables: { id: history[viewedHistoryIndex].id } });
     locationHistory.push('/app/cards');
-    setProceedToAction(false);
-  }, [proceedToAction]);
+  };
 
   const handleChange = (event: SelectChangeEvent<string>) => {
     const selectedHistory = history.find(
@@ -178,15 +175,19 @@ const HistoryContainer: React.FC<HistoryContainerProps> = ({ history }) => {
         <Button
           color="secondary"
           endIcon={<DeleteOutline />}
-          onClick={() => setDialogToggle(true)}
+          onClick={() => setDialogOpen(true)}
         >
           Delete History
         </Button>
       </Box>
       <AlertDialog
-        dialogText={`Do you really want To delete History #${history[viewedHistoryIndex].id}`}
-        state={{ dialogToggle, setDialogToggle, setProceedToAction }}
-      />
+        title={`Delete History`}
+        open={dialogOpen}
+        handleClose={() => setDialogOpen(false)}
+        handleConfirm={handleDeleteHistory}
+      >
+        Do you really want To delete History #${history[viewedHistoryIndex].id}
+      </AlertDialog>
     </Card>
   );
 };

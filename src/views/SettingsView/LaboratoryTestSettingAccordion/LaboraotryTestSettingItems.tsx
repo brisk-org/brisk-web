@@ -15,6 +15,7 @@ import React, { useEffect } from 'react';
 import { LaboratoryTestContentInput } from '../../../generated/graphql';
 
 interface Props {
+  isInSubCategory?: boolean;
   categoryTracksStock: boolean;
   laboratoryTest: LaboratoryTestContentInput;
   setLaboratoryTest: React.Dispatch<
@@ -22,22 +23,33 @@ interface Props {
   >;
 }
 const LaboraotryTestSettingContent: React.FC<Props> = ({
+  isInSubCategory,
   categoryTracksStock,
   laboratoryTest,
   setLaboratoryTest
 }) => {
   useEffect(() => {
-    setLaboratoryTest(prevLabTest => ({
-      ...prevLabTest,
-      hasPrice:
-        !prevLabTest.hasPrice && !prevLabTest.isInfluencedByCategory
-          ? true
-          : prevLabTest.hasPrice,
-      trackInStock:
-        categoryTracksStock && laboratoryTest.isInfluencedByCategory
-          ? false
-          : prevLabTest.trackInStock
-    }));
+    setLaboratoryTest(prevLabTest => {
+      if (isInSubCategory) {
+        return {
+          ...prevLabTest,
+          hasPrice: false,
+          trackInStock: false,
+          isInfluencedByCategory: true
+        };
+      }
+      return {
+        ...prevLabTest,
+        hasPrice:
+          !prevLabTest.hasPrice && !prevLabTest.isInfluencedByCategory
+            ? true
+            : prevLabTest.hasPrice,
+        trackInStock:
+          categoryTracksStock && laboratoryTest.isInfluencedByCategory
+            ? false
+            : prevLabTest.trackInStock
+      };
+    });
   }, [categoryTracksStock, laboratoryTest.isInfluencedByCategory]);
 
   return (
@@ -63,6 +75,7 @@ const LaboraotryTestSettingContent: React.FC<Props> = ({
       <ListItem>
         <ListItemIcon>
           <Checkbox
+            disabled={isInSubCategory}
             checked={laboratoryTest.isInfluencedByCategory}
             onChange={(_, checked) => {
               setLaboratoryTest(prevLabTest => ({
@@ -82,7 +95,7 @@ const LaboraotryTestSettingContent: React.FC<Props> = ({
           <Checkbox
             color="secondary"
             checked={laboratoryTest.hasPrice}
-            disabled={!laboratoryTest.isInfluencedByCategory}
+            disabled={!laboratoryTest.isInfluencedByCategory || isInSubCategory}
             onChange={(_, checked) => {
               setLaboratoryTest(prevLabTest => ({
                 ...prevLabTest,
@@ -132,7 +145,8 @@ const LaboraotryTestSettingContent: React.FC<Props> = ({
                 : laboratoryTest.trackInStock
             }
             disabled={
-              laboratoryTest.isInfluencedByCategory && categoryTracksStock
+              isInSubCategory ||
+              (laboratoryTest.isInfluencedByCategory && categoryTracksStock)
             }
             onChange={(_, checked) => {
               setLaboratoryTest(prevLabTest => ({

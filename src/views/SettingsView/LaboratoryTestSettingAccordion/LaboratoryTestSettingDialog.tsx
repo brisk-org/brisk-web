@@ -48,14 +48,15 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [submit, setSubmit] = useState(false);
 
   useEffect(() => {
-    if (confirmDelete) {
-      (async function() {
-        await deleteCategory();
-      })();
-    }
-  }, [confirmDelete]);
+    if (!submit) return;
+    setSubmit(false);
+  }, [submit]);
+  const handleDeleteCategory = async () => {
+    await deleteCategory();
+  };
 
   const [newAddedField, setNewAddedField] = useState<
     LaboratorySettingEnteryFields
@@ -91,121 +92,139 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
         aria-labelledby={`alert-dialog-title`}
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle>
-          <Typography variant="h5">
-            {category.name}
-            {category.laboratoryTests[0] && (
-              <Typography sx={{ ml: 1 }} variant="caption">
-                (
-                {category.laboratoryTests
-                  .map(
-                    laboratoryTest =>
-                      laboratoryTest.isInfluencedByCategory &&
-                      laboratoryTest.name
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            setSubmit(true);
+          }}
+        >
+          <DialogTitle>
+            <Typography variant="h5">
+              {category.name}
+              {category.laboratoryTests[0] && (
+                <Typography sx={{ ml: 1 }} variant="caption">
+                  (
+                  {category.laboratoryTests
+                    .map(
+                      laboratoryTest =>
+                        laboratoryTest.isInfluencedByCategory &&
+                        laboratoryTest.name
+                    )
+                    .filter(value => !!value)
+                    .join(', ') ||
+                    `No Tests are Influenced By ${category.name}`}
                   )
-                  .filter(value => !!value)
-                  .join(', ') || `No Tests are Influenced By ${category.name}`}
-                )
-              </Typography>
+                </Typography>
+              )}
+            </Typography>
+            <Typography variant="body2">price: {category.price}etb</Typography>
+            <IconButton
+              sx={{ position: 'absolute', top: 20, right: 20 }}
+              onClick={handleClose}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <UpdateLaboratoryTestCategoryFields
+              fields={{ ...category }}
+              submit={submit}
+            />
+            {category.laboratoryTests[0] && (
+              <List
+                aria-labelledby="nested-list-subheader"
+                subheader={
+                  <ListSubheader component="div" id="nested-list-subheader">
+                    Examinations
+                  </ListSubheader>
+                }
+              >
+                {category.laboratoryTests.map(laboratoryTest => (
+                  <LaboraotryTestSetting
+                    submit={submit}
+                    categoryTracksStock={category.trackInStock}
+                    laboratoryTest={laboratoryTest}
+                    isExpanded={expandedLaboratoryTest === laboratoryTest.name}
+                    setExpandedLaboratoryTest={setExpandedLaboratoryTest}
+                  />
+                ))}
+              </List>
             )}
-          </Typography>
-          <Typography variant="body2">price: {category.price}etb</Typography>
-          <IconButton
-            sx={{ position: 'absolute', top: 20, right: 20 }}
-            onClick={handleClose}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <UpdateLaboratoryTestCategoryFields fields={{ ...category }} />
-          {category.laboratoryTests[0] && (
-            <List
-              aria-labelledby="nested-list-subheader"
-              subheader={
-                <ListSubheader component="div" id="nested-list-subheader">
-                  Examinations
-                </ListSubheader>
-              }
+            <Button
+              sx={{ mt: 2, width: '100%' }}
+              onClick={() => setAddLabTestDialogOpen(true)}
+              variant="contained"
+              endIcon={<AddIcon />}
             >
-              {category.laboratoryTests.map(laboratoryTest => (
-                <LaboraotryTestSetting
-                  categoryTracksStock={category.trackInStock}
-                  laboratoryTest={laboratoryTest}
-                  isExpanded={expandedLaboratoryTest === laboratoryTest.name}
-                  setExpandedLaboratoryTest={setExpandedLaboratoryTest}
-                />
-              ))}
-            </List>
-          )}
-          <Button
-            sx={{ mt: 2, width: '100%' }}
-            onClick={() => setAddLabTestDialogOpen(true)}
-            variant="contained"
-            endIcon={<AddIcon />}
-          >
-            Add New Laboratory Test
-          </Button>
+              Add New Laboratory Test
+            </Button>
 
-          <CreateNewLaboraotryTestDialog
-            categoryTracksStock={category.trackInStock}
-            open={addLabTestDialogOpen}
-            onClose={() => setAddLabTestDialogOpen(false)}
-            categoryId={category.id}
-          />
-          {category.subCategories[0] && (
-            <List
-              aria-labelledby="nested-list-subheader"
-              subheader={
-                <ListSubheader component="div" id="nested-list-subheader">
-                  Sub Categories
-                </ListSubheader>
-              }
+            <CreateNewLaboraotryTestDialog
+              categoryTracksStock={category.trackInStock}
+              open={addLabTestDialogOpen}
+              onClose={() => setAddLabTestDialogOpen(false)}
+              categoryId={category.id}
+            />
+            {category.subCategories[0] && (
+              <List
+                aria-labelledby="nested-list-subheader"
+                subheader={
+                  <ListSubheader component="div" id="nested-list-subheader">
+                    Sub Categories
+                  </ListSubheader>
+                }
+              >
+                {category.subCategories.map(subCategory => (
+                  <LaboratoryTestSubCategorySetting
+                    submit={submit}
+                    categoryId={category.id}
+                    subCategory={subCategory}
+                    isExpanded={expandedSubCategory === subCategory.name}
+                    setExpandedSubCategory={setExpandedSubCategory}
+                  />
+                ))}
+              </List>
+            )}
+            <AddNewFieldsFormDialog
+              title="Add a Sub Category"
+              hasPrice={true}
+              field={newAddedField}
+              setField={setNewAddedField}
+              onSubmit={createSubCategorySubmit}
+            />
+            <Button
+              sx={{ mt: 2, width: '100%' }}
+              onClick={() => setDeleteDialogOpen(true)}
+              variant="contained"
+              color="error"
+              endIcon={<DeleteIcon />}
             >
-              {category.subCategories.map(subCategory => (
-                <LaboratoryTestSubCategorySetting
-                  categoryId={category.id}
-                  subCategory={subCategory}
-                  isExpanded={expandedSubCategory === subCategory.name}
-                  setExpandedSubCategory={setExpandedSubCategory}
-                />
-              ))}
-            </List>
-          )}
-          <AddNewFieldsFormDialog
-            title="Add a Sub Category"
-            hasPrice={true}
-            field={newAddedField}
-            setField={setNewAddedField}
-            onSubmit={createSubCategorySubmit}
-          />
-          <Button
-            sx={{ mt: 2, width: '100%' }}
-            onClick={() => setDeleteDialogOpen(true)}
-            variant="contained"
-            color="error"
-            endIcon={<DeleteIcon />}
-          >
-            Delete Category
-          </Button>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button type="submit" color="primary" autoFocus onClick={handleClose}>
-            Continue
-          </Button>
-        </DialogActions>
+              Delete Category
+            </Button>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              color="primary"
+              autoFocus
+              // onClick={() => setSubmit(true)}
+            >
+              Continue
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
       <AlertDialog
-        dialogText={`Delete ${category.name}`}
-        state={{
-          dialogToggle: deleteDialogOpen,
-          setDialogToggle: setDeleteDialogOpen,
-          setProceedToAction: setConfirmDelete
-        }}
-      />
+        title="Are you sure?"
+        open={deleteDialogOpen}
+        handleClose={() => setDeleteDialogOpen(false)}
+        handleConfirm={handleDeleteCategory}
+      >
+        Delete {category.name}
+      </AlertDialog>
     </>
   );
 };

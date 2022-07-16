@@ -29,20 +29,17 @@ interface LinksListProps {
 const LinksList: React.FC<LinksListProps> = ({ card }) => {
   const classes = useStyles();
 
-  const [dialogToggle, setDialogToggle] = useState(false);
-  const [proceedToAction, setProceedToAction] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const history = useHistory();
   const [deleteCard] = useDeleteCardMutation({
     onError: err => console.log(err)
   });
 
-  useEffect(() => {
-    if (!proceedToAction) return;
-    deleteCard({ variables: { id: card.id } });
+  const handleDeleteCard = async () => {
+    await deleteCard({ variables: { id: card.id } });
     history.push('/app/data/card');
-    setProceedToAction(false);
-  }, [proceedToAction]);
+  };
 
   return (
     <>
@@ -66,7 +63,7 @@ const LinksList: React.FC<LinksListProps> = ({ card }) => {
             variant="contained"
             color="secondary"
             size="small"
-            onClick={() => setDialogToggle(true)}
+            onClick={() => setDialogOpen(true)}
           >
             Delete Card
           </Button>
@@ -115,9 +112,13 @@ const LinksList: React.FC<LinksListProps> = ({ card }) => {
         </Box>
       </Box>
       <AlertDialog
-        dialogText={`Do you really want To delete the Card for ${card.name}`}
-        state={{ dialogToggle, setDialogToggle, setProceedToAction }}
-      />
+        title="Are you sure?"
+        open={dialogOpen}
+        handleClose={() => setDialogOpen(false)}
+        handleConfirm={handleDeleteCard}
+      >
+        Do you really want To delete the Card for ${card.name}
+      </AlertDialog>
     </>
   );
 };

@@ -211,14 +211,6 @@ export type LaboratoryTestIdInput = {
   id: Scalars['String'];
 };
 
-export type LaboratoryTestRequest = {
-  __typename?: 'LaboratoryTestRequest';
-  id: Scalars['ID'];
-  value?: Maybe<Scalars['String']>;
-  created_at: Scalars['String'];
-  updated_at: Scalars['String'];
-};
-
 export type LaboratoryTestSubCategory = {
   __typename?: 'LaboratoryTestSubCategory';
   id: Scalars['ID'];
@@ -356,6 +348,7 @@ export type MutationCreateLaboratoryExaminationArgs = {
   price: Scalars['Float'];
   laboratoryTest: Array<LaboratoryTestIdInput>;
   selectedCategories?: Maybe<Array<Scalars['ID']>>;
+  selectedSubCategories?: Maybe<Array<Scalars['ID']>>;
 };
 
 
@@ -678,7 +671,6 @@ export type Query = {
   laboratoryTestsForCategory: Array<LaboratoryTest>;
   laboratoryTestCategories: Array<LaboratoryTestCategory>;
   laboratoryTestSubCategories: Array<LaboratoryTestSubCategory>;
-  laboratoryTestRequests: Array<LaboratoryTestRequest>;
   setting: Settings;
   cardsCount: Scalars['Float'];
   cards: Array<Card>;
@@ -1102,6 +1094,7 @@ export type CreateLaboratoryExaminationMutationVariables = Exact<{
   cardId: Scalars['ID'];
   laboratoryTest: Array<LaboratoryTestIdInput> | LaboratoryTestIdInput;
   selectedCategories?: Maybe<Array<Scalars['ID']> | Scalars['ID']>;
+  selectedSubCategories?: Maybe<Array<Scalars['ID']> | Scalars['ID']>;
   price: Scalars['Float'];
 }>;
 
@@ -1687,6 +1680,9 @@ export type CardQuery = (
         & { category?: Maybe<(
           { __typename?: 'LaboratoryTest' }
           & Pick<LaboratoryTest, 'id' | 'name'>
+        )>, subCategory?: Maybe<(
+          { __typename?: 'LaboratoryTestSubCategory' }
+          & Pick<LaboratoryTestSubCategory, 'id' | 'name'>
         )> }
       )>, values?: Maybe<Array<(
         { __typename?: 'LaboratoryExaminationValue' }
@@ -1814,6 +1810,9 @@ export type LaboratoryExaminationQuery = (
       & { category?: Maybe<(
         { __typename?: 'LaboratoryTest' }
         & Pick<LaboratoryTest, 'name'>
+      )>, subCategory?: Maybe<(
+        { __typename?: 'LaboratoryTestSubCategory' }
+        & Pick<LaboratoryTestSubCategory, 'name'>
       )> }
     )>, values?: Maybe<Array<(
       { __typename?: 'LaboratoryExaminationValue' }
@@ -2979,11 +2978,12 @@ export type CompleteLaboratoryExaminationMutationHookResult = ReturnType<typeof 
 export type CompleteLaboratoryExaminationMutationResult = Apollo.MutationResult<CompleteLaboratoryExaminationMutation>;
 export type CompleteLaboratoryExaminationMutationOptions = Apollo.BaseMutationOptions<CompleteLaboratoryExaminationMutation, CompleteLaboratoryExaminationMutationVariables>;
 export const CreateLaboratoryExaminationDocument = gql`
-    mutation CreateLaboratoryExamination($cardId: ID!, $laboratoryTest: [LaboratoryTestIdInput!]!, $selectedCategories: [ID!], $price: Float!) {
+    mutation CreateLaboratoryExamination($cardId: ID!, $laboratoryTest: [LaboratoryTestIdInput!]!, $selectedCategories: [ID!], $selectedSubCategories: [ID!], $price: Float!) {
   createLaboratoryExamination(
     cardId: $cardId
     laboratoryTest: $laboratoryTest
     selectedCategories: $selectedCategories
+    selectedSubCategories: $selectedSubCategories
     price: $price
   ) {
     id
@@ -3012,6 +3012,7 @@ export type CreateLaboratoryExaminationMutationFn = Apollo.MutationFunction<Crea
  *      cardId: // value for 'cardId'
  *      laboratoryTest: // value for 'laboratoryTest'
  *      selectedCategories: // value for 'selectedCategories'
+ *      selectedSubCategories: // value for 'selectedSubCategories'
  *      price: // value for 'price'
  *   },
  * });
@@ -4437,6 +4438,10 @@ export const CardDocument = gql`
           id
           name
         }
+        subCategory {
+          id
+          name
+        }
       }
       values {
         id
@@ -4766,6 +4771,9 @@ export const LaboratoryExaminationDocument = gql`
       name
       normalValue
       category {
+        name
+      }
+      subCategory {
         name
       }
       commonValues

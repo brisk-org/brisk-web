@@ -13,6 +13,9 @@ query LaboratoryExamination($id: ID!) {
       category {
         name
       }
+      subCategory {
+        name
+      }
       commonValues
       price
       hasPrice

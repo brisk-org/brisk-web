@@ -2,12 +2,14 @@ mutation CreateLaboratoryExamination(
   $cardId: ID!
   $laboratoryTest: [LaboratoryTestIdInput!]!
   $selectedCategories: [ID!]
+  $selectedSubCategories: [ID!]
   $price: Float!
 ) {
   createLaboratoryExamination(
     cardId: $cardId
     laboratoryTest: $laboratoryTest
     selectedCategories: $selectedCategories
+    selectedSubCategories: $selectedSubCategories
     price: $price
   ) {
     id

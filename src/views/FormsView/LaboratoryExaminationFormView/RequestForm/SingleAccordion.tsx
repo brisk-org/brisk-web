@@ -6,7 +6,8 @@ import {
   AccordionSummary,
   AccordionDetails,
   Checkbox,
-  FormControlLabel
+  FormControlLabel,
+  Typography
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { ExpandMore } from '@mui/icons-material';
@@ -79,6 +80,25 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
       });
     });
   };
+  const handleSubCategoryClick = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    checked: boolean
+  ) => {
+    setCategories(prevCategories =>
+      prevCategories?.map(prevCategory =>
+        prevCategory.name === category.name
+          ? {
+              ...prevCategory,
+              subCategories: prevCategory.subCategories.map(subCategory =>
+                subCategory.name === event.target.name
+                  ? { ...subCategory, selected: checked }
+                  : { ...subCategory }
+              )
+            }
+          : { ...prevCategory }
+      )
+    );
+  };
 
   return (
     <Accordion disabled={!validId} className={classes.root}>
@@ -97,13 +117,55 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
               onChange={handleCategoryClick}
               name={category.name}
               color="primary"
-              disabled={!validId || !category.price}
+              disabled={
+                !validId ||
+                !category.laboratoryTests.some(
+                  test => test.isInfluencedByCategory
+                )
+              }
             />
           }
           label={category.name}
         />
       </AccordionSummary>
       <AccordionDetails className={classes.root}>
+        {category.subCategories.map((subCategory, index) => (
+          <Accordion
+            sx={{ boxShadow: 'none', border: '1px solid lightgray' }}
+            disabled={!validId}
+            className={classes.root}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMore />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <FormControlLabel
+                aria-label="Header"
+                onClick={event => event.stopPropagation()}
+                onFocus={event => event.stopPropagation()}
+                control={
+                  <Checkbox
+                    checked={subCategory.selected}
+                    onChange={handleSubCategoryClick}
+                    name={subCategory.name}
+                    color="primary"
+                  />
+                }
+                label={subCategory.name}
+              />
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container>
+                {subCategory.laboratoryTests.map(test => (
+                  <Grid key={index} item md={6} xs={12} sm={4}>
+                    <Typography>{test.name}</Typography>
+                  </Grid>
+                ))}
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+        ))}
         <Grid container spacing={3}>
           {category.laboratoryTests.map((test, index) => (
             <Grid key={index} item md={6} xs={12} sm={4}>

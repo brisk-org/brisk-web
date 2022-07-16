@@ -26,14 +26,19 @@ import {
 } from '@mui/icons-material';
 import LaboraotryTestSettingContent from './LaboraotryTestSettingItems';
 import { Box } from '@mui/material';
+import AlertDialog from '../../../components/AlertDialog';
 
 interface Props {
+  isInSubCategory?: boolean;
+  submit: boolean;
   categoryTracksStock: boolean;
   laboratoryTest: LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
   isExpanded: boolean;
   setExpandedLaboratoryTest: React.Dispatch<React.SetStateAction<string>>;
 }
 const LaboraotryTestSetting: React.FC<Props> = ({
+  isInSubCategory,
+  submit,
   categoryTracksStock,
   laboratoryTest: oldLaboraotryTest,
   isExpanded,
@@ -52,12 +57,9 @@ const LaboraotryTestSetting: React.FC<Props> = ({
   const [laboratoryTest, setLaboraotryTest] = useState<
     LaboratoryTestContentInput
   >(initialState);
-
-  useEffect(() => {
-    setLaboraotryTest(initialState);
-  }, [oldLaboraotryTest]);
-
   const [newCommonValue, setNewCommonValue] = useState('');
+  const [moreOptionsMenuOpen, setMoreOptionsMenuOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const [updateLaboratoryTest, { loading }] = useUpdateLaboratoryTestMutation({
     refetchQueries: [{ query: LaboratoryTestCategoriesDocument }]
@@ -69,18 +71,25 @@ const LaboraotryTestSetting: React.FC<Props> = ({
     refetchQueries: [{ query: LaboratoryTestCategoriesDocument }]
   });
 
+  useEffect(() => {
+    setLaboraotryTest(initialState);
+  }, [oldLaboraotryTest]);
+
   const handleDelete = async () => {
     await deleteLaboraotryTest();
+    setDeleteDialogOpen(false);
   };
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async event => {
-    event.preventDefault();
-    await updateLaboratoryTest({
-      variables: {
-        id: oldLaboraotryTest.id,
-        content: { ...laboratoryTest }
-      }
-    });
-  };
+  useEffect(() => {
+    (async function() {
+      if (!submit) return;
+      await updateLaboratoryTest({
+        variables: {
+          id: oldLaboraotryTest.id,
+          content: { ...laboratoryTest }
+        }
+      });
+    })();
+  }, [submit]);
   return (
     <>
       <ListItemButton
@@ -115,7 +124,7 @@ const LaboraotryTestSetting: React.FC<Props> = ({
         <IconButton
           onClick={e => {
             e.stopPropagation();
-            handleDelete();
+            setDeleteDialogOpen(true);
           }}
         >
           <Delete fontSize="small" />
@@ -123,69 +132,61 @@ const LaboraotryTestSetting: React.FC<Props> = ({
         {isExpanded ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       {isExpanded && <Divider />}
-      <form onSubmit={handleSubmit}>
-        <Collapse in={isExpanded} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
-          <List
-            // sx={{ borderLeft: '1px solid lightgray' }}
-            component="div"
-            disablePadding
-          >
-            <LaboraotryTestSettingContent
-              categoryTracksStock={categoryTracksStock}
-              laboratoryTest={laboratoryTest}
-              setLaboratoryTest={setLaboraotryTest}
-            />
-          </List>
-          <CommonValuesCollapse
-            commonValue={newCommonValue}
-            setCommonValue={setNewCommonValue}
-            onSubmit={() => {
-              // set
-              // setNewCommonValue('');
-            }}
-          >
-            {laboratoryTest.commonValues &&
-              laboratoryTest.commonValues.map((commonValue, index) => (
-                <>
-                  <ListItem
-                    secondaryAction={
-                      <IconButton
-                        onClick={() => {
-                          setLaboraotryTest(prevLabTest => ({
-                            ...prevLabTest,
-                            commonValues: prevLabTest.commonValues?.filter(
-                              commonVal => commonVal !== commonValue
-                            )
-                          }));
-                        }}
-                        color="secondary"
-                        size="small"
-                        edge="end"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    }
-                  >
-                    <ListItemText primary={commonValue} />
-                  </ListItem>
-                  <Divider />
-                </>
-              ))}
-          </CommonValuesCollapse>
-          <Box
-            sx={{
-              mt: 2,
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'end'
-            }}
-          >
-            <Button variant="outlined" type="submit">
-              {loading ? '...Loading' : 'Submit Updates'}
-            </Button>
-          </Box>
-        </Collapse>
-      </form>
+      <Collapse in={isExpanded} timeout="auto" unmountOnExit sx={{ pl: 1 }}>
+        <List component="div" disablePadding>
+          <LaboraotryTestSettingContent
+            isInSubCategory={isInSubCategory}
+            categoryTracksStock={categoryTracksStock}
+            laboratoryTest={laboratoryTest}
+            setLaboratoryTest={setLaboraotryTest}
+          />
+        </List>
+        <CommonValuesCollapse
+          commonValue={newCommonValue}
+          setCommonValue={setNewCommonValue}
+          onSubmit={() => {
+            // set
+            // setNewCommonValue('');
+          }}
+        >
+          {laboratoryTest.commonValues &&
+            laboratoryTest.commonValues.map((commonValue, index) => (
+              <>
+                <ListItem
+                  secondaryAction={
+                    <IconButton
+                      onClick={() => {
+                        setLaboraotryTest(prevLabTest => ({
+                          ...prevLabTest,
+                          commonValues: prevLabTest.commonValues?.filter(
+                            commonVal => commonVal !== commonValue
+                          )
+                        }));
+                      }}
+                      color="secondary"
+                      size="small"
+                      edge="end"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  }
+                >
+                  <ListItemText primary={commonValue} />
+                </ListItem>
+                <Divider />
+              </>
+            ))}
+        </CommonValuesCollapse>
+        <Divider />
+      </Collapse>
+      <AlertDialog
+        title="Are you sure?"
+        open={deleteDialogOpen}
+        handleClose={() => setDeleteDialogOpen(false)}
+        handleConfirm={handleDelete}
+      >
+        Delete {laboratoryTest.name}
+      </AlertDialog>
     </>
   );
 };

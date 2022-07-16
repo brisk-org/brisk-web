@@ -53,7 +53,7 @@ const SingleDetailedPrescription: React.FC<{
   const itemDom = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
-  const [dialogToggle, setDialogToggle] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [proceedToAction, setProceedToAction] = useState(false);
 
   const history = useHistory();
@@ -85,13 +85,10 @@ const SingleDetailedPrescription: React.FC<{
       itemDom.current?.scrollIntoView();
     }
   }, [id]);
-  useEffect(() => {
-    if (!proceedToAction) return;
-    (async function() {
-      await deletePrescription();
-    })();
-    setDialogToggle(false);
-  }, [proceedToAction]);
+  const handleDeletePrescription = async () => {
+    await deletePrescription();
+    setDialogOpen(false);
+  };
 
   return (
     <Grid item md={6} sm={12} ref={itemDom}>
@@ -140,11 +137,16 @@ const SingleDetailedPrescription: React.FC<{
             })}
           </ul>
           <AlertDialog
-            dialogText={`Delete #${prescription.id} test`}
-            state={{ dialogToggle, setDialogToggle, setProceedToAction }}
-          />
+            title="Are you sure?"
+            open={dialogOpen}
+            handleClose={() => setDialogOpen(false)}
+            handleConfirm={handleDeletePrescription}
+          >
+            Delete #{prescription.id} test
+          </AlertDialog>
+
           <Button
-            onClick={() => setDialogToggle(true)}
+            onClick={() => setDialogOpen(true)}
             fullWidth
             variant="contained"
             color="secondary"

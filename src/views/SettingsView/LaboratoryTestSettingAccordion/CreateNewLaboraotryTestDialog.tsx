@@ -71,6 +71,7 @@ const CreateNewLaboraotryTestDialog: React.FC<Props> = ({
         <DialogContent sx={{ width: '500px' }}>
           <List>
             <LaboraotryTestSettingContent
+              isInSubCategory={true}
               categoryTracksStock={categoryTracksStock}
               laboratoryTest={newLaboratoryTest}
               setLaboratoryTest={setNewLaboratoryTest}

@@ -57,8 +57,7 @@ const LaboratoryExaminationItem: React.FC<{
 
   const [open, setOpen] = useState(false);
   const [onPrint, setOnPrint] = useState(false);
-  const [dialogToggle, setDialogToggle] = useState(false);
-  const [proceedToDeleteAction, setProceedToDeleteAction] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const history = useHistory();
   const query = new URLSearchParams(useLocation().search);
@@ -105,11 +104,10 @@ const LaboratoryExaminationItem: React.FC<{
       itemDom.current?.scrollIntoView();
     }
   }, [id, laboratoryExaminations.id]);
-  useEffect(() => {
-    if (!proceedToDeleteAction) return;
-    deleteLabExamination();
+  const handleDeleteLabExamination = async () => {
+    await deleteLabExamination();
     history.push('/app/data/laboratory-test');
-  }, [proceedToDeleteAction]);
+  };
 
   return (
     <>
@@ -147,7 +145,7 @@ const LaboratoryExaminationItem: React.FC<{
             Print Examination
           </Button>
           <Button
-            onClick={() => setDialogToggle(true)}
+            onClick={() => setDialogOpen(true)}
             fullWidth
             variant="contained"
             color="secondary"
@@ -157,13 +155,13 @@ const LaboratoryExaminationItem: React.FC<{
         </List>
       </Collapse>
       <AlertDialog
-        dialogText={`Delete #${laboratoryExaminations.id} test`}
-        state={{
-          dialogToggle,
-          setDialogToggle,
-          setProceedToAction: setProceedToDeleteAction
-        }}
-      />
+        title="Are you sure?"
+        open={dialogOpen}
+        handleClose={() => setDialogOpen(false)}
+        handleConfirm={handleDeleteLabExamination}
+      >
+        Delete {laboratoryExaminations.id}
+      </AlertDialog>
     </>
   );
 };

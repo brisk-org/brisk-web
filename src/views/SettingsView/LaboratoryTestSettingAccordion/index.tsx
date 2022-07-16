@@ -23,8 +23,6 @@ const LaboratoryTestSettingMainAccordion = () => {
   const [newCategoryField, setNewCategoryField] = useState<
     LaboratorySettingEnteryFields
   >({ name: '' });
-  // const [laboratoryTestCategories, setLaboratoryTestCategories] = useState<LaboraotryTestCategoriesQuery['laboratoryTestCategories']>(
-  //   );
   const { data, loading } = useLaboratoryTestCategoriesQuery({
     fetchPolicy: 'network-only'
   });

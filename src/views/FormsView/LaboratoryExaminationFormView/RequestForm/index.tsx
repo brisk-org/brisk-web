@@ -14,26 +14,17 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Page from '../../../../components/Page';
-// import {
-//   categories,
-//   testsPlaceHolder,
-//   PlaceholderTestType
-// } from '../../../../data/testsPlaceHolder';
 import SingleAccordion from './SingleAccordion';
 import {
   LaboratoryTestCategoriesQuery,
   useCreateLaboratoryExaminationMutation,
   useLaboratoryTestCategoriesQuery
 } from '../../../../generated/graphql';
-// import SnackbarSuccess from '../../../../components/AlertSnackbar';
 import { cardQuery } from '../../../../constants/queries';
-// import {
-//   LaboratoryTestCatagories,
-//   LaboratoryTestDetails
-// } from '../../../../data/testsSeed';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { SettingsContext } from '../../../../context/SettingContext';
+import { testsPlaceHolder } from '../../../../data/testsPlaceHolder';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -42,19 +33,20 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(3)
   }
 }));
-
-// export interface RequestCategories extends LaboratoryTestCatagories {
-//   selected: boolean;
-//   tests: RequestCategoryTest[];
-// }
 type LabTestCategory = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0];
+type LabTestSubCategory = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['subCategories'][0];
 type LabTest = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
+
+interface SubCategory extends LabTestSubCategory {
+  selected: boolean;
+}
 interface RequestLabTest extends LabTest {
   selected: boolean;
 }
 export interface RequestCategories extends LabTestCategory {
   selected: boolean;
   laboratoryTests: RequestLabTest[];
+  subCategories: SubCategory[];
 }
 
 const RequestLaboratoryTestFormView = () => {
@@ -69,15 +61,19 @@ const RequestLaboratoryTestFormView = () => {
     id: query.get('id'),
     cardName: query.get('name')
   });
-  // const [tests, setTests] = useState<PlaceholderTestType[]>();
   const { categories: categoriesContext } = useContext(SettingsContext);
 
   const categoriesInitialState = categoriesContext?.map(category => ({
     ...category,
     selected: false,
-    laboratoryTests: [
-      ...category.laboratoryTests.map(test => ({ ...test, selected: false }))
-    ]
+    subCategories: category.subCategories.map(test => ({
+      ...test,
+      selected: false
+    })),
+    laboratoryTests: category.laboratoryTests.map(test => ({
+      ...test,
+      selected: false
+    }))
   }));
 
   const [categories, setCategories] = useState<RequestCategories[] | undefined>(
@@ -159,35 +155,50 @@ const RequestLaboratoryTestFormView = () => {
 
       const selectedLaboratoryTestId = selectedCategories
         ?.map(category =>
-          category?.laboratoryTests
+          category!.laboratoryTests
             .filter(test => test.selected)
-            .map(test => test.id)
+            .map(test => ({ id: test.id || '' }))
         )
         .flat()
         .flat();
+      const selectedSubCategories = categories
+        ?.map(category =>
+          category.subCategories.filter(subCategory => subCategory.selected)
+        )
+        .flat();
+      selectedSubCategories?.forEach(subCategory => {
+        price += subCategory.price;
+      });
 
-      if (!selectedLaboratoryTestId) return;
+      const laboratoryTestsFromSubCategory = selectedSubCategories
+        ?.map(subCategory =>
+          subCategory.laboratoryTests
+            .map(test => ({ id: test.id || '' }))
+            .flat()
+        )
+        .flat();
+
+      if (!selectedLaboratoryTestId && !laboratoryTestsFromSubCategory) return;
       console.log('result', price, selectedLaboratoryTestId);
       const test = await createLaboratoryExamination({
         variables: {
           cardId: fromQuery.id,
           price,
           laboratoryTest: [
-            ...selectedLaboratoryTestId.map(id => ({
-              id: id || ''
-            }))
+            ...(selectedLaboratoryTestId ? selectedLaboratoryTestId : []),
+            ...(laboratoryTestsFromSubCategory
+              ? laboratoryTestsFromSubCategory
+              : [])
           ],
+          selectedSubCategories: selectedSubCategories?.map(
+            subCategory => subCategory?.id || ''
+          ),
           selectedCategories: selectedCategories
             ?.filter(category => category && category.trackInStock)
             .map(category => category?.id || '')
-
-          // result: JSON.stringify(selectedCategories)
         }
       });
       setSuccessSnackbarOpen(true);
-      // Object.values(categories).forEach(value => {
-      //   value = false;
-      // });
       console.log('test', test);
       history.push(
         cardQuery({
@@ -242,17 +253,7 @@ const RequestLaboratoryTestFormView = () => {
           <Grid container>
             {categories ? (
               categories.map((category, index) => (
-                <Grid
-                  key={index}
-                  item
-                  md={
-                    category.name === 'Clinical Chemistry' ||
-                    category.name === 'Hormone Test'
-                      ? 12
-                      : 6
-                  }
-                  xs={12}
-                >
+                <Grid key={index} item md={6} xs={12}>
                   <SingleAccordion
                     category={category}
                     setCategories={setCategories}
