@@ -21,12 +21,15 @@ const SettingsProvider: React.FC = ({ children }) => {
   >();
 
   const { data, loading } = useSettingQuery({
-    onError: err => console.error(err)
+    onError: err => console.error(err),
+    pollInterval: 30000
   });
   const {
     data: laboratoryCategoriesData,
     loading: laboraotryCategoryLoading
-  } = useLaboratoryTestCategoriesQuery();
+  } = useLaboratoryTestCategoriesQuery({
+    pollInterval: 30000
+  });
   useEffect(() => {
     if (!data) return;
     setCardPrice(data.setting.card_price);
