@@ -142,7 +142,7 @@ const LaboratoryTestsGraph: React.FC<Props> = ({
             }}
           />
         }
-        title="Todays Report"
+        title="Examinations Request Analysis"
       />
       <Divider />
       <CardContent>

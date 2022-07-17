@@ -68,10 +68,17 @@ const LaboratoryExaminationItem: React.FC<{
     content: () => componentToBePrinted.current,
     onAfterPrint: () => setOnPrint(false)
   });
+  useEffect(() => {
+    console.log(onPrint);
+  }, [onPrint]);
   const handlePrintFn = () => {
     setOnPrint(true);
-    print && print();
   };
+  useEffect(() => {
+    if (!onPrint) return;
+
+    print && print();
+  }, [onPrint]);
 
   const [
     deleteLabExamination,

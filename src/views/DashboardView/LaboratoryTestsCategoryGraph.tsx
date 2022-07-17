@@ -111,7 +111,7 @@ const LaboratoryTestsCategoryGraph = () => {
             }}
           />
         }
-        title="Todays Report"
+        title="Categories Request Analysis"
       />
       <Divider />
       <CardContent>

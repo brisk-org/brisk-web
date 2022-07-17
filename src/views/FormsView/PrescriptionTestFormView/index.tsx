@@ -87,7 +87,9 @@ const PrescriptionTestFormView = () => {
     drName: username
   });
   const [medications, setMedications] = useState<SelectablePrescription[]>();
-  const { data, loading } = useMedicinesQuery();
+  const { data, loading } = useMedicinesQuery({
+    pollInterval: 20000
+  });
 
   const [
     createPrescriptionTest,

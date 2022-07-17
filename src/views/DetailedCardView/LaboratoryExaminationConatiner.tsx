@@ -59,8 +59,6 @@ const LaboratoryExaminationConatiner: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  console.log(laboratoryExaminations, 'ksldjfskdj');
-
   return (
     <Card className={classes.root}>
       <CardHeader

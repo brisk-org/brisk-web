@@ -87,69 +87,74 @@ const CreateUserDialog: React.FC<{
     }));
   };
 
-  const handleSuccess = async () => {
+  const handleSuccess: React.FormEventHandler<HTMLFormElement> = async event => {
+    event.preventDefault();
     const res = await register();
     console.log(res);
     !res.data?.register.errors && handleClose();
   };
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Add a new User</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          To subscribe to this website, please enter your email address here. We
-          will send updates occasionally.
-        </DialogContentText>
-        {error && (
-          <Typography variant="body1" color="error">
-            {error}
-          </Typography>
-        )}
-        <TextField
-          autoFocus
-          fullWidth
-          label="Username"
-          margin="normal"
-          name="username"
-          onChange={handleChange}
-          value={user.username}
-          type="name"
-          required
-          variant="outlined"
-        />
-        <TextField
-          fullWidth
-          label="Password"
-          margin="normal"
-          name="password"
-          onChange={handleChange}
-          value={user.password}
-          type="password"
-          required
-          variant="outlined"
-        />
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Occupation</InputLabel>
-          <Select
-            label="Occupation"
-            name="occupation"
-            onChange={handleSelectChange}
-            value={user.occupation}
-            variant="outlined"
+      <form onSubmit={handleSuccess}>
+        <DialogTitle>Add a new User</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To subscribe to this website, please enter your email address here.
+            We will send updates occasionally.
+          </DialogContentText>
+          {error && (
+            <Typography variant="body1" color="error">
+              {error}
+            </Typography>
+          )}
+          <TextField
+            autoFocus
+            fullWidth
+            label="Username"
+            margin="normal"
+            name="username"
+            onChange={handleChange}
+            value={user.username}
+            type="name"
             required
-          >
-            {occupationOptions.map((option, index) => (
-              <MenuItem key={index} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSuccess}>Add</Button>
-      </DialogActions>
+            variant="outlined"
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            margin="normal"
+            name="password"
+            onChange={handleChange}
+            value={user.password}
+            type="password"
+            required
+            variant="outlined"
+          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Occupation</InputLabel>
+            <Select
+              label="Occupation"
+              name="occupation"
+              onChange={handleSelectChange}
+              value={user.occupation}
+              variant="outlined"
+              required
+            >
+              {occupationOptions.map((option, index) => (
+                <MenuItem key={index} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button type="submit" variant="outlined">
+            Add
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };

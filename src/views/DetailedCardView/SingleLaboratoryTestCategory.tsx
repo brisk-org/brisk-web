@@ -14,7 +14,7 @@ import clsx from 'clsx';
 import PrintHeader from '../../components/PrintHeader';
 import { SettingsContext } from '../../context/SettingContext';
 import { CategorySharp } from '@mui/icons-material';
-const useStyle = makeStyles(theme =>
+const useStyle = makeStyles(() =>
   createStyles({
     root: {
       display: 'grid',
@@ -49,7 +49,7 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
   onPrint
 }) => {
   const classes = useStyle();
-  console.log(onPrint);
+
   const { categories: categoriesContext } = useContext(SettingsContext);
   const [categories, setCategories] = useState<BasicCategory[] | undefined>(
     categoriesContext?.map(category => ({
@@ -82,7 +82,6 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
                   subCategory.name === laboratoryTest.subCategory?.name
               )
             ) {
-              console.log(laboratoryExamination.values, 'skdljfskd');
               return {
                 ...subCategory,
                 laboratoryTests: laboratoryExamination.laboratoryTests
@@ -116,9 +115,13 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
         )
     );
   }, []);
+  useEffect(() => {
+    console.log(onPrint);
+  }, [onPrint]);
 
   return (
     <div ref={componentToBePrinted}>
+      {console.log(onPrint, 'ksldjfksd')}
       <Box sx={{ width: '100%' }}>{onPrint && <PrintHeader />}</Box>
       <div className={clsx({ [classes.root]: onPrint })}>
         {categories?.map((category, index) => (

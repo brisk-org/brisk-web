@@ -131,9 +131,12 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({ medicine }) => {
             primary={medicine.name}
             secondary={
               <>
-                <Typography variant="caption">
-                  {medicine.inStock} in stock
+                <Typography sx={{ display: 'block' }} variant="caption">
+                  {medicine.price} etb
                 </Typography>
+                {/* <Typography variant="caption">
+                  {medicine.inStock} in stock
+                </Typography> */}
               </>
             }
           />
