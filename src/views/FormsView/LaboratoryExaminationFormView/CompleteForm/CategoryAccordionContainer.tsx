@@ -46,13 +46,16 @@ const AccordionContainer: React.FC<Props> = ({ category, setCategories }) => {
           <Typography>{category.name}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ borderRadius: 'none' }}>
-          {category.subCategories.map(subCategory => (
-            <SubCategoryAccordionContainer
-              subCategory={subCategory}
-              setCategories={setCategories}
-              categoryName={category.name}
-            />
-          ))}
+          {category.subCategories.some(
+            ({ laboratoryTests }) => laboratoryTests.length > 0
+          ) &&
+            category.subCategories.map(subCategory => (
+              <SubCategoryAccordionContainer
+                subCategory={subCategory}
+                setCategories={setCategories}
+                categoryName={category.name}
+              />
+            ))}
           <Grid container spacing={3}>
             {category.laboratoryTests.map(laboratoryTest => (
               <Grid item md={6} xs={12} sm={4} px={4}>

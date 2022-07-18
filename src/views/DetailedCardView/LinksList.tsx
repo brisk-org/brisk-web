@@ -59,6 +59,7 @@ const LinksList: React.FC<LinksListProps> = ({ card }) => {
             </Button>
           </Link>
           <Button
+            className={classes.btn}
             fullWidth
             variant="contained"
             color="secondary"

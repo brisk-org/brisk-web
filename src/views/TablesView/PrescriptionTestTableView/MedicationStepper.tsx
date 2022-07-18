@@ -75,6 +75,7 @@ const MedicationStepper: React.FC<Props> = ({
   }, [activeStep]);
 
   const handleStepperClick = (index: number, statusIndex: number) => {
+    console.log(medicationsCheckIn.checkIn[index].status[statusIndex].isPaid, 'yooo');
     if (!medicationsCheckIn.checkIn[index].status[statusIndex].isPaid) return;
     if (lastCheckIn && lastCheckIn[index].status[statusIndex].isCompleted)
       return;

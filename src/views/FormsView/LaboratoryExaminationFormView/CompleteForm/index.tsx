@@ -116,7 +116,13 @@ const CompleteLaboratoryExaminationFormView = () => {
       }))
     );
     setCategories(prevLabCategories =>
-      prevLabCategories?.filter(category => category.laboratoryTests.length > 0)
+      prevLabCategories?.filter(
+        category =>
+          category.laboratoryTests.length > 0 ||
+          category.subCategories.some(
+            ({ laboratoryTests }) => laboratoryTests.length > 0
+          )
+      )
     );
     console.log(data, categories, 'hereee');
   }, [data, loading]);

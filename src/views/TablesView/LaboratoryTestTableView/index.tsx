@@ -99,13 +99,6 @@ const LaboratoryExaminationTableView = () => {
   return (
     <Page className={classes.root} title="Laboratory Examination">
       <Container ref={firstRender} maxWidth={false}>
-        <Box display="flex" justifyContent="flex-end">
-          <Link to="card/add">
-            <Button color="primary" variant="contained">
-              Add patients
-            </Button>
-          </Link>
-        </Box>
         <Toolbar
           loading={searchedLaboratoryExaminationsLoading}
           searchState={{ terms, setTerms }}

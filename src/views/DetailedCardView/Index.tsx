@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Backdrop, CircularProgress, Container, Grid } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import Page from '../../components/Page';
@@ -6,7 +6,7 @@ import SimpleCardInfo from './SimpleCardInfo';
 import HistoryContainer from './HistoryContainer';
 import LaboratoryExaminationConatiner from './LaboratoryExaminationConatiner';
 import { useLocation } from 'react-router-dom';
-import { useCardQuery } from '../../generated/graphql';
+import { CardQuery, useCardQuery } from '../../generated/graphql';
 import PrescriptionContainer from './PrescriptionContainer';
 
 const useStyles = makeStyles(theme => ({
@@ -21,18 +21,22 @@ const DetailedCardView = () => {
   const classes = useStyles();
   const query = new URLSearchParams(useLocation().search);
   const id = query.get('id');
+  const [card, setCard] = useState<CardQuery['card']>();
 
   const { data, loading } = useCardQuery({
     variables: {
       id: id || ''
     },
     fetchPolicy: 'no-cache',
-    pollInterval: 10000,
+    // pollInterval: 10000,
     onError: err => {
       console.log(err);
     }
   });
-  useEffect(() => console.log(data), [data]);
+  useEffect(() => {
+    if (!data) return;
+    setCard(data.card);
+  }, [data]);
 
   return (
     <Page title="Customers">
@@ -42,26 +46,26 @@ const DetailedCardView = () => {
             <CircularProgress color="inherit" />
           </Backdrop>
         )}
-        {data && (
+        {card && (
           <Grid container spacing={3}>
             <Grid item md={4} sm={12} style={{ height: 'auto' }}>
-              <SimpleCardInfo data={data} />
-              {data.card.laboratoryExaminations &&
-                data.card.laboratoryExaminations[0] && (
+              {card && <SimpleCardInfo card={card} />}
+              {card.laboratoryExaminations &&
+                card.laboratoryExaminations[0] && (
                   <LaboratoryExaminationConatiner
-                    cardName={data.card.name}
-                    laboratoryExaminations={data.card.laboratoryExaminations}
+                    cardName={card.name}
+                    laboratoryExaminations={card.laboratoryExaminations}
                   />
                 )}
             </Grid>
             <Grid item md={8} sm={12}>
-              {data.card.history && data.card.history[0] && (
-                <HistoryContainer history={data.card.history} />
+              {card.history && card.history[0] && (
+                <HistoryContainer history={card.history} />
               )}
-              {data.card.prescriptions && data.card.prescriptions[0] && (
+              {card.prescriptions && card.prescriptions[0] && (
                 <PrescriptionContainer
-                  cardName={data.card.name}
-                  prescriptions={data.card.prescriptions}
+                  cardName={card.name}
+                  prescriptions={card.prescriptions}
                 />
               )}
             </Grid>

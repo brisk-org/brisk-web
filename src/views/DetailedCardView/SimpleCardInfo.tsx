@@ -18,10 +18,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface SimpleCardInfoProps {
-  data: CardQuery;
+  card: NonNullable<CardQuery['card']>;
 }
 
-const SimpleCardInfo: React.FC<SimpleCardInfoProps> = ({ data: { card } }) => {
+const SimpleCardInfo: React.FC<SimpleCardInfoProps> = ({card}) => {
   const classes = useStyles();
 
   return (

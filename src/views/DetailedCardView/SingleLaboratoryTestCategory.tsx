@@ -114,14 +114,9 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
             category.subCategories.length > 0
         )
     );
-  }, []);
-  useEffect(() => {
-    console.log(onPrint);
-  }, [onPrint]);
-
+  }, [laboratoryExamination]);
   return (
     <div ref={componentToBePrinted}>
-      {console.log(onPrint, 'ksldjfksd')}
       <Box sx={{ width: '100%' }}>{onPrint && <PrintHeader />}</Box>
       <div className={clsx({ [classes.root]: onPrint })}>
         {categories?.map((category, index) => (
