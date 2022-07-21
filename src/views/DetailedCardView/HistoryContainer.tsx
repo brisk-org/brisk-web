@@ -17,7 +17,7 @@ import { useHistory } from 'react-router-dom';
 import { DeleteOutline, EditOutlined, GraphicEq } from '@mui/icons-material';
 
 import { CardQuery, useDeleteHistoryMutation } from '../../generated/graphql';
-import VSHistory from './VSHistory';
+import VitalHistory from './VitalHIstory';
 import GeneralDetails from './GeneralDetails';
 import OrganHistory from './OrganHistory';
 import DetailedHistory from './DetailedHistory';
@@ -144,7 +144,7 @@ const HistoryContainer: React.FC<HistoryContainerProps> = ({ history }) => {
       />
       <CardContent>
         <Grid className={classes.grid} container spacing={3}>
-          <VSHistory data={vsHistoryProps} />
+          <VitalHistory data={vsHistoryProps} />
         </Grid>
         <Divider />
         <Grid className={classes.grid} container spacing={3}>

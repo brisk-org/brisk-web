@@ -67,8 +67,9 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({ medicine }) => {
   });
 
   useEffect(() => {
+    console.log(medicine);
     setMedicineEdit(medicine);
-  }, [medicine]);
+  }, [medicine, openSettingDialog]);
 
   const handleDeleteMedicine = async () => {
     await deleteMedicine({ variables: { id: medicine.id } })
@@ -134,9 +135,9 @@ const SinglePrescriptionRate: React.FC<SingleRateProps> = ({ medicine }) => {
                 <Typography sx={{ display: 'block' }} variant="caption">
                   {medicine.price} etb
                 </Typography>
-                {/* <Typography variant="caption">
+                <Typography variant="caption">
                   {medicine.inStock} in stock
-                </Typography> */}
+                </Typography>
               </>
             }
           />

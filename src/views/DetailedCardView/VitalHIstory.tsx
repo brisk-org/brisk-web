@@ -19,10 +19,13 @@ const VSHistory: React.FC<VSHistoryProps> = ({
     <>
       <Grid item md={3} sm={6} xs={12}>
         <Typography variant="body2" color="textSecondary">
-          BP
+          BP <Typography variant="caption">(MMHG)</Typography>
         </Typography>
         <Typography variant="h4" color="primary">
-          {bp}
+          {bp?.replace('MMHG', ' ')}
+          <Typography variant="h4" color="primary">
+            {/* (MMHG) */}
+          </Typography>
         </Typography>
       </Grid>
       <Grid item md={3} sm={6} xs={12}>

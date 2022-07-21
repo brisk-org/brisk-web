@@ -8,7 +8,7 @@ import {
   Chip,
   Button
 } from '@mui/material';
-import { format, isBefore, isToday, sub } from 'date-fns';
+import { add, format, isBefore, isToday, sub } from 'date-fns';
 import {
   ArrowForward as ArrowForwardIcon,
   ArrowBack as ArrowBackIcon,
@@ -75,7 +75,10 @@ const MedicationStepper: React.FC<Props> = ({
   }, [activeStep]);
 
   const handleStepperClick = (index: number, statusIndex: number) => {
-    console.log(medicationsCheckIn.checkIn[index].status[statusIndex].isPaid, 'yooo');
+    console.log(
+      medicationsCheckIn.checkIn[index].status[statusIndex].isPaid,
+      'yooo'
+    );
     if (!medicationsCheckIn.checkIn[index].status[statusIndex].isPaid) return;
     if (lastCheckIn && lastCheckIn[index].status[statusIndex].isCompleted)
       return;
@@ -259,7 +262,7 @@ const MedicationStepper: React.FC<Props> = ({
                 <Box textAlign="center">
                   {isBefore(
                     new Date(checkIn.date),
-                    sub(new Date(), { days: -2 })
+                    sub(new Date(), { days: 1 })
                   ) &&
                     !checkIn.status[0].isCompleted && (
                       <Typography variant="caption">(Missed)</Typography>

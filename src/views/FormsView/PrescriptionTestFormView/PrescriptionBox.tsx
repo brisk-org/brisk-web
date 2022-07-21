@@ -23,15 +23,20 @@ const PrescriptionBox: React.FC<Props> = ({
   medication,
   setMedications: setMedicine
 }) => {
-  const [error, setError] = useState('');
-  const [medicationEdit, setMedicationEdit] = useState<
-    AddMedicineMutationVariables
-  >({
+  const initialMedicationState = {
     ...medication,
     name: medication.medicine.name,
     price: medication.medicine.price,
+    strength: medication.strength || '',
     inStock: medication.medicine.inStock
-  });
+  };
+  const [error, setError] = useState('');
+  const [medicationEdit, setMedicationEdit] = useState<
+    AddMedicineMutationVariables
+  >(initialMedicationState);
+  useEffect(() => {
+    setMedicationEdit(initialMedicationState);
+  }, [medication]);
   useEffect(() => {
     if (!medicationEdit.forDays) return;
     if (medicationEdit.perDay === PerDay['Stat']) {
@@ -46,7 +51,7 @@ const PrescriptionBox: React.FC<Props> = ({
       }
     }
     setError('');
-  }, [medicationEdit]);
+  }, [medicationEdit, medication.medicine.inStock]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const handleClick = () => {
     if (!medication.selected) {
@@ -78,7 +83,7 @@ const PrescriptionBox: React.FC<Props> = ({
               inStock: medicationEdit.inStock
             },
             forDays: medicationEdit.forDays!,
-            strength: medicationEdit.strength!,
+            strength: medicationEdit.strength || '',
             perDay: medicationEdit.perDay!,
             selected: true
           };
@@ -115,7 +120,7 @@ const PrescriptionBox: React.FC<Props> = ({
       <PrescriptionSettingDialog
         error={error}
         open={dialogOpen}
-        title="Prescription Info"
+        title={medication.medicine.name}
         type="request"
         buttonText="Request"
         onClose={() => setDialogOpen(false)}

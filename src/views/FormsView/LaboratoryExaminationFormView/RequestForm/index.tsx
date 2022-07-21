@@ -14,7 +14,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Page from '../../../../components/Page';
-import SingleAccordion from './SingleAccordion';
+import SingleAccordion from './AccordionContaienr';
 import {
   LaboratoryTestCategoriesQuery,
   useCreateLaboratoryExaminationMutation,
@@ -37,10 +37,10 @@ type LabTestCategory = LaboratoryTestCategoriesQuery['laboratoryTestCategories']
 type LabTestSubCategory = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['subCategories'][0];
 type LabTest = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
 
-interface SubCategory extends LabTestSubCategory {
+export interface SubCategory extends LabTestSubCategory {
   selected: boolean;
 }
-interface RequestLabTest extends LabTest {
+export interface RequestLabTest extends LabTest {
   selected: boolean;
 }
 export interface RequestCategories extends LabTestCategory {

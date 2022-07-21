@@ -7,11 +7,14 @@ import {
   AccordionDetails,
   Checkbox,
   FormControlLabel,
-  Typography
+  Typography,
+  Popover
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { ExpandMore } from '@mui/icons-material';
 import { RequestCategories } from '.';
+import LaboratoryTestGridItem from './LaboratoryTestGridItem';
+import SubCategoryAccordionContainer from './SubCategoryAccordionContainer';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -37,10 +40,12 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
   const classes = useStyles();
 
   const [categoryChecked, setCategoryChecked] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const outOfStock = category.trackInStock && !category.inStock;
 
   const handleCategoryClick:
     | ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void)
-    | undefined = (event, checked) => {
+    | undefined = (_, checked) => {
     setCategoryChecked(!categoryChecked);
 
     setCategories(prevCategories =>
@@ -99,7 +104,12 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
       )
     );
   };
-
+  const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <Accordion disabled={!validId} className={classes.root}>
       <AccordionSummary
@@ -111,6 +121,8 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
           aria-label="Header"
           onClick={event => event.stopPropagation()}
           onFocus={event => event.stopPropagation()}
+          onMouseEnter={handlePopoverOpen}
+          onMouseLeave={handlePopoverClose}
           control={
             <Checkbox
               checked={categoryChecked}
@@ -121,7 +133,8 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
                 !validId ||
                 !category.laboratoryTests.some(
                   test => test.isInfluencedByCategory
-                )
+                ) ||
+                outOfStock
               }
             />
           }
@@ -129,61 +142,41 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
         />
       </AccordionSummary>
       <AccordionDetails className={classes.root}>
-        {category.subCategories.map((subCategory, index) => (
-          <Accordion
-            sx={{ boxShadow: 'none', border: '1px solid lightgray' }}
-            disabled={!validId}
-            className={classes.root}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
-              <FormControlLabel
-                aria-label="Header"
-                onClick={event => event.stopPropagation()}
-                onFocus={event => event.stopPropagation()}
-                control={
-                  <Checkbox
-                    checked={subCategory.selected}
-                    onChange={handleSubCategoryClick}
-                    name={subCategory.name}
-                    color="primary"
-                  />
-                }
-                label={subCategory.name}
-              />
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container>
-                {subCategory.laboratoryTests.map(test => (
-                  <Grid key={index} item md={6} xs={12} sm={4}>
-                    <Typography>{test.name}</Typography>
-                  </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
+        {category.subCategories.map(subCategory => (
+          <SubCategoryAccordionContainer
+            key={subCategory.id}
+            subCategory={subCategory}
+            handleClick={handleSubCategoryClick}
+          />
         ))}
         <Grid container spacing={3}>
-          {category.laboratoryTests.map((test, index) => (
-            <Grid key={index} item md={6} xs={12} sm={4}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    disabled={!test.hasPrice}
-                    checked={test.selected}
-                    onChange={handleTestChange}
-                    name={test.name}
-                    color="primary"
-                  />
-                }
-                label={test.name}
-              />
-            </Grid>
+          {category.laboratoryTests.map(laboratoryTest => (
+            <LaboratoryTestGridItem
+              key={laboratoryTest.id}
+              laboratoryTest={laboratoryTest}
+              handleClick={handleTestChange}
+            />
           ))}
         </Grid>
+        <Popover
+          sx={{
+            pointerEvents: 'none'
+          }}
+          open={Boolean(anchorEl) && outOfStock}
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left'
+          }}
+          onClose={handlePopoverClose}
+          disableRestoreFocus
+        >
+          <Typography sx={{ px: 2, py: 1 }}>Out of Stock!</Typography>
+        </Popover>
       </AccordionDetails>
     </Accordion>
   );

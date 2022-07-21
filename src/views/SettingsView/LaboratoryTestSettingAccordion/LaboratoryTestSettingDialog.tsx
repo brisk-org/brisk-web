@@ -96,6 +96,7 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
           onSubmit={e => {
             e.preventDefault();
             setSubmit(true);
+            handleClose();
           }}
         >
           <DialogTitle>
@@ -206,12 +207,7 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
             <Button onClick={handleClose} color="primary">
               Cancel
             </Button>
-            <Button
-              type="submit"
-              color="primary"
-              autoFocus
-              // onClick={() => setSubmit(true)}
-            >
+            <Button type="submit" color="primary" autoFocus>
               Continue
             </Button>
           </DialogActions>

@@ -127,17 +127,14 @@ const PrescriptionSettingDialog: React.FC<Props> = ({
                 options={perDayOption}
               />
               <Box sx={{ mt: 2 }}></Box>
-              {typeof medicine.strength === 'string' && (
-                <TextField
-                  required={type === 'request'}
-                  name="strength"
-                  value={medicine.strength}
-                  label="Strength"
-                  onChange={handleChange}
-                  margin="dense"
-                  variant="standard"
-                />
-              )}
+              <TextField
+                name="strength"
+                value={medicine.strength}
+                label="Strength"
+                onChange={handleChange}
+                margin="dense"
+                variant="standard"
+              />
               {type === 'request' && (
                 <TextareaAutosize
                   style={{
