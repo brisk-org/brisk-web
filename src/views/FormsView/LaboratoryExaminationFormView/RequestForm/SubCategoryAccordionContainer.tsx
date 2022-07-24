@@ -57,11 +57,13 @@ const SubCategoryAccordionContainer: React.FC<Props> = ({
       </AccordionSummary>
       <AccordionDetails>
         <Grid container>
-          {subCategory.laboratoryTests.map((laboratoryTest, index) => (
-            <Grid key={index} item md={6} xs={12} sm={4}>
-              <Typography>{laboratoryTest.name}</Typography>
-            </Grid>
-          ))}
+          {[...subCategory.laboratoryTests]
+            .sort((a, b) => parseInt(a.id) - parseInt(b.id))
+            .map((laboratoryTest, index) => (
+              <Grid key={index} item md={6} xs={12} sm={4}>
+                <Typography>{laboratoryTest.name}</Typography>
+              </Grid>
+            ))}
         </Grid>
         <Popover
           sx={{

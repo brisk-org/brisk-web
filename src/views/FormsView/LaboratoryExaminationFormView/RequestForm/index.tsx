@@ -14,7 +14,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Page from '../../../../components/Page';
-import SingleAccordion from './AccordionContaienr';
+import AccordionContainer from './AccordionContaienr';
 import {
   LaboratoryTestCategoriesQuery,
   useCreateLaboratoryExaminationMutation,
@@ -115,13 +115,7 @@ const RequestLaboratoryTestFormView = () => {
           if (!selectedTests[0]) {
             return;
           }
-          if (category.selected && !category.price) {
-            setFaitalError(true);
-            enqueueSnackbar(`${category.name} must have a price`, {
-              variant: 'error'
-            });
-            return;
-          }
+
           if (category.selected) {
             price += category.price!;
           }
@@ -254,7 +248,7 @@ const RequestLaboratoryTestFormView = () => {
             {categories ? (
               categories.map((category, index) => (
                 <Grid key={index} item md={6} xs={12}>
-                  <SingleAccordion
+                  <AccordionContainer
                     category={category}
                     setCategories={setCategories}
                     validId={!!fromQuery.id}

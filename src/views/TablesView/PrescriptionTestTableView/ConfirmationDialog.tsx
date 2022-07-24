@@ -47,6 +47,8 @@ const useStyles = makeStyles(theme => ({
 // export type CheckInPrice = { name: string; };
 export type PrescriptionCheckIns = {
   name: string;
+  strength: string;
+  other: string;
   perDay: PerDay;
   completed: number;
   paid: number;
@@ -79,6 +81,8 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     setMedicationsCheckIn(
       prescription.medications?.map(medication => ({
         name: medication.medicine.name,
+        strength: medication.strength || '',
+        other: medication.other || '',
         remaining: medication.checkIn.reduce(
           (prevPrice, medication) =>
             !medication.status.some(status => status.isPaid)
@@ -234,6 +238,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
                 />
               );
             })}
+          {occupation === Occupation['Nurse'] && (
+            <Typography>{prescription.rx}</Typography>
+          )}
         </DialogContent>
         <DialogActions>
           {occupation === Occupation['Nurse'] && (

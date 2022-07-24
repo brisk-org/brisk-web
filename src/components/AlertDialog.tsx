@@ -29,10 +29,23 @@ const AlertDialog: React.FC<Props> = ({
         <DialogContentText>{children}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
+        <Button
+          onClick={e => {
+            e.stopPropagation();
+            handleClose();
+          }}
+          color="primary"
+        >
           Cancel
         </Button>
-        <Button onClick={handleConfirm} color="primary" autoFocus>
+        <Button
+          onClick={e => {
+            e.stopPropagation();
+            handleConfirm();
+          }}
+          color="primary"
+          autoFocus
+        >
           Confirm
         </Button>
       </DialogActions>

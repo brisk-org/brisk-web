@@ -32,7 +32,7 @@ interface SingleAccordionProps {
   >;
 }
 
-const SingleAccordion: React.FC<SingleAccordionProps> = ({
+const AccordionContainer: React.FC<SingleAccordionProps> = ({
   category,
   setCategories,
   validId
@@ -150,13 +150,15 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
           />
         ))}
         <Grid container spacing={3}>
-          {category.laboratoryTests.map(laboratoryTest => (
-            <LaboratoryTestGridItem
-              key={laboratoryTest.id}
-              laboratoryTest={laboratoryTest}
-              handleClick={handleTestChange}
-            />
-          ))}
+          {[...category.laboratoryTests]
+            .sort((a, b) => parseInt(a.id) - parseInt(b.id))
+            .map(laboratoryTest => (
+              <LaboratoryTestGridItem
+                key={laboratoryTest.id}
+                laboratoryTest={laboratoryTest}
+                handleClick={handleTestChange}
+              />
+            ))}
         </Grid>
         <Popover
           sx={{
@@ -182,4 +184,4 @@ const SingleAccordion: React.FC<SingleAccordionProps> = ({
   );
 };
 
-export default SingleAccordion;
+export default AccordionContainer;

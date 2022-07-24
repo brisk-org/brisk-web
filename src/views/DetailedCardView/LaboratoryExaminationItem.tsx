@@ -48,10 +48,13 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const LaboratoryExaminationItem: React.FC<{
+  cardName: string;
+  cardAge: string;
+  cardGender: string;
   laboratoryExaminations: NonNullable<
     CardQuery['card']['laboratoryExaminations']
   >[0];
-}> = ({ laboratoryExaminations }) => {
+}> = ({ laboratoryExaminations, cardName, cardAge, cardGender }) => {
   const classes = useStyles();
   const itemDom = useRef<HTMLDivElement>(null);
 
@@ -137,6 +140,9 @@ const LaboratoryExaminationItem: React.FC<{
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List className={classes.sticky} subheader={<li />}>
           <SingleLaboratoryExaminationCategory
+            cardName={cardName}
+            cardAge={cardAge}
+            cardGender={cardGender}
             componentToBePrinted={componentToBePrinted}
             laboratoryExamination={laboratoryExaminations}
             onPrint={onPrint}

@@ -54,6 +54,8 @@ const DetailedCardView = () => {
                 card.laboratoryExaminations[0] && (
                   <LaboratoryExaminationConatiner
                     cardName={card.name}
+                    cardAge={card.age}
+                    cardGender={card.gender}
                     laboratoryExaminations={card.laboratoryExaminations}
                   />
                 )}

@@ -18,7 +18,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import { PrescriptionCheckIns } from './ConfirmationDialog';
 import clsx from 'clsx';
-import { CheckIn, PerDay } from '../../../generated/graphql';
+import { CheckIn, Occupation, PerDay } from '../../../generated/graphql';
 import { AuthContext } from '../../../context/AuthContext';
 
 const useStyles = makeStyles(theme => ({
@@ -42,6 +42,8 @@ const PriceStepper: React.FC<Props> = ({
   setPrescriptionsCheckIn
 }) => {
   const classes = useStyles();
+
+  const { occupation } = useContext(AuthContext);
 
   const [activeStep, setActiveStep] = useState(
     medicationsCheckIn.checkIn.findIndex(checkIn => !checkIn.status[0].isPaid)
@@ -209,18 +211,20 @@ const PriceStepper: React.FC<Props> = ({
             }
             ) remaining: ({medicationsCheckIn.remaining})
           </Typography>
-          <Typography variant="caption" component="p">
-            Paid Today: {medicationsCheckIn.paidToday}
-          </Typography>
+          {occupation === Occupation['Reception'] && (
+            <Typography variant="caption" component="p">
+              Paid Today: {medicationsCheckIn.paidToday}
+            </Typography>
+          )}
         </Typography>
-        <div>
+        {/* <div>
           <IconButton onClick={handleBack} color="secondary">
             <ArrowBackIcon fontSize="small" />
           </IconButton>
           <IconButton onClick={handleNext} color="primary">
             <ArrowForwardIcon fontSize="small" />
           </IconButton>
-        </div>
+        </div> */}
       </Box>
       <Stepper
         sx={{

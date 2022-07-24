@@ -49,12 +49,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface Props {
   cardName: string;
+  cardAge: string;
+  cardGender: string;
   laboratoryExaminations: NonNullable<
     CardQuery['card']['laboratoryExaminations']
   >;
 }
 const LaboratoryExaminationConatiner: React.FC<Props> = ({
   cardName,
+  cardAge,
+  cardGender,
   laboratoryExaminations
 }) => {
   const classes = useStyles();
@@ -74,6 +78,9 @@ const LaboratoryExaminationConatiner: React.FC<Props> = ({
             .map((laboratoryExamination, index) => (
               <LaboratoryExaminationItem
                 key={index}
+                cardName={cardName}
+                cardAge={cardAge}
+                cardGender={cardGender}
                 laboratoryExaminations={laboratoryExamination}
               />
             ))}

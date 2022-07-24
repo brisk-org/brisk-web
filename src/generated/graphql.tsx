@@ -273,6 +273,7 @@ export type Mutation = {
   markLaboratoryExaminationAsSeen: LaboratoryExamination;
   createLaboratoryTest: LaboratoryTest;
   updateLaboratoryTest: LaboratoryTest;
+  moveLaboratoryTest: LaboratoryTest;
   deleteLaboratoryTest: Scalars['Boolean'];
   createLaboratoryTestCategory: LaboratoryTestCategory;
   updateLaboratoryTestCategory: LaboratoryTestCategory;
@@ -389,6 +390,13 @@ export type MutationCreateLaboratoryTestArgs = {
 export type MutationUpdateLaboratoryTestArgs = {
   content: LaboratoryTestContentInput;
   id: Scalars['ID'];
+};
+
+
+export type MutationMoveLaboratoryTestArgs = {
+  id: Scalars['ID'];
+  categoryId?: Maybe<Scalars['ID']>;
+  subCategoryId?: Maybe<Scalars['ID']>;
 };
 
 
@@ -1056,6 +1064,28 @@ export type DeleteLaboratoryTestMutationVariables = Exact<{
 export type DeleteLaboratoryTestMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteLaboratoryTest'>
+);
+
+export type MoveLaboratoryTestMutationVariables = Exact<{
+  id: Scalars['ID'];
+  categoryId?: Maybe<Scalars['ID']>;
+  subCategoryId?: Maybe<Scalars['ID']>;
+}>;
+
+
+export type MoveLaboratoryTestMutation = (
+  { __typename?: 'Mutation' }
+  & { moveLaboratoryTest: (
+    { __typename?: 'LaboratoryTest' }
+    & Pick<LaboratoryTest, 'id'>
+    & { subCategory?: Maybe<(
+      { __typename?: 'LaboratoryTestSubCategory' }
+      & Pick<LaboratoryTestSubCategory, 'id' | 'name'>
+    )>, category?: Maybe<(
+      { __typename?: 'LaboratoryTest' }
+      & Pick<LaboratoryTest, 'id' | 'name'>
+    )> }
+  ) }
 );
 
 export type UpdateLaboratoryTestMutationVariables = Exact<{
@@ -2900,6 +2930,53 @@ export function useDeleteLaboratoryTestMutation(baseOptions?: Apollo.MutationHoo
 export type DeleteLaboratoryTestMutationHookResult = ReturnType<typeof useDeleteLaboratoryTestMutation>;
 export type DeleteLaboratoryTestMutationResult = Apollo.MutationResult<DeleteLaboratoryTestMutation>;
 export type DeleteLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<DeleteLaboratoryTestMutation, DeleteLaboratoryTestMutationVariables>;
+export const MoveLaboratoryTestDocument = gql`
+    mutation MoveLaboratoryTest($id: ID!, $categoryId: ID, $subCategoryId: ID) {
+  moveLaboratoryTest(
+    id: $id
+    categoryId: $categoryId
+    subCategoryId: $subCategoryId
+  ) {
+    id
+    subCategory {
+      id
+      name
+    }
+    category {
+      id
+      name
+    }
+  }
+}
+    `;
+export type MoveLaboratoryTestMutationFn = Apollo.MutationFunction<MoveLaboratoryTestMutation, MoveLaboratoryTestMutationVariables>;
+
+/**
+ * __useMoveLaboratoryTestMutation__
+ *
+ * To run a mutation, you first call `useMoveLaboratoryTestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMoveLaboratoryTestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [moveLaboratoryTestMutation, { data, loading, error }] = useMoveLaboratoryTestMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      categoryId: // value for 'categoryId'
+ *      subCategoryId: // value for 'subCategoryId'
+ *   },
+ * });
+ */
+export function useMoveLaboratoryTestMutation(baseOptions?: Apollo.MutationHookOptions<MoveLaboratoryTestMutation, MoveLaboratoryTestMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MoveLaboratoryTestMutation, MoveLaboratoryTestMutationVariables>(MoveLaboratoryTestDocument, options);
+      }
+export type MoveLaboratoryTestMutationHookResult = ReturnType<typeof useMoveLaboratoryTestMutation>;
+export type MoveLaboratoryTestMutationResult = Apollo.MutationResult<MoveLaboratoryTestMutation>;
+export type MoveLaboratoryTestMutationOptions = Apollo.BaseMutationOptions<MoveLaboratoryTestMutation, MoveLaboratoryTestMutationVariables>;
 export const UpdateLaboratoryTestDocument = gql`
     mutation UpdateLaboratoryTest($id: ID!, $content: LaboratoryTestContentInput!) {
   updateLaboratoryTest(id: $id, content: $content) {

@@ -207,7 +207,7 @@ const MedicationStepper: React.FC<Props> = ({
         }}
       >
         <Typography variant="body2">
-          {medicationsCheckIn.name}{' '}
+          {medicationsCheckIn.name}({medicationsCheckIn.strength})
           <Typography variant="caption">
             {/* ({prescriptionCheckIn.checkIn[0].perDay}) */}
           </Typography>
@@ -333,6 +333,9 @@ const MedicationStepper: React.FC<Props> = ({
             ))}
           </Stepper>
         </>
+      )}
+      {medicationsCheckIn.other && (
+        <Typography>Other: {medicationsCheckIn.other}</Typography>
       )}
     </Box>
   );

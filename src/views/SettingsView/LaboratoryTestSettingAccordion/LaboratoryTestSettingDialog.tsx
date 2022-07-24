@@ -136,19 +136,23 @@ const LaboratorylaboratoryTestSettingDialog: React.FC<Props> = ({
                 aria-labelledby="nested-list-subheader"
                 subheader={
                   <ListSubheader component="div" id="nested-list-subheader">
-                    Examinations
+                    Tests
                   </ListSubheader>
                 }
               >
-                {category.laboratoryTests.map(laboratoryTest => (
-                  <LaboraotryTestSetting
-                    submit={submit}
-                    categoryTracksStock={category.trackInStock}
-                    laboratoryTest={laboratoryTest}
-                    isExpanded={expandedLaboratoryTest === laboratoryTest.name}
-                    setExpandedLaboratoryTest={setExpandedLaboratoryTest}
-                  />
-                ))}
+                {[...category.laboratoryTests]
+                  .sort((a, b) => parseInt(a.id) - parseInt(b.id))
+                  .map(laboratoryTest => (
+                    <LaboraotryTestSetting
+                      submit={submit}
+                      categoryTracksStock={category.trackInStock}
+                      laboratoryTest={laboratoryTest}
+                      isExpanded={
+                        expandedLaboratoryTest === laboratoryTest.name
+                      }
+                      setExpandedLaboratoryTest={setExpandedLaboratoryTest}
+                    />
+                  ))}
               </List>
             )}
             <Button

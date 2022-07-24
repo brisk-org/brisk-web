@@ -13,6 +13,9 @@ import {
 } from '../../../generated/graphql';
 import PrescriptionSettingDialog from '../../SettingsView/MedicineAccordion/MedicineSettingDialog';
 
+interface MedicationEdit extends AddMedicineMutationVariables {
+  other?: string;
+}
 interface Props {
   medication: SelectablePrescription;
   setMedications: React.Dispatch<
@@ -27,13 +30,14 @@ const PrescriptionBox: React.FC<Props> = ({
     ...medication,
     name: medication.medicine.name,
     price: medication.medicine.price,
+    other: '',
     strength: medication.strength || '',
     inStock: medication.medicine.inStock
   };
   const [error, setError] = useState('');
-  const [medicationEdit, setMedicationEdit] = useState<
-    AddMedicineMutationVariables
-  >(initialMedicationState);
+  const [medicationEdit, setMedicationEdit] = useState<MedicationEdit>(
+    initialMedicationState
+  );
   useEffect(() => {
     setMedicationEdit(initialMedicationState);
   }, [medication]);
@@ -72,8 +76,8 @@ const PrescriptionBox: React.FC<Props> = ({
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     if (error) return;
     event.preventDefault();
-    setMedicine(prevPrescriptions => {
-      return prevPrescriptions!.map(prevPrescription => {
+    setMedicine(prevPrescriptions =>
+      prevPrescriptions!.map(prevPrescription => {
         if (medication.medicine.id === prevPrescription.medicine.id) {
           return {
             medicine: {
@@ -83,15 +87,15 @@ const PrescriptionBox: React.FC<Props> = ({
               inStock: medicationEdit.inStock
             },
             forDays: medicationEdit.forDays!,
+            other: medicationEdit.other,
             strength: medicationEdit.strength || '',
             perDay: medicationEdit.perDay!,
             selected: true
           };
         }
         return { ...prevPrescription };
-      });
-    });
-    console.log(medication);
+      })
+    );
     onClose();
   };
   return (

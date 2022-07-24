@@ -9,7 +9,9 @@ import {
   TextField,
   IconButton,
   Button,
-  Typography
+  Typography,
+  Menu,
+  MenuItem
 } from '@mui/material';
 import {
   LaboratoryTestCategoriesDocument,
@@ -20,7 +22,13 @@ import {
 } from '../../../generated/graphql';
 
 import LaboraotryTestSetting from './LaboraotryTestSetting';
-import { Add, Delete, ExpandLess, ExpandMore } from '@mui/icons-material';
+import {
+  Add,
+  Delete,
+  ExpandLess,
+  ExpandMore,
+  MoreVert
+} from '@mui/icons-material';
 import CreateNewLaboraotryTestDialog from './CreateNewLaboraotryTestDialog';
 import AlertDialog from '../../../components/AlertDialog';
 
@@ -70,6 +78,9 @@ const LaboratoryTestSubCategorySetting: React.FC<Props> = ({
   const handleDelete = async () => {
     await deleteSubCategory();
   };
+  const handleCloseMoreVent = () => {
+    // setOpenMoreVent(false);
+  };
   useEffect(() => {
     if (!submit) return;
 
@@ -103,14 +114,7 @@ const LaboratoryTestSubCategorySetting: React.FC<Props> = ({
             </Typography>
           }
         />
-        <IconButton
-          onClick={e => {
-            e.stopPropagation();
-            setDeleteDialogOpen(true);
-          }}
-        >
-          <Delete fontSize="small" />
-        </IconButton>
+
         {isExpanded ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       {!isExpanded && <Divider />}

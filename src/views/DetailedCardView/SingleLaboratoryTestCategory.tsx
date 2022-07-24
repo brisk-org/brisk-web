@@ -5,7 +5,8 @@ import {
   ListItem,
   ListItemText,
   Box,
-  Divider
+  Divider,
+  Typography
 } from '@mui/material';
 
 import { CardQuery } from '../../generated/graphql';
@@ -23,6 +24,9 @@ const useStyle = makeStyles(() =>
   })
 );
 interface Props {
+  cardName: string;
+  cardAge: string;
+  cardGender: string;
   laboratoryExamination: NonNullable<
     CardQuery['card']['laboratoryExaminations']
   >[0];
@@ -44,6 +48,9 @@ type BasicCategory = {
   subCategories: BasicSubCategory[];
 };
 const SingleLaboratoryTestCategory: React.FC<Props> = ({
+  cardAge,
+  cardName,
+  cardGender,
   laboratoryExamination,
   componentToBePrinted,
   onPrint
@@ -75,29 +82,31 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
       prevCategories
         ?.map(category => ({
           name: category.name,
-          subCategories: category.subCategories.map(subCategory => {
-            if (
-              laboratoryExamination.laboratoryTests.find(
-                laboratoryTest =>
-                  subCategory.name === laboratoryTest.subCategory?.name
-              )
-            ) {
-              return {
-                ...subCategory,
-                laboratoryTests: laboratoryExamination.laboratoryTests
-                  .filter(test => test.subCategory?.name === subCategory.name)
-                  .map(test => ({
-                    name: test.name,
-                    normalValue: test.normalValue,
-                    value:
-                      laboratoryExamination.values?.find(
-                        ({ id }) => test.id === id
-                      )?.value || ''
-                  }))
-              };
-            }
-            return { ...subCategory };
-          }),
+          subCategories: category.subCategories
+            .map(subCategory => {
+              if (
+                laboratoryExamination.laboratoryTests.find(
+                  laboratoryTest =>
+                    subCategory.name === laboratoryTest.subCategory?.name
+                )
+              ) {
+                return {
+                  ...subCategory,
+                  laboratoryTests: laboratoryExamination.laboratoryTests
+                    .filter(test => test.subCategory?.name === subCategory.name)
+                    .map(test => ({
+                      name: test.name,
+                      normalValue: test.normalValue,
+                      value:
+                        laboratoryExamination.values?.find(
+                          ({ id }) => test.id === id
+                        )?.value || ''
+                    }))
+                };
+              }
+              return undefined as any;
+            })
+            .filter(subCategory => subCategory),
           laboratoryTests: laboratoryExamination.laboratoryTests
             .filter(test => test.category?.name === category.name)
             .map(test => ({
@@ -117,7 +126,19 @@ const SingleLaboratoryTestCategory: React.FC<Props> = ({
   }, [laboratoryExamination]);
   return (
     <div ref={componentToBePrinted}>
-      <Box sx={{ width: '100%' }}>{onPrint && <PrintHeader />}</Box>
+      {onPrint && (
+        <>
+          <Box sx={{ width: '100%' }}>
+            <PrintHeader />
+          </Box>
+          <Box sx={{ width: '100%', mx: 2, mt: 3 }}>
+            <Typography>Patient Name: {cardName}</Typography>
+            <Typography>Patient Age: {cardAge}</Typography>
+            <Typography>Patient Gender: {cardGender}</Typography>
+          </Box>
+        </>
+      )}
+
       <div className={clsx({ [classes.root]: onPrint })}>
         {categories?.map((category, index) => (
           <List key={index}>

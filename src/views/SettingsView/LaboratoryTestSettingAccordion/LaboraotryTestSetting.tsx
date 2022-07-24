@@ -8,7 +8,11 @@ import {
   Collapse,
   List,
   Button,
-  Typography
+  Typography,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Select
 } from '@mui/material';
 import CommonValuesCollapse from './CommonValuesCollapse';
 import {
@@ -21,12 +25,16 @@ import {
 import {
   Delete,
   Delete as DeleteIcon,
+  DeleteOutline,
+  DirectionsOutlined,
   ExpandLess,
-  ExpandMore
+  ExpandMore,
+  MoreVert
 } from '@mui/icons-material';
 import LaboraotryTestSettingContent from './LaboraotryTestSettingItems';
 import { Box } from '@mui/material';
 import AlertDialog from '../../../components/AlertDialog';
+import LaboratoryTestVentMenu from './LaboratoryTestVentMenu';
 
 interface Props {
   isInSubCategory?: boolean;
@@ -58,27 +66,20 @@ const LaboraotryTestSetting: React.FC<Props> = ({
     LaboratoryTestContentInput
   >(initialState);
   const [newCommonValue, setNewCommonValue] = useState('');
-  const [moreOptionsMenuOpen, setMoreOptionsMenuOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [moreVentAnchorEl, setMoreVentAnchorEl] = useState<HTMLElement | null>(
+    null
+  );
 
   const [updateLaboratoryTest, { loading }] = useUpdateLaboratoryTestMutation({
     refetchQueries: [{ query: LaboratoryTestCategoriesDocument }]
   });
-  const [deleteLaboraotryTest] = useDeleteLaboratoryTestMutation({
-    variables: {
-      id: oldLaboraotryTest.id
-    },
-    refetchQueries: [{ query: LaboratoryTestCategoriesDocument }]
-  });
-
   useEffect(() => {
     setLaboraotryTest(initialState);
   }, [oldLaboraotryTest]);
-
-  const handleDelete = async () => {
-    await deleteLaboraotryTest();
-    setDeleteDialogOpen(false);
+  const handleCloseMoreVent = () => {
+    setMoreVentAnchorEl(null);
   };
+
   useEffect(() => {
     (async function() {
       if (!submit) return;
@@ -121,14 +122,20 @@ const LaboraotryTestSetting: React.FC<Props> = ({
             </>
           }
         />
+        <LaboratoryTestVentMenu
+          laboratoryTestId={oldLaboraotryTest.id}
+          anchorEl={moreVentAnchorEl}
+          handleClose={handleCloseMoreVent}
+        />
         <IconButton
           onClick={e => {
             e.stopPropagation();
-            setDeleteDialogOpen(true);
+            setMoreVentAnchorEl(e.currentTarget);
           }}
         >
-          <Delete fontSize="small" />
+          <MoreVert fontSize="small" />
         </IconButton>
+
         {isExpanded ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       {isExpanded && <Divider />}
@@ -144,10 +151,7 @@ const LaboraotryTestSetting: React.FC<Props> = ({
         <CommonValuesCollapse
           commonValue={newCommonValue}
           setCommonValue={setNewCommonValue}
-          onSubmit={() => {
-            // set
-            // setNewCommonValue('');
-          }}
+          onSubmit={() => {}}
         >
           {laboratoryTest.commonValues &&
             laboratoryTest.commonValues.map((commonValue, index) => (
@@ -179,14 +183,6 @@ const LaboraotryTestSetting: React.FC<Props> = ({
         </CommonValuesCollapse>
         <Divider />
       </Collapse>
-      <AlertDialog
-        title="Are you sure?"
-        open={deleteDialogOpen}
-        handleClose={() => setDeleteDialogOpen(false)}
-        handleConfirm={handleDelete}
-      >
-        Delete {laboratoryTest.name}
-      </AlertDialog>
     </>
   );
 };

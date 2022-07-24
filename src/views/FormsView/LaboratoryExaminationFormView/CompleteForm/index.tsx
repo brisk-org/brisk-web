@@ -27,7 +27,7 @@ import {
 } from '../../../../generated/graphql';
 import { ExpandMore } from '@mui/icons-material';
 import { SettingsContext } from '../../../../context/SettingContext';
-import AccordionContainer from './CategoryAccordionContainer';
+import AccordionContainer from './AccordionContainer';
 // import { LaboratoryExaminationCatagories } from '../../../../data/testsSeed';
 
 type OriginalLaboratoryTest = LaboratoryTestCategoriesQuery['laboratoryTestCategories'][0]['laboratoryTests'][0];
@@ -222,8 +222,9 @@ const CompleteLaboratoryExaminationFormView = () => {
           </Card>
           <Grid container>
             {categories &&
-              categories.map((category, index) => (
+              categories.map(category => (
                 <AccordionContainer
+                  key={category.id}
                   category={category}
                   setCategories={setCategories}
                 />

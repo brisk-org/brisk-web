@@ -1,0 +1,17 @@
+mutation MoveLaboratoryTest($id: ID!, $categoryId: ID, $subCategoryId: ID) {
+  moveLaboratoryTest(
+    id: $id
+    categoryId: $categoryId
+    subCategoryId: $subCategoryId
+  ) {
+    id
+    subCategory {
+      id
+      name
+    }
+    category {
+      id
+      name
+    }
+  }
+}
