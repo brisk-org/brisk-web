@@ -98,10 +98,7 @@ const CreateUserDialog: React.FC<{
       <form onSubmit={handleSuccess}>
         <DialogTitle>Add a new User</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
-          </DialogContentText>
+          <DialogContentText>This fields can't be edited</DialogContentText>
           {error && (
             <Typography variant="body1" color="error">
               {error}

@@ -8,10 +8,10 @@
   "parserOptions": {
     "ecmaVersion": 2020
   },
-  // "plugins": ["react"],
+  "plugins": ["import"],
   "rules": {
     "no-console": "off",
-    "no-eval": "error"
-    // "import/first": "error"
+    "no-eval": "error",
+    "import/first": "warn"
   }
 }
