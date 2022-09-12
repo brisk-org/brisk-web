@@ -4,14 +4,17 @@
     "es6": true,
     "node": true
   },
-  // "extends": "react-app",
+  "extends": [
+    "airbnb-typescript/base",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended"
+  ],
   "parserOptions": {
     "ecmaVersion": 2020
   },
-  "plugins": ["import"],
   "rules": {
-    "no-console": "off",
+    "no-console": "warn",
     "no-eval": "error",
-    "import/first": "warn"
+    "import/first": "error"
   }
 }

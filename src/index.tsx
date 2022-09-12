@@ -49,6 +49,7 @@ const httpLink = new HttpLink({
 export const wsClient = new SubscriptionClient(wsUri, {
   reconnect: true
 });
+console.log('ksdjf');
 
 const wsLink = new WebSocketLink(wsClient);
 const splitLink = split(
