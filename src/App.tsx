@@ -18,8 +18,8 @@ const App = () => {
   globalStyles();
   const location = useLocation();
 
-  let urlLength = location.pathname.split('/').length;
-  const ref = useRef<Number>(location.pathname.split('/').length);
+  const urlLength = location.pathname.split('/').length;
+  const ref = useRef<number>(location.pathname.split('/').length);
   const notistackRef = useRef<SnackbarProvider>(null);
 
   useEffect(() => {

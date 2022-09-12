@@ -9,9 +9,13 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:import/recommended"
   ],
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2020
+    "ecmaVersion": 12,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
+  "plugins": ["@typescript-eslint"],
   "rules": {
     "no-console": "warn",
     "no-eval": "error",
