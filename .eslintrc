@@ -17,8 +17,20 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"],
+    "@typescript-eslint/comma-dangle": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "import/named": "off",
     "no-console": "warn",
     "no-eval": "error",
     "import/first": "error"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".ts", ".tsx"]
+      }
+    }
   }
 }

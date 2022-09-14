@@ -14,7 +14,7 @@ import { format } from 'date-fns';
 import { AuthContext } from '../../../context/AuthContext';
 import { BallTriangle, useLoading } from '@agney/react-loading';
 import clsx from 'clsx';
-import { useHistory } from 'react-router';
+import { useHistory } from 'react-router-dom';
 import { quickPrescribeQuery } from '../../../constants/queries';
 import ConfirmationDialog from './ConfirmationDialog';
 import CompletedQuickPrescriptionTestListDialog from './CompletedQuickPrescriptionTestListDialog';
@@ -69,9 +69,9 @@ const SingleQuickPrescriptionTestRow: React.FC<{
 
   const history = useHistory();
   const { occupation } = useContext(AuthContext);
-  const [
-    markQuickPerscriptionAsSeen
-  ] = useMarkQuickPrescriptionAsSeenMutation();
+  // const [
+  //   markQuickPerscriptionAsSeen
+  // ] = useMarkQuickPrescriptionAsSeenMutation();
 
   const handleClick = async () => {
     // const { bp, dressing, injection, depo, tat } = JSON.parse(
@@ -79,7 +79,9 @@ const SingleQuickPrescriptionTestRow: React.FC<{
     // ) as any;
     switch (occupation) {
       case Occupation.Reception:
-        !prescription.paid && setPaymentDialogOpen(true);
+        if (!prescription.paid) {
+          setPaymentDialogOpen(true);
+        }
         break;
       case Occupation.Doctor:
         // prescription.new &&
@@ -89,13 +91,12 @@ const SingleQuickPrescriptionTestRow: React.FC<{
         setCompletedListDialogOpen(true);
         break;
       case Occupation.Nurse:
-        prescription.completed
-          ? setCompletedListDialogOpen(true)
-          : history.push(
-              quickPrescribeQuery({
-                id: prescription.id
-              })
-            );
+        if (prescription.completed) setCompletedListDialogOpen(true);
+        history.push(
+          quickPrescribeQuery({
+            id: prescription.id
+          })
+        );
     }
   };
 
