@@ -22,25 +22,25 @@ declare module '@mui/styles/defaultTheme' {
 }
 
 const host =
-  process.env.NODE_ENV === 'production'
+  process.env.NODE_ENV !== 'production'
     ? 'brisk-server.onrender.com/'
     : `${window.location.hostname}:4000`;
 
-// const uri =
-//   process.env.NODE_ENV === 'production'
-//     ? `https://${host}/graphql`
-//     : `http://${host}/graphql`;
+const uri =
+  process.env.NODE_ENV === 'production'
+    ? `https://${host}/graphql`
+    : `http://${host}/graphql`;
 
-// const wsUri =
-//   process.env.NODE_ENV === 'production'
-//     ? `wss://${host}/subscriptions`
-//     : `ws://${host}/subscriptions`;
+const wsUri =
+  process.env.NODE_ENV === 'production'
+    ? `wss://${host}/subscriptions`
+    : `ws://${host}/subscriptions`;
 
 // const host = `${window.location.hostname}:4000`;
 
-const uri = `http://${host}/graphql`;
+// const uri = `http://${host}/graphql`;
 
-const wsUri = `ws://${host}/subscriptions`;
+// const wsUri = `ws://${host}/subscriptions`;
 
 const httpLink = new HttpLink({
   uri,
