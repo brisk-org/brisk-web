@@ -21,10 +21,10 @@ declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
-// const host =
-//   process.env.NODE_ENV === 'production'
-//     ? 'briskserver.herokuapp.com'
-//     : `${window.location.hostname}:4000`;
+const host =
+  process.env.NODE_ENV === 'production'
+    ? 'brisk-server.onrender.com/'
+    : `${window.location.hostname}:4000`;
 
 // const uri =
 //   process.env.NODE_ENV === 'production'
@@ -36,7 +36,7 @@ declare module '@mui/styles/defaultTheme' {
 //     ? `wss://${host}/subscriptions`
 //     : `ws://${host}/subscriptions`;
 
-const host = `${window.location.hostname}:4000`;
+// const host = `${window.location.hostname}:4000`;
 
 const uri = `http://${host}/graphql`;
 
