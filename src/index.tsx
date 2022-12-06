@@ -23,7 +23,7 @@ declare module '@mui/styles/defaultTheme' {
 
 const host =
   process.env.NODE_ENV === 'production'
-    ? 'brisk-server.onrender.com/'
+    ? 'brisk-server.onrender.com'
     : `${window.location.hostname}:4000`;
 
 const uri =
