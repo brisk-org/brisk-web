@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, ReactChildren } from 'react';
 import { Helmet } from 'react-helmet';
 import makeStyles from '@mui/styles/makeStyles';
 
@@ -9,9 +9,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+// eslint-disable-next-line react/display-name
 const Page: React.FC<any> = forwardRef(
   (
-    { children, title = '' },
+    { children, title = '' }: any,
     ref: React.LegacyRef<HTMLDivElement> | undefined
   ) => {
     const classes = useStyles();

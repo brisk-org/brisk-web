@@ -5,13 +5,13 @@
     "node": true
   },
   "extends": ["plugin:react/recommended"],
-  // "parser": "@typescript-eslint/parser",
-  "plugins": ["react"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["react", "import"],
   "rules": {
-    "no-use-before-define": "off",
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
-    "@typescript-eslint/no-use-before-define": ["error"],
+    "react/jsx-key": "warn",
+    "react/no-unescaped-entities": "warn",
     "@typescript-eslint/comma-dangle": "off",
     "@typescript-eslint/no-empty-interface": "off",
     "import/named": "off",
@@ -27,3 +27,4 @@
     }
   }
 }
+//
