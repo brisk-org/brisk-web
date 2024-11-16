@@ -16,23 +16,25 @@ import {
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { createClient } from 'graphql-ws';
 
 declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
 }
 
 const host =
-  process.env.NODE_ENV === 'production'
+  import.meta.env.NODE_ENV === 'production'
     ? 'brisk-server.onrender.com'
-    : `${window.location.hostname}:4000`;
+    : `localhost:4000`;
 
 const uri =
-  process.env.NODE_ENV === 'production'
+  import.meta.env.NODE_ENV === 'production'
     ? `https://${host}/graphql`
     : `http://${host}/graphql`;
 
 const wsUri =
-  process.env.NODE_ENV === 'production'
+  import.meta.env.NODE_ENV === 'production'
     ? `wss://${host}/subscriptions`
     : `ws://${host}/subscriptions`;
 
@@ -46,12 +48,17 @@ const httpLink = new HttpLink({
   uri,
   credentials: 'same-origin'
 });
-export const wsClient = new SubscriptionClient(wsUri, {
-  reconnect: true
-});
+// export const wsClient = new SubscriptionClient(wsUri, {
+//   reconnect: true
+// });
 console.log('ksdjf');
 
-const wsLink = new WebSocketLink(wsClient);
+// const wsLink = new WebSocketLink(wsClient);
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: 'ws://localhost:4000/subscriptions'
+  })
+);
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
@@ -63,8 +70,6 @@ const splitLink = split(
   wsLink,
   httpLink
 );
-console.log(process.env, process.env.NODE_ENV, process.env.SERVER_URL);
-
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: splitLink

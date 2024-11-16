@@ -94,10 +94,10 @@ const AuthProvider: React.FC = ({ children }) => {
         }
       });
       // eslint-disable-next-line no-restricted-globals
-      location.pathname === '/' && history.push(redirectLink(occupation));
+      // location.pathname === '/' && history.push(redirectLink(occupation));
       return;
     }
-    history.push('/login');
+    // history.push('/login');
   }, []);
 
   const register = function(data: RegisterMutation) {

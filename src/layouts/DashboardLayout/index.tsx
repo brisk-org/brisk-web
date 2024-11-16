@@ -57,13 +57,9 @@ const DashboardLayout: React.FC = () => {
                   routeOccupation => routeOccupation === occupation
                 );
                 return (
-                  occupationMatches && (
-                    <Route
-                      exact
-                      path={route.path}
-                      component={route.component}
-                    />
-                  )
+                  // occupationMatches && (
+                  <Route exact path={route.path} component={route.component} />
+                  // )
                 );
               })}
             </Switch>

@@ -14,6 +14,7 @@ export type Scalars = {
   Float: number;
 };
 
+
 export type Card = {
   __typename?: 'Card';
   id: Scalars['ID'];
