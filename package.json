@@ -65,7 +65,7 @@
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview",
+    "preview": "vite preview",
     "service": "node serveHandler/serve.js",
     "test": "vitest",
     "test:coverage": "vitest run --coverage --watch=false",
